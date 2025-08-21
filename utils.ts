@@ -14,6 +14,10 @@ export class Point2 {
     return Math.hypot(this.x, this.y);
   }
 
+  clone() {
+    return new Point2(this.x, this.y);
+  }
+
   addI(p: Point2) {
     this.x += p.x;
     this.y += p.y;
@@ -32,8 +36,16 @@ export class Point2 {
     return this;
   }
 
+  add(p: Point2) {
+    return this.clone().addI(p);
+  }
+
+  sub(p: Point2) {
+    return this.clone().subI(p);
+  }
+
   multiplyScalar(n: number): Point2 {
-    return new Point2(this.x * n, this.y * n);
+    return this.clone().multiplyScalarI(n);
   }
 
   dot(p: Point2): number {
@@ -74,6 +86,20 @@ export default class Math2D {
    * L = P0 + t * direction */
   static linePointAt(p0: Point2, t: number, dir: Point2) {
     return new Point2(p0.x + t * dir.x, p0.y + t * dir.y);
+  }
+
+  /* Find point on line defined parametrically by
+   * L = P0 + t * direction */
+  static linePoint(p0: Point2, t: number, dir: number | "V" | "H") {
+    if (dir === "V") {
+      return new Point2(p0.x + t, p0.y);
+    }
+
+    if (dir === "H") {
+      return new Point2(p0.x, p0.y + t);
+    }
+
+    return new Point2(p0.x + t, p0.y + t * dir);
   }
 
   static lerp2(min: Point2, max: Point2, t: number): Point2 {
