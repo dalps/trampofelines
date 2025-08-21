@@ -5,29 +5,47 @@ export function lerp(min: number, max: number, t: number) {
 export class Point2 {
   constructor(public x: number, public y: number) {}
 
+  set(x: number, y: number) {
+    this.x = x;
+    this.y = y;
+  }
+
   l2(): number {
     return Math.hypot(this.x, this.y);
   }
 
-  add(p: Point2): void {
+  addI(p: Point2) {
     this.x += p.x;
     this.y += p.y;
+    return this;
   }
 
-  sub(p: Point2): void {
+  subI(p: Point2) {
     this.x -= p.x;
     this.y -= p.y;
+    return this;
   }
 
-  multiplyScalar(n: number) {
+  multiplyScalarI(n: number) {
     this.x *= n;
     this.y *= n;
+    return this;
+  }
+
+  multiplyScalar(n: number): Point2 {
+    return new Point2(this.x * n, this.y * n);
   }
 
   dot(p: Point2): number {
     return this.x * p.x + this.y * p.y;
   }
+
+  toString() {
+    return `(${this.x},${this.y})`;
+  }
 }
+
+export const Vec2 = Point2;
 
 export default class Math2D {
   static add(sum: Point2, addend1: Point2, addend2: Point2) {
@@ -48,13 +66,17 @@ export default class Math2D {
     return a.x * b.x + a.y * b.y;
   }
 
+  static multiplyScalar(p: Point2, n: number): Point2 {
+    return new Point2(p.x * n, p.y * n);
+  }
+
   /* Find point on line defined parametrically by
    * L = P0 + t * direction */
   static linePointAt(p0: Point2, t: number, dir: Point2) {
     return new Point2(p0.x + t * dir.x, p0.y + t * dir.y);
   }
 
-  static lerp(min: Point2, max: Point2, t: number): Point2 {
+  static lerp2(min: Point2, max: Point2, t: number): Point2 {
     return new Point2(lerp(min.x, max.x, t), lerp(min.y, max.y, t));
   }
 }
