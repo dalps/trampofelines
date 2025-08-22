@@ -14,6 +14,13 @@ export class Point2 {
     return Math.hypot(this.x, this.y);
   }
 
+  normalize(): Point2 {
+    const l2 = this.l2();
+    this.x /= l2;
+    this.y /= l2;
+    return this;
+  }
+
   clone() {
     return new Point2(this.x, this.y);
   }
