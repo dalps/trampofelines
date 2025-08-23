@@ -65,7 +65,7 @@ export class Repulsion extends Force {
 export class DynamicBody {
   public velocity: Point2;
   private _forces: Force[] = [];
-  private _tmp = new Point2(0, 0);
+  private _aux = new Point2(0, 0);
   private _locks = { x: false, y: false };
 
   constructor(public position: Point2, public mass = 1, public friction = 0) {
@@ -86,17 +86,17 @@ export class DynamicBody {
   }
 
   public get totalForce() {
-    this._tmp.set(0, 0);
+    this._aux.set(0, 0);
     this._forces.forEach((f) =>
-      this._tmp.addI(f.direction.multiplyScalar(f.magnitude))
+      this._aux.addI(f.direction.multiplyScalar(f.magnitude))
     );
-    return this._tmp;
+    return this._aux;
   }
 
   public get acceleration(): Point2 {
     return this.totalForce
       .multiplyScalarI(1 / this.mass)
-      .subI(this.velocity.multiplyScalar(this.friction)); // incredibly unstable
+      .subI(this.velocity.multiplyScalar(this.friction));
   }
 
   toggleX() {
@@ -139,6 +139,15 @@ export class DynamicBody {
       this.position.add(this.totalForce.multiplyScalar(1)),
       "pink"
     );
+
+    // popsicle(ctx, this.position, this.position.add(this.velocity), "magenta");
+
+    // popsicle(
+    //   ctx,
+    //   this.position,
+    //   this.position.add(this.acceleration),
+    //   "hotpink"
+    // );
   }
 
   toString() {
