@@ -66,6 +66,7 @@ export class DynamicBody {
   public velocity: Point2;
   private _forces: Force[] = [];
   private _tmp = new Point2(0, 0);
+  private _locks = { x: false, y: false };
 
   constructor(public position: Point2, public mass = 1, public friction = 0) {
     this.velocity = new Point2(0, 0);
@@ -94,16 +95,30 @@ export class DynamicBody {
 
   public get acceleration(): Point2 {
     return this.totalForce
-      .multiplyScalar(1 / this.mass)
-      .sub(this.velocity.multiplyScalar(this.friction));
+      .multiplyScalarI(1 / this.mass)
+      .subI(this.velocity.multiplyScalar(this.friction)); // incredibly unstable
+  }
+
+  toggleX() {
+    this._locks.x = !this._locks.x;
+  }
+
+  toggleY() {
+    this._locks.y = !this._locks.y;
   }
 
   update(dt: number) {
-    this.velocity.addI(this.acceleration.multiplyScalar(dt));
+    if (!this._locks.x) {
+      this.velocity.x += this.acceleration.x * dt;
+      this.position.x +=
+        this.velocity.x * dt + this.acceleration.x * dt * dt * 0.5;
+    }
 
-    this.position
-      .addI(this.velocity.multiplyScalar(dt))
-      .addI(this.acceleration.multiplyScalar(dt * dt * 0.5));
+    if (!this._locks.y) {
+      this.velocity.y += this.acceleration.y * dt;
+      this.position.y +=
+        this.velocity.y * dt + this.acceleration.y * dt * dt * 0.5;
+    }
   }
 
   drawForces(ctx: CanvasRenderingContext2D) {
