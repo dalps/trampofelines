@@ -54,7 +54,7 @@ export class Repulsion extends Force {
   }
 
   override get magnitude(): number {
-    return this.strength / this.from.sub(this.to).l2();
+    return this.strength - this.from.sub(this.to).l2();
   }
 
   override get direction(): Point2 {
