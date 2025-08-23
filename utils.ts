@@ -2,6 +2,15 @@ export function lerp(min: number, max: number, t: number) {
   return min + (max - min) * t;
 }
 
+export function damp(
+  current: number,
+  target: number,
+  lambda: number,
+  dt: number
+) {
+  return lerp(current, target, 1 - Math.exp(-lambda * dt));
+}
+
 export class Point2 {
   constructor(public x: number, public y: number) {}
 

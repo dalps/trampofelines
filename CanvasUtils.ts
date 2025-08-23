@@ -48,17 +48,21 @@ export function popsicle(
   ctx.arc(from.x, from.y, 2, 0, Math.PI * 2);
   ctx.fill();
   ctx.closePath();
-  
+
   ctx.beginPath();
   ctx.moveTo(from.x, from.y);
   ctx.lineTo(to.x, to.y);
   ctx.stroke();
   ctx.closePath();
-  
+
   ctx.beginPath();
   ctx.arc(to.x, to.y, arrowSize, 0, Math.PI * 2);
   ctx.fill();
   ctx.closePath();
+}
+
+export function circle(ctx: CanvasRenderingContext2D, p: Point2, r: number) {
+  ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
 }
 
 export function drawGrid(
