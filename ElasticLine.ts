@@ -3,7 +3,13 @@ import Math2D, { Point2 } from "./utils";
 
 class Joint extends DynamicBody {
   public neighbors: Joint[] = [];
-  constructor(position: Point2, mass = 0.1, damping = 1) {
+  constructor(
+    position: Point2,
+    mass = 0.1,
+    damping = 1,
+    public attraction = 100,
+    public repulsion = 50
+  ) {
     super(position, mass, damping);
   }
 
@@ -11,13 +17,11 @@ class Joint extends DynamicBody {
     this.neighbors.push(t);
     t.neighbors.push(this);
 
-    const attraction = 100;
-    const repulsion = 0;
-    this.addForce(new Attraction(this.position, t.position, attraction));
-    t.addForce(new Attraction(t.position, this.position, attraction));
+    this.addForce(new Attraction(this.position, t.position, this.attraction));
+    t.addForce(new Attraction(t.position, this.position, this.attraction));
 
-    this.addForce(new Repulsion(this.position, t.position, repulsion));
-    t.addForce(new Repulsion(t.position, this.position, repulsion));
+    this.addForce(new Repulsion(this.position, t.position, this.repulsion));
+    t.addForce(new Repulsion(t.position, this.position, this.repulsion));
   }
 
   update(dt: number): void {
@@ -29,16 +33,33 @@ class Joint extends DynamicBody {
 export class ElasticLine {
   public joints: Joint[] = [];
 
-  constructor(start: Point2, end: Point2, nJoints: number) {
+  constructor(
+    start: Point2,
+    end: Point2,
+    nJoints: number,
+    toggleX = false,
+    toggleY = false,
+    public mass = 0.1,
+    public damping = 1,
+    public jointsAttraction = 100,
+    public jointsRepulsion = 30
+  ) {
     let prevJoint: Joint | undefined = undefined;
 
     for (let i = 0; i < nJoints; i++) {
-      const joint = new Joint(Math2D.lerp2(start, end, i / (nJoints - 1)));
+      const joint = new Joint(
+        Math2D.lerp2(start, end, i / (nJoints - 1)),
+        mass,
+        damping,
+        jointsAttraction,
+        jointsRepulsion
+      );
 
       prevJoint && joint.addNeighbor(prevJoint);
       this.joints.push(joint);
 
-      // joint.toggleX();
+      toggleX && joint.toggleX();
+      toggleY && joint.toggleY();
 
       prevJoint = joint;
     }
@@ -48,31 +69,26 @@ export class ElasticLine {
     this.joints.at(-1)?.clearForces();
   }
 
-  draw(ctx: CanvasRenderingContext2D, cw: number, ch: number) {
+  draw(ctx: CanvasRenderingContext2D, { color = "black", lineWidth = 1 } = {}) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = lineWidth;
+
     ctx.beginPath();
     ctx.moveTo(this.joints[0].position.x, this.joints[0].position.y);
-
-    ctx.fillStyle = "blue";
-    ctx.strokeStyle = "black";
-    ctx.lineWidth = 1;
-
-    this.joints.forEach((a) => {
-      ctx.lineTo(a.position.x, a.position.y);
+    this.joints.forEach((j) => {
+      ctx.lineTo(j.position.x, j.position.y);
     });
-
-    ctx.lineTo(cw - 10, ch - 10);
-    ctx.lineTo(10, ch - 10);
-    ctx.lineTo(this.joints[0].position.x, this.joints[0].position.y);
-    ctx.fill();
     ctx.stroke();
-    ctx.closePath();
   }
 
-  drawJoints(ctx: CanvasRenderingContext2D, color = "yellow") {
-    ctx.fillStyle = color;
-    this.joints.forEach((a) => {
+  drawJoints(
+    ctx: CanvasRenderingContext2D,
+    colors = ["yellow", "magenta", "cyan"]
+  ) {
+    this.joints.forEach((j, i) => {
+      ctx.fillStyle = colors[i % colors.length];
       ctx.beginPath();
-      ctx.arc(a.position.x, a.position.y, 3, 0, Math.PI * 2);
+      ctx.arc(j.position.x, j.position.y, 3, 0, Math.PI * 2);
       ctx.closePath();
 
       ctx.fill();

@@ -137,7 +137,7 @@ export class DynamicBody {
       ctx,
       this.position,
       this.position.add(this.totalForce.multiplyScalar(1)),
-      "pink"
+      "hotpink"
     );
 
     // popsicle(ctx, this.position, this.position.add(this.velocity), "magenta");
