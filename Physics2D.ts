@@ -40,7 +40,7 @@ export class Attraction extends Force {
   }
 
   override get magnitude(): number {
-    return this.strength * this.to.sub(this.from).l2();
+    return this.strength + this.to.sub(this.from).l2();
   }
 
   override get direction(): Point2 {
@@ -67,7 +67,7 @@ export class DynamicBody {
   private _forces: Force[] = [];
   private _tmp = new Point2(0, 0);
 
-  constructor(public position: Point2, public mass = 1) {
+  constructor(public position: Point2, public mass = 1, public friction = 0) {
     this.velocity = new Point2(0, 0);
   }
 
@@ -93,12 +93,17 @@ export class DynamicBody {
   }
 
   public get acceleration(): Point2 {
-    return this.totalForce.multiplyScalar(1 / this.mass);
+    return this.totalForce
+      .multiplyScalar(1 / this.mass)
+      .sub(this.velocity.multiplyScalar(this.friction));
   }
 
   update(dt: number) {
     this.velocity.addI(this.acceleration.multiplyScalar(dt));
-    this.position.addI(this.velocity.multiplyScalar(dt));
+
+    this.position
+      .addI(this.velocity.multiplyScalar(dt))
+      .addI(this.acceleration.multiplyScalar(dt * dt * 0.5));
   }
 
   drawForces(ctx: CanvasRenderingContext2D) {
