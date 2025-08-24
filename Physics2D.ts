@@ -99,12 +99,31 @@ export class CollisionManager {
 
       const c1 = b1.collider!;
       const c2 = b2.collider!;
-      if (b1.collider!.checkContact(b2.collider!)) {
-        const direction = c1.center.sub(c2.center);
-        b1.addForce(new Force(direction, 10));
-        b2.addForce(new Force(direction.multiplyScalar(-1), 10));
+      if (c1.checkContact(c2)) {
+        console.log(
+          `Collided! New velocities: ${this.collide(b1, b2)} ${this.collide(
+            b2,
+            b1
+          )}`
+        );
+        b1.velocity = this.collide(b1, b2);
+        b2.velocity = this.collide(b2, b1);
       }
     });
+  }
+
+  static collide(body: DynamicBody, against: DynamicBody) {
+    const c1 = body.collider!;
+    const c2 = against.collider!;
+    const sep = c1.center.sub(c2.center);
+
+    return body.velocity.sub(
+      sep.multiplyScalar(
+        (((2 * against.mass) / (body.mass + against.mass)) *
+          body.velocity.sub(against.velocity).dot(sep)) /
+          Math.pow(sep.l2(), 2)
+      )
+    );
   }
 }
 
@@ -119,10 +138,7 @@ export class CircleCollider extends Collider {
 
   checkContact(c2: CircleCollider): boolean {
     const distance = this.center.sub(c2.center).l2();
-    const colliding = distance <= this.radius * 2;
-
-    // console.log(`${distance}, ${colliding}`);
-    return this.center.sub(c2.center).l2() <= this.radius * 2;
+    return distance <= this.radius * 2;
   }
 }
 
@@ -151,8 +167,8 @@ export class DynamicBody {
     this._forces = [];
   }
 
-  createCollider() {
-    this.collider = new CircleCollider(this.position, 10);
+  createCollider(radius: number) {
+    this.collider = new CircleCollider(this.position, radius);
   }
 
   public get totalForce() {
