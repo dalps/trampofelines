@@ -39,10 +39,10 @@ export class ElasticLine {
     nJoints: number,
     toggleX = false,
     toggleY = false,
-    public mass = 0.1,
-    public damping = 1,
+    public mass = 0.05,
+    public damping = 20,
     public jointsAttraction = 100,
-    public jointsRepulsion = 30
+    public jointsRepulsion = 0
   ) {
     let prevJoint: Joint | undefined = undefined;
 
