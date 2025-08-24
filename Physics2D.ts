@@ -62,45 +62,48 @@ export class Repulsion extends Force {
   }
 }
 
-export class CollisionManager {
-  private static _bodies: Set<WeakRef<DynamicBody>> = new Set();
+interface CollisionPair {
+  r1: WeakRef<DynamicBody>;
+  r2: WeakRef<DynamicBody>;
+}
 
-  static register(body: DynamicBody): WeakRef<DynamicBody> {
-    if (!body.collider) {
+export class CollisionManager {
+  private static _id = 0;
+  private static _bodies: Map<number, CollisionPair> = new Map();
+
+  static register(b1: DynamicBody, b2: DynamicBody): number {
+    if (!b1.collider || !b2.collider) {
       throw new Error("Cannot register a body without an attached collider.");
     }
 
-    if (body.ref && this._bodies.has(body.ref)) {
-      // console.log("Already has a ref")
-      return body.ref;
-    }
+    const r1 = new WeakRef(b1);
+    const r2 = new WeakRef(b2);
 
-    const ref = new WeakRef(body);
-    this._bodies.add(ref);
-    return ref;
+    this._bodies.set(this._id++, { r1, r2 });
+    return this._id;
+  }
+
+  static unregister(id: number) {
+    this._bodies.delete(id);
   }
 
   static update(dt: number) {
-    this._bodies.forEach((ref) => {
-      const body = ref.deref();
+    this._bodies.forEach(({ r1, r2 }) => {
+      const b1 = r1.deref();
+      const b2 = r2.deref();
 
-      if (!body) {
-        console.log("Body missing");
+      if (!b1 || !b2) {
+        console.log("A body's missing");
         return;
       }
 
-      this._bodies.forEach((ref2) => {
-        const b2 = ref2.deref();
-        if (ref === ref2 || !b2) return;
-
-        const c1 = body.collider!;
-        const c2 = b2.collider!;
-        if (body.collider!.checkContact(b2.collider!)) {
-          const direction = c1.center.sub(c2.center);
-          body.addForce(new Force(direction, 10));
-          b2.addForce(new Force(direction.multiplyScalar(-1), 10));
-        }
-      });
+      const c1 = b1.collider!;
+      const c2 = b2.collider!;
+      if (b1.collider!.checkContact(b2.collider!)) {
+        const direction = c1.center.sub(c2.center);
+        b1.addForce(new Force(direction, 10));
+        b2.addForce(new Force(direction.multiplyScalar(-1), 10));
+      }
     });
   }
 }
@@ -150,7 +153,6 @@ export class DynamicBody {
 
   createCollider() {
     this.collider = new CircleCollider(this.position, 10);
-    this.ref = CollisionManager.register(this);
   }
 
   public get totalForce() {
