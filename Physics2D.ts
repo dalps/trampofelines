@@ -1,5 +1,5 @@
 import { circle, popsicle } from "./CanvasUtils";
-import { Point2 } from "./utils";
+import { damp, Point2 } from "./utils";
 
 export type instant = number;
 
@@ -86,8 +86,16 @@ export class Repulsion extends Force {
   }
 }
 
+const lambdaFactor = 2;
+const contactForceFactor = 100;
+const EPSILON = 0.000001;
 class ContactForce extends Force {
-  update(dt: instant) {}
+  update(dt: instant) {
+    this._magnitude =
+      this._magnitude <= EPSILON
+        ? 0
+        : damp(this._magnitude, 0, lambdaFactor, dt);
+  }
 }
 
 interface CollisionPair {
@@ -128,30 +136,27 @@ export class CollisionManager {
       const c1 = b1.collider!;
       const c2 = b2.collider!;
       if (c1.checkContact(c2)) {
-        console.log(
-          `Collided! New velocities: ${this.collide(b1, b2)} ${this.collide(
-            b2,
-            b1
-          )}`
-        );
-        b1.velocity = this.collide(b1, b2);
-        b2.velocity = this.collide(b2, b1);
+        b1.addForce(this.collide(b1, b2));
+        b2.addForce(this.collide(b2, b1));
       }
     });
   }
 
-  static collide(body: DynamicBody, against: DynamicBody): Point2 {
+  static collide(body: DynamicBody, against: DynamicBody): ContactForce {
     const c1 = body.collider!;
     const c2 = against.collider!;
     const sep = c1.center.sub(c2.center);
 
-    return body.velocity.sub(
-      sep.multiplyScalar(
-        (((2 * against.mass) / (body.mass + against.mass)) *
-          body.velocity.sub(against.velocity).dot(sep)) /
-          Math.pow(sep.l2(), 2)
-      )
-    );
+    const massFactor = (2 * against.mass) / (body.mass + against.mass);
+    const magnitude =
+      (massFactor * body.velocity.sub(against.velocity).dot(sep)) /
+      (sep.l2() + c1.radius + c2.radius);
+
+    const direction = body.velocity
+      .sub(sep.multiplyScalar(magnitude))
+      .normalize();
+
+    return new ContactForce(sep.normalize(), massFactor * contactForceFactor);
   }
 }
 
@@ -222,6 +227,8 @@ export class DynamicBody {
   }
 
   update(dt: number) {
+    this._forces.forEach((f) => f.update && f.update(dt));
+
     if (!this._locks.x) {
       this.velocity.x += this.acceleration.x * dt;
       this.position.x +=
