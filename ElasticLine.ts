@@ -165,5 +165,7 @@ export class ElasticLine extends ElasticShape {
     // clamp the extremities
     this.joints.at(0)?.clearForces();
     this.joints.at(-1)?.clearForces();
+    this.joints.at(0)?.toggleFixed();
+    this.joints.at(-1)?.toggleFixed();
   }
 }

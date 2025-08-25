@@ -180,6 +180,7 @@ export class DynamicBody {
   private _forces: Force[] = [];
   private _aux = new Point2(0, 0);
   private _locks = { x: false, y: false };
+  private _fixed = false;
   public collider?: CircleCollider;
   public ref?: WeakRef<DynamicBody>;
 
@@ -226,7 +227,13 @@ export class DynamicBody {
     this._locks.y = !this._locks.y;
   }
 
+  toggleFixed() {
+    this._fixed = !this._fixed;
+  }
+
   update(dt: number) {
+    if (this._fixed) return;
+
     this._forces.forEach((f) => f.update && f.update(dt));
 
     if (!this._locks.x) {
@@ -244,14 +251,14 @@ export class DynamicBody {
 
   drawForces(ctx: CanvasRenderingContext2D) {
     // draw each individual force
-    // this._forces.forEach((f) => {
-    //   popsicle(
-    //     ctx,
-    //     this.position,
-    //     this.position.add(f.direction.multiplyScalar(f.magnitude)),
-    //     "green"
-    //   );
-    // });
+    this._forces.forEach((f) => {
+      popsicle(
+        ctx,
+        this.position,
+        this.position.add(f.direction.multiplyScalar(f.magnitude)),
+        "green"
+      );
+    });
 
     // draw the total force
     popsicle(
