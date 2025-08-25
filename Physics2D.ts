@@ -1,6 +1,8 @@
 import { circle, popsicle } from "./CanvasUtils";
 import { Point2 } from "./utils";
 
+export type instant = number;
+
 /**
  * A static force that can be applied to a dynamic body
  */
@@ -31,16 +33,28 @@ export class Force {
   }
 }
 
+type AttractionStrengthBehavior = "Additive" | "Multiplicative";
+
 /**
  * A pull towards another body in space
  */
 export class Attraction extends Force {
-  constructor(public from: Point2, public to: Point2, public strength = 1) {
+  constructor(
+    public from: Point2,
+    public to: Point2,
+    public strength = 1,
+    public behavior: AttractionStrengthBehavior = "Additive"
+  ) {
     super();
   }
 
   override get magnitude(): number {
-    return this.strength + this.to.sub(this.from).l2();
+    switch (this.behavior) {
+      case "Additive":
+        return this.strength + this.to.sub(this.from).l2();
+      case "Multiplicative":
+        return this.strength * this.to.sub(this.from).l2();
+    }
   }
 
   override get direction(): Point2 {
@@ -49,17 +63,31 @@ export class Attraction extends Force {
 }
 
 export class Repulsion extends Force {
-  constructor(public from: Point2, public to: Point2, public strength = 1) {
+  constructor(
+    public from: Point2,
+    public to: Point2,
+    public strength = 1,
+    public behavior: AttractionStrengthBehavior = "Additive"
+  ) {
     super();
   }
 
   override get magnitude(): number {
-    return this.strength - this.from.sub(this.to).l2();
+    switch (this.behavior) {
+      case "Additive":
+        return this.strength - this.from.sub(this.to).l2();
+      case "Multiplicative":
+        return this.strength / this.from.sub(this.to).l2();
+    }
   }
 
   override get direction(): Point2 {
     return this.from.sub(this.to).normalize();
   }
+}
+
+class ContactForce extends Force {
+  update(dt: instant) {}
 }
 
 interface CollisionPair {
@@ -87,7 +115,7 @@ export class CollisionManager {
     this._bodies.delete(id);
   }
 
-  static update(dt: number) {
+  static update(dt: instant) {
     this._bodies.forEach(({ r1, r2 }) => {
       const b1 = r1.deref();
       const b2 = r2.deref();
@@ -112,7 +140,7 @@ export class CollisionManager {
     });
   }
 
-  static collide(body: DynamicBody, against: DynamicBody) {
+  static collide(body: DynamicBody, against: DynamicBody): Point2 {
     const c1 = body.collider!;
     const c2 = against.collider!;
     const sep = c1.center.sub(c2.center);
@@ -209,14 +237,14 @@ export class DynamicBody {
 
   drawForces(ctx: CanvasRenderingContext2D) {
     // draw each individual force
-    this._forces.forEach((f) => {
-      popsicle(
-        ctx,
-        this.position,
-        this.position.add(f.direction.multiplyScalar(f.magnitude)),
-        "green"
-      );
-    });
+    // this._forces.forEach((f) => {
+    //   popsicle(
+    //     ctx,
+    //     this.position,
+    //     this.position.add(f.direction.multiplyScalar(f.magnitude)),
+    //     "green"
+    //   );
+    // });
 
     // draw the total force
     popsicle(
@@ -226,7 +254,7 @@ export class DynamicBody {
       "hotpink"
     );
 
-    // popsicle(ctx, this.position, this.position.add(this.velocity), "magenta");
+    popsicle(ctx, this.position, this.position.add(this.velocity), "magenta");
 
     // popsicle(
     //   ctx,
