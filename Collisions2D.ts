@@ -45,27 +45,30 @@ export class CollisionManager {
 
       const c1 = b1.collider!;
       const c2 = b2.collider!;
-      if (c1.checkContact(c2)) {
-        b1.addForce(this.collide(b1, b2));
-        b2.addForce(this.collide(b2, b1));
+
+      const info = c1.checkContact(c2);
+
+      if (info.test) {
+        b1.addForce(this.collide(b1, b2, info.sep1));
+        b2.addForce(this.collide(b2, b1, info.sep2));
       }
     });
   }
 
-  static collide(body: DynamicBody, against: DynamicBody): ContactForce {
-    const c1 = body.collider!;
-    const c2 = against.collider!;
-    const sep = c1.center.sub(c2.center);
-
+  static collide(
+    body: DynamicBody,
+    against: DynamicBody,
+    sep: Point2
+  ): ContactForce {
     const massFactor = (2 * against.mass) / (body.mass + against.mass);
 
-    const magnitude =
-      (massFactor * body.velocity.sub(against.velocity).dot(sep)) /
-      (sep.l2() + c1.radius + c2.radius);
+    // const magnitude =
+    //   (massFactor * body.velocity.sub(against.velocity).dot(info.sep)) /
+    //   (info.sep.l2() + c1.radius + c2.radius);
 
-    const direction = body.velocity
-      .sub(sep.multiplyScalar(magnitude))
-      .normalize();
+    // const direction = body.velocity
+    //   .sub(info.sep.multiplyScalar(magnitude))
+    //   .normalize();
 
     return new ContactForce(sep.normalize(), massFactor * contactForceFactor);
   }
@@ -73,9 +76,15 @@ export class CollisionManager {
 
 type ColliderType = "Circle" | "Box" | "Line";
 
+interface ContactInfo {
+  test: boolean;
+  sep1: Point2;
+  sep2: Point2;
+}
+
 export abstract class Collider {
   constructor(public type: ColliderType) {}
-  abstract checkContact(c2: Collider): boolean;
+  abstract checkContact(c2: Collider): ContactInfo; // return more info than just a boolean
 }
 
 export class CircleCollider extends Collider {
@@ -83,9 +92,14 @@ export class CircleCollider extends Collider {
     super("Circle");
   }
 
-  checkContact(that: CircleCollider): boolean {
-    const distance = this.center.sub(that.center).l2();
-    return distance <= this.radius + that.radius;
+  checkContact(that: CircleCollider) {
+    const sep = this.center.sub(that.center);
+    const distance = sep.l2();
+    return {
+      test: distance <= this.radius + that.radius,
+      sep1: sep,
+      sep2: sep.multiplyScalar(-1),
+    };
   }
 }
 
@@ -111,7 +125,7 @@ export class BoxCollider extends Collider {
     this.center = new Point2(this.left + width * 0.5, this.top + height * 0.5);
   }
 
-  checkContact(that: Collider): boolean {
+  checkContact(that: Collider) {
     switch (that.type) {
       case "Circle": {
         return false;
@@ -127,24 +141,32 @@ export class BoxCollider extends Collider {
 }
 
 export class LineCollider extends Collider {
+  public direction: Point2;
   constructor(public p1: Point2, public p2: Point2) {
     super("Line");
+
+    this.direction = p1.sub(p2).normalize();
   }
 
   get length(): number {
     return this.p1.sub(this.p2).l2();
   }
 
-  checkContact(that: Collider): boolean {
+  checkContact(that: Collider) {
     switch (that.type) {
       case "Circle": {
         const { center, radius } = that as CircleCollider;
         const d1 = this.p1.sub(center).l2();
         const d2 = this.p2.sub(center).l2();
         const sum = d1 + d2;
-        return (
-          sum + 2 * radius <= this.length || this.length <= sum - 2 * radius
-        );
+        return {
+          test:
+            sum + 2 * radius <= this.length || this.length <= sum - 2 * radius,
+
+          sep: center.sub(
+            this.direction.multiplyScalar(center.dot(this.direction))
+          ),
+        };
       }
       case "Box": {
         return false;
