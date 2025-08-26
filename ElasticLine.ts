@@ -60,14 +60,18 @@ export class ElasticShape {
     }
   }
 
-  draw(ctx: CanvasRenderingContext2D, { color = "black", lineWidth = 1 } = {}) {
+  draw(
+    ctx: CanvasRenderingContext2D,
+    { color = "black", lineWidth = 1, lineCap = "round" as CanvasLineCap } = {}
+  ) {
     ctx.strokeStyle = color;
     ctx.lineWidth = lineWidth;
+    ctx.lineCap = lineCap;
 
     ctx.beginPath();
     ctx.moveTo(this.joints[0].position.x, this.joints[0].position.y);
     this.joints.forEach((j) => {
-      ctx.lineTo(j.position.x, j.position.y);
+      ctx.lineTo(j.position.x, j.position.y); // consider using bezier curves for a smooth line
     });
     this.closed && ctx.closePath();
     ctx.stroke();
@@ -133,14 +137,21 @@ export class ElasticLine extends ElasticShape {
     start: Point2,
     end: Point2,
     nJoints: number,
-    toggleX = false,
-    toggleY = false,
-    public mass = 0.05,
-    public damping = 20,
-    public jointsAttraction = 100,
-    public jointsRepulsion = 0
+    {
+      toggleX = false,
+      toggleY = false,
+      mass = 0.05,
+      damping = 20,
+      jointsAttraction = 100,
+      jointsRepulsion = 0,
+    } = {}
   ) {
     super([], mass, damping, jointsAttraction, jointsRepulsion);
+
+    this.mass = mass;
+    this.damping = damping;
+    this.jointsAttraction = jointsAttraction;
+    this.jointsRepulsion = jointsRepulsion;
 
     let prevJoint: Joint | undefined = undefined;
 
