@@ -103,7 +103,8 @@ export class ContactForce extends Force {
 }
 
 export class DynamicBody {
-  public velocity: Point2;
+  public _position: Point2;
+  public _velocity: Point2;
   private _forces: Force[] = [];
   private _aux = new Point2(0, 0);
   private _locks = { x: false, y: false };
@@ -111,8 +112,17 @@ export class DynamicBody {
   public collider?: Collider;
   public ref?: WeakRef<DynamicBody>;
 
-  constructor(public position: Point2, public mass = 1, public friction = 0) {
-    this.velocity = new Point2(0, 0);
+  constructor(position: Point2, public mass = 1, public friction = 0) {
+    this._position = position;
+    this._velocity = new Point2(0, 0);
+  }
+
+  get position() {
+    return this._position;
+  }
+
+  get velocity() {
+    return this._velocity;
   }
 
   translate(x: number, y: number) {
@@ -121,7 +131,7 @@ export class DynamicBody {
   }
 
   addForce(force: Force) {
-    this._forces.push(force);
+    !this._fixed && this._forces.push(force);
   }
 
   clearForces() {
@@ -143,7 +153,7 @@ export class DynamicBody {
   public get acceleration(): Point2 {
     return this.totalForce
       .multiplyScalarI(1 / this.mass)
-      .subI(this.velocity.multiplyScalar(this.friction));
+      .subI(this._velocity.multiplyScalar(this.friction));
   }
 
   toggleX() {
@@ -166,15 +176,15 @@ export class DynamicBody {
     );
 
     if (!this._locks.x) {
-      this.velocity.x += this.acceleration.x * dt;
-      this.position.x +=
-        this.velocity.x * dt + this.acceleration.x * dt * dt * 0.5;
+      this._velocity.x += this.acceleration.x * dt;
+      this._position.x +=
+        this._velocity.x * dt + this.acceleration.x * dt * dt * 0.5;
     }
 
     if (!this._locks.y) {
-      this.velocity.y += this.acceleration.y * dt;
-      this.position.y +=
-        this.velocity.y * dt + this.acceleration.y * dt * dt * 0.5;
+      this._velocity.y += this.acceleration.y * dt;
+      this._position.y +=
+        this._velocity.y * dt + this.acceleration.y * dt * dt * 0.5;
     }
   }
 
