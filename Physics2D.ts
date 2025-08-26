@@ -1,4 +1,5 @@
 import { circle, popsicle } from "./CanvasUtils";
+import type { CircleCollider, Collider } from "./Collisions2D";
 import { damp, Point2 } from "./utils";
 
 export type instant = number;
@@ -86,92 +87,18 @@ export class Repulsion extends Force {
   }
 }
 
-const lambdaFactor = 2;
-const contactForceFactor = 100;
-const EPSILON = 0.000001;
-class ContactForce extends Force {
+export class ContactForce extends Force {
+  static EPSILON = 0.000001;
+
+  constructor(d: Point2, m: number, public lambda = 1) {
+    super(d, m);
+  }
+
   update(dt: instant) {
     this._magnitude =
-      this._magnitude <= EPSILON
+      this._magnitude <= ContactForce.EPSILON
         ? 0
-        : damp(this._magnitude, 0, lambdaFactor, dt);
-  }
-}
-
-interface CollisionPair {
-  r1: WeakRef<DynamicBody>;
-  r2: WeakRef<DynamicBody>;
-}
-
-export class CollisionManager {
-  private static _id = 0;
-  private static _bodies: Map<number, CollisionPair> = new Map();
-
-  static register(b1: DynamicBody, b2: DynamicBody): number {
-    if (!b1.collider || !b2.collider) {
-      throw new Error("Cannot register a body without an attached collider.");
-    }
-
-    const r1 = new WeakRef(b1);
-    const r2 = new WeakRef(b2);
-
-    this._bodies.set(this._id++, { r1, r2 });
-    return this._id;
-  }
-
-  static unregister(id: number) {
-    this._bodies.delete(id);
-  }
-
-  static update(dt: instant) {
-    this._bodies.forEach(({ r1, r2 }) => {
-      const b1 = r1.deref();
-      const b2 = r2.deref();
-
-      if (!b1 || !b2) {
-        console.log("A body's missing");
-        return;
-      }
-
-      const c1 = b1.collider!;
-      const c2 = b2.collider!;
-      if (c1.checkContact(c2)) {
-        b1.addForce(this.collide(b1, b2));
-        b2.addForce(this.collide(b2, b1));
-      }
-    });
-  }
-
-  static collide(body: DynamicBody, against: DynamicBody): ContactForce {
-    const c1 = body.collider!;
-    const c2 = against.collider!;
-    const sep = c1.center.sub(c2.center);
-
-    const massFactor = (2 * against.mass) / (body.mass + against.mass);
-    const magnitude =
-      (massFactor * body.velocity.sub(against.velocity).dot(sep)) /
-      (sep.l2() + c1.radius + c2.radius);
-
-    const direction = body.velocity
-      .sub(sep.multiplyScalar(magnitude))
-      .normalize();
-
-    return new ContactForce(sep.normalize(), massFactor * contactForceFactor);
-  }
-}
-
-export abstract class Collider {
-  abstract checkContact(c2: Collider): boolean;
-}
-
-export class CircleCollider extends Collider {
-  constructor(public center: Point2, public radius: number) {
-    super();
-  }
-
-  checkContact(c2: CircleCollider): boolean {
-    const distance = this.center.sub(c2.center).l2();
-    return distance <= this.radius * 2;
+        : damp(this._magnitude, 0, this.lambda, dt);
   }
 }
 
@@ -181,7 +108,7 @@ export class DynamicBody {
   private _aux = new Point2(0, 0);
   private _locks = { x: false, y: false };
   private _fixed = false;
-  public collider?: CircleCollider;
+  public collider?: Collider;
   public ref?: WeakRef<DynamicBody>;
 
   constructor(public position: Point2, public mass = 1, public friction = 0) {
@@ -201,8 +128,8 @@ export class DynamicBody {
     this._forces = [];
   }
 
-  createCollider(radius: number) {
-    this.collider = new CircleCollider(this.position, radius);
+  attachCollider(c: Collider) {
+    this.collider = c;
   }
 
   public get totalForce() {
@@ -234,7 +161,9 @@ export class DynamicBody {
   update(dt: number) {
     if (this._fixed) return;
 
-    this._forces.forEach((f) => f.update && f.update(dt));
+    this._forces.forEach(
+      (f) => (f as ContactForce).update && (f as ContactForce).update(dt)
+    );
 
     if (!this._locks.x) {
       this.velocity.x += this.acceleration.x * dt;

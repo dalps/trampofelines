@@ -68,6 +68,14 @@ export class Point2 {
     return this.x * p.x + this.y * p.y;
   }
 
+  projectI(i: Point2, j: Point2) {
+    return this.set(this.dot(i), this.dot(j));
+  }
+
+  project(i: Point2, j: Point2) {
+    return this.clone().projectI(i, j);
+  }
+
   toString() {
     return `(${this.x},${this.y})`;
   }
