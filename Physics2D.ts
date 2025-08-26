@@ -211,7 +211,7 @@ export class DynamicBody {
     if (!this.collider) return;
 
     ctx.lineWidth = 1;
-    ctx.strokeStyle = "green";
+    ctx.strokeStyle = "yellowgreen";
 
     ctx.beginPath();
     circle(ctx, this.collider?.center, this.collider?.radius);
