@@ -68,24 +68,20 @@ export function circle(ctx: CanvasRenderingContext2D, p: Point2, r: number) {
 export function drawGrid(
   canvas: HTMLCanvasElement,
   ctx: CanvasRenderingContext2D,
-  sep: number,
-  width = 2
+  { sep = 20, lineWidth = 2, color = "#ccc", offsetX = 0, offsetY = 0 } = {}
 ) {
-  const majorColor = "#cacaca";
-  const minorColor = "#d4d4d4";
+  ctx.lineWidth = lineWidth;
+  ctx.strokeStyle = color;
 
-  ctx.lineWidth = width;
-  ctx.strokeStyle = majorColor;
-
-  const h = Math.floor(canvas.width / sep);
-  const v = Math.floor(canvas.height / sep);
-  for (let i = 0, x = 0; i < h; i++, x += sep) {
+  const h = Math.floor((canvas.width + Math.abs(offsetX) * 2) / sep);
+  const v = Math.floor((canvas.height + Math.abs(offsetY) * 2) / sep);
+  for (let i = 0, x = offsetX; i < h; i++, x += sep) {
     ctx.beginPath();
     ctx.moveTo(x, 0);
     ctx.lineTo(x, canvas.height);
     ctx.stroke();
   }
-  for (let i = 0, y = 0; i < v; i++, y += sep) {
+  for (let i = 0, y = offsetY; i < v; i++, y += sep) {
     ctx.beginPath();
     ctx.moveTo(0, y);
     ctx.lineTo(canvas.width, y);

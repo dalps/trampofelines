@@ -227,12 +227,12 @@ export class DynamicBody {
 export const Gravity = new Force(new Point2(0, 1), 9.81);
 
 export class Ball extends DynamicBody {
-  constructor(p: Point2, public radius = 2) {
+  constructor(p: Point2, public radius = 2, public color = "yellow") {
     super(p, radius, 0);
   }
 
   draw(ctx: CanvasRenderingContext2D) {
-    ctx.fillStyle = "yellow";
+    ctx.fillStyle = this.color;
     ctx.strokeStyle = "black";
     ctx.lineWidth = 2;
     ctx.beginPath();
