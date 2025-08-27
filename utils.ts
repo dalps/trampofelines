@@ -1,3 +1,7 @@
+export function makeColor(r = 255, g = 255, b = 255, a = 1) {
+  return `rgba(${r},${g},${b},${a})`;
+}
+
 export function lerp(min: number, max: number, t: number) {
   return min + (max - min) * t;
 }
