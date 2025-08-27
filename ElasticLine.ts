@@ -81,6 +81,8 @@ export class ElasticShape {
     ctx: CanvasRenderingContext2D,
     colors = ["yellow", "magenta", "cyan"]
   ) {
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = "black";
     this.joints.forEach((j, i) => {
       ctx.fillStyle = colors[i % colors.length];
       ctx.beginPath();
