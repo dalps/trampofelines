@@ -6,7 +6,7 @@ import {
 } from "./Physics2D";
 import { damp, Point2 } from "./utils";
 
-const contactForceFactor = 10;
+const contactForceFactor = 20;
 
 interface CollisionPair {
   r1: WeakRef<DynamicBody>;
@@ -48,7 +48,12 @@ export class CollisionManager {
 
       const info = c1.checkContact(c2);
 
-      if (info.test) {
+      // only react if ball is in descending motion AND strictly above the joint
+      const isDescending = b2._velocity.y >= 0;
+      const aboveJoint = b2._position.y < b1._position.y;
+
+      if (info.test && isDescending && aboveJoint) {
+        console.log(`b1: ${b1.name} vs b2: ${b2.name} ${b2._velocity}`);
         b1.addForce(this.collide(b1, b2, info.sep1));
         b2.addForce(this.collide(b2, b1, info.sep2));
       }

@@ -110,11 +110,20 @@ export class DynamicBody {
   private _locks = { x: false, y: false };
   private _fixed = false;
   public collider?: Collider;
+  public name?: string;
   public ref?: WeakRef<DynamicBody>;
+  public mass: number;
+  public friction: number;
 
-  constructor(position: Point2, public mass = 1, public friction = 0) {
+  constructor(
+    position: Point2,
+    { name = "__body__", mass = 1, friction = 1 } = {}
+  ) {
     this._position = position;
     this._velocity = new Point2(0, 0);
+    this.mass = mass;
+    this.friction = friction;
+    this.name = name;
   }
 
   get position() {
@@ -237,8 +246,8 @@ export class DynamicBody {
 export const Gravity = new Force(new Point2(0, 1), 9.81);
 
 export class Ball extends DynamicBody {
-  constructor(p: Point2, public radius = 2, public color = "yellow") {
-    super(p, radius, 0);
+  constructor(p: Point2, public radius = 10, public color = "yellow") {
+    super(p, { mass: radius, name: "ball", friction: 0.1 });
   }
 
   draw(ctx: CanvasRenderingContext2D) {
