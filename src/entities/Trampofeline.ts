@@ -94,7 +94,7 @@ export default class Trampofelines {
         return;
       }
 
-      const line = new Trampofeline(p1, p2, 10, {
+      const line = new Trampofeline(p2, p1, 10, {
         damping: 2,
         mass: 2,
         jointsAttraction: 220,
