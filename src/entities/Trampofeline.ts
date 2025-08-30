@@ -1,3 +1,4 @@
+import { circle } from "../lib/CanvasUtils";
 import { CircleCollider, CollisionManager } from "../lib/Collisions2D";
 import { ElasticLine } from "../lib/ElasticLine";
 import { Ball, Gravity } from "../lib/Physics2D";
@@ -92,7 +93,7 @@ export default class Trampofelines {
         return;
       }
 
-      const line = new ElasticLine(p1, p2, 10, {
+      const line = new Trampofeline(p1, p2, 10, {
         damping: 2,
         mass: 2,
         jointsAttraction: 220,
@@ -130,5 +131,144 @@ export default class Trampofelines {
 
   static isDrawing() {
     return drawing;
+  }
+}
+
+const coatColor = "#011123";
+const coatColor2 = "#556679ff";
+export class Trampofeline extends ElasticLine {
+  draw(ctx: CanvasRenderingContext2D): void {
+    ctx.lineWidth = 25;
+    ctx.strokeStyle = coatColor;
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
+
+    ctx.beginPath();
+    ctx.moveTo(this.joints[0].position.x, this.joints[0].position.y);
+    this.joints.forEach((j) => {
+      ctx.lineTo(j.position.x, j.position.y);
+    });
+    this.closed && ctx.closePath();
+    ctx.stroke();
+
+    // draw the face at the first joint (where the mouse motion started)
+    ctx.save();
+
+    const j0 = this.joints[0]._position;
+    const j1 = this.joints[1]._position;
+    const dir = j1.sub(j0).normalize();
+    ctx.translate(j0.x, j0.y);
+    const e1 = new Point2(1, 0);
+    const angle = Math.acos(e1.dot(dir));
+    ctx.rotate(angle + Math.PI / 2);
+
+    // arms & paws
+    ctx.strokeStyle = coatColor;
+    ctx.lineWidth = 10;
+    const pawDistance = 10;
+    [pawDistance, -pawDistance].forEach((x) => {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, 40);
+      ctx.stroke();
+
+      ctx.save();
+      ctx.strokeStyle = coatColor2;
+      ctx.lineWidth = 2;
+      ctx.translate(x, 40);
+
+      ctx.beginPath();
+      ctx.moveTo(2, 4);
+      ctx.lineTo(2, 0);
+      ctx.moveTo(-2, 4);
+      ctx.lineTo(-2, 0);
+      ctx.stroke();
+      ctx.restore();
+    });
+
+    // mouth
+    ctx.fillStyle = coatColor;
+    ctx.beginPath();
+    ctx.moveTo(20, -20);
+    // ctx.quadraticCurveTo(0, 50, -20, -20);
+    ctx.bezierCurveTo(40, 30, -40, 30, -20, -20);
+    ctx.closePath();
+    ctx.fill();
+
+    // eyes
+    const eyeY = -10;
+    const outerEye = 5;
+    const innerEye = 2;
+
+    ctx.fillStyle = "white";
+    ctx.beginPath();
+    circle(ctx, new Point2(10, eyeY), outerEye);
+    circle(ctx, new Point2(-10, eyeY), outerEye);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.fillStyle = "black";
+    ctx.beginPath();
+    circle(ctx, new Point2(10, eyeY), innerEye);
+    circle(ctx, new Point2(-10, eyeY), innerEye);
+    ctx.closePath();
+    ctx.fill();
+
+    // whiskers
+    ctx.strokeStyle = "white";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    const start = 5;
+    const end = 20;
+    [
+      [-start, -end],
+      [start, end],
+    ].forEach(([start, end]) => {
+      [-5, 0, 5].forEach((y) => {
+        ctx.moveTo(start, 0);
+        ctx.lineTo(end, y);
+      });
+    });
+    ctx.stroke();
+
+    // ears
+    ctx.fillStyle = coatColor;
+    ctx.strokeStyle = coatColor2;
+    const innerEarX = 10;
+    const earY = -18;
+    const earHeight = 10;
+
+    ctx.beginPath();
+    [innerEarX, -innerEarX].forEach((x, i) => {
+      ctx.moveTo(x, earY);
+      ctx.lineTo(x + (i === 1 ? -1 : 1) * 5, earY - earHeight);
+      ctx.lineTo(x + (i === 1 ? -1 : 1) * 10, earY);
+      ctx.stroke();
+      ctx.fill();
+    });
+
+    // snout
+    ctx.fillStyle = "pink";
+    ctx.strokeStyle = "black";
+    ctx.beginPath();
+    circle(ctx, new Point2(0, 0), 4);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    // mouth
+    ctx.strokeStyle = coatColor2;
+    ctx.beginPath();
+    const mouthY = 5;
+    const mouthAngle = 5;
+    const mouthWidth = 7;
+    ctx.moveTo(-mouthWidth, mouthY);
+    ctx.quadraticCurveTo(-mouthAngle, 10, 0, mouthY);
+    ctx.quadraticCurveTo(mouthAngle, 10, mouthWidth, mouthY);
+    ctx.stroke();
+
+    // draw the butt & the tail at the last joint (where the mouse was lifted)
+
+    ctx.restore();
   }
 }

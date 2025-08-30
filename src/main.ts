@@ -5,7 +5,7 @@ import { Attraction, Ball, Gravity, Repulsion } from "./lib/Physics2D";
 import { Ripple, RippleManager } from "./lib/Ripple";
 import Math2D, { lerp, Point2, resolveMousePosition } from "./lib/utils";
 import { Pane } from "tweakpane";
-import Trampofelines from "./entities/Trampofeline";
+import Trampofelines, { Trampofeline } from "./entities/Trampofeline";
 import "./style.css";
 import { Clock, type timestamp } from "./lib/TimeUtils";
 
@@ -19,7 +19,7 @@ let ctx: CanvasRenderingContext2D;
 let pane: Pane;
 
 const settings = {
-  showJoints: true,
+  showJoints: false,
   showForces: false,
   play: true,
   colliderRadius: 20,
@@ -66,6 +66,19 @@ function init() {
   clear();
 
   Trampofelines.init(state, canvas);
+
+  lines.push(
+    new Trampofeline(
+      new Point2(cw * 0.2, ch * 0.5),
+      new Point2(cw * 0.8, ch * 0.5),
+      10,
+      {
+        mass: 10,
+        jointsAttraction: 100,
+        jointsRepulsion: 100,
+      }
+    )
+  );
 
   function makeBall(
     startPos: Point2,
@@ -148,11 +161,11 @@ function init() {
 }
 
 function clear() {
-  ctx.fillStyle = "#222";
+  ctx.fillStyle = "#eee";
   ctx.fillRect(0, 0, cw, ch);
 
   drawGrid(canvas, ctx, {
-    color: "#444",
+    color: "#ddd",
     lineWidth: 1,
     sep: 20,
     offsetX: -10,
@@ -173,7 +186,7 @@ function draw(time: timestamp) {
   lines.forEach((l) => {
     settings.play && l.update(dt);
 
-    l.draw(ctx, { color: "white", lineWidth: 10 });
+    l.draw(ctx);
     settings.showJoints && l.drawJoints(ctx);
 
     l.joints.forEach((j) => {
