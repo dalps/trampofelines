@@ -1,17 +1,23 @@
-export default class Clock {
-  private static _then: number;
-  private static _now: number = 0;
+// A monotonically increasing number
+export type timestamp = number;
+
+// A very small number
+export type instant = number;
+
+export class Clock {
+  private static _then: timestamp;
+  private static _now: timestamp = 0;
   private static _id = 0;
   private static _timers = new Map<
     number,
-    { _elapsed: number; interval: number; cb: () => void }
+    { _elapsed: timestamp; interval: number; cb: () => void }
   >();
 
   static get dt() {
     return this._now - this._then;
   }
 
-  static update(time: number): number {
+  static update(time: timestamp): instant {
     this._then = this._now;
     this._now = time;
 

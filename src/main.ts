@@ -5,9 +5,9 @@ import { Attraction, Ball, Gravity, Repulsion } from "./lib/Physics2D";
 import { Ripple, RippleManager } from "./lib/Ripple";
 import Math2D, { lerp, Point2, resolveMousePosition } from "./lib/utils";
 import { Pane } from "tweakpane";
-import Clock from "./lib/Clock";
 import Trampofelines from "./entities/Trampofeline";
 import "./style.css";
+import { Clock, type timestamp } from "./lib/TimeUtils";
 
 let cw = 480;
 let ch = 480;
@@ -160,7 +160,7 @@ function clear() {
   });
 }
 
-function draw(time: number) {
+function draw(time: timestamp) {
   time *= 0.01;
   const dt = Clock.update(time);
 
