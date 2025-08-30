@@ -8,6 +8,7 @@ import { Pane } from "tweakpane";
 import Trampofelines, { Trampofeline } from "./entities/Trampofeline";
 import "./style.css";
 import { Clock, type timestamp } from "./lib/TimeUtils";
+import { drawTitle, toranporin } from "./type";
 
 let cw = 480;
 let ch = 480;
@@ -171,6 +172,9 @@ function clear() {
     offsetX: -10,
     offsetY: -10,
   });
+
+  toranporin(ctx);
+  drawTitle(ctx);
 }
 
 function draw(time: timestamp) {
