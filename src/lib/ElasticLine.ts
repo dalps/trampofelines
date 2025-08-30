@@ -1,4 +1,10 @@
-import { Attraction, DynamicBody, Force, Repulsion } from "./Physics2D";
+import {
+  Attraction,
+  DynamicBody,
+  Force,
+  Repulsion,
+  type instant,
+} from "./Physics2D";
 import Math2D, { Point2 } from "./utils";
 
 class Joint extends DynamicBody {
@@ -24,7 +30,7 @@ class Joint extends DynamicBody {
     t.addForce(new Repulsion(t.position, this.position, this.repulsion));
   }
 
-  update(dt: number): void {
+  update(dt: instant): void {
     super.update(dt);
   }
 }
@@ -94,9 +100,9 @@ export class ElasticShape {
     });
   }
 
-  update(time: number) {
+  update(dt: instant) {
     this.joints.forEach((joint) => {
-      joint.update(time);
+      joint.update(dt);
     });
   }
 }

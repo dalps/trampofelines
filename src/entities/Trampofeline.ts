@@ -1,7 +1,8 @@
 import { circle } from "../lib/CanvasUtils";
 import { CircleCollider, CollisionManager } from "../lib/Collisions2D";
 import { ElasticLine } from "../lib/ElasticLine";
-import { Ball, Gravity } from "../lib/Physics2D";
+import { Ball, Gravity, type instant } from "../lib/Physics2D";
+import type { timestamp } from "../lib/TimeUtils";
 import {
   lerp,
   Point2,
@@ -139,8 +140,17 @@ export default class Trampofelines {
 }
 
 const coatColor = "#011123";
-const coatColor2 = "#556679ff";
+const coatColor2 = "#112236ff";
+const detailColor = "#556679ff";
+
 export class Trampofeline extends ElasticLine {
+  private _time: timestamp = 0;
+
+  update(dt: instant): void {
+    super.update(dt);
+    this._time += dt;
+  }
+
   draw(ctx: CanvasRenderingContext2D): void {
     ctx.lineWidth = 25;
     ctx.strokeStyle = coatColor;
@@ -179,7 +189,7 @@ export class Trampofeline extends ElasticLine {
       ctx.stroke();
 
       ctx.save();
-      ctx.strokeStyle = coatColor2;
+      ctx.strokeStyle = detailColor;
       ctx.lineWidth = 2;
       ctx.translate(x, 40);
 
@@ -239,7 +249,7 @@ export class Trampofeline extends ElasticLine {
 
     // ears
     ctx.fillStyle = coatColor;
-    ctx.strokeStyle = coatColor2;
+    ctx.strokeStyle = detailColor;
     const innerEarX = 10;
     const earY = -18;
     const earHeight = 10;
@@ -263,7 +273,7 @@ export class Trampofeline extends ElasticLine {
     ctx.stroke();
 
     // mouth
-    ctx.strokeStyle = coatColor2;
+    ctx.strokeStyle = detailColor;
     ctx.beginPath();
     const mouthY = 5;
     const mouthAngle = 5;
@@ -293,7 +303,7 @@ export class Trampofeline extends ElasticLine {
       circle(ctx, new Point2(0, 0), 20);
       ctx.fill();
 
-      ctx.strokeStyle = coatColor2;
+      ctx.strokeStyle = detailColor;
       ctx.beginPath();
       ctx.moveTo(2, 4);
       ctx.lineTo(-2, 0);
@@ -312,11 +322,11 @@ export class Trampofeline extends ElasticLine {
         ctx.stroke();
 
         ctx.save();
-        ctx.strokeStyle = coatColor2;
+        ctx.strokeStyle = detailColor;
         ctx.lineWidth = 2;
         ctx.translate(x, 40);
 
-        ctx.fillStyle = coatColor2;
+        ctx.fillStyle = detailColor;
         ctx.beginPath();
         circle(ctx, new Point2(0, -3), 3);
         ctx.closePath();
@@ -332,7 +342,7 @@ export class Trampofeline extends ElasticLine {
 
       // tail
       const tailSegmentSize = 25;
-      const tailSwerve = 15;
+      const tailSwerve = lerp(0, 15, Math.sin(this._time * 0.1));
       const tailSegments = 3;
       const startY = -7;
       ctx.strokeStyle = coatColor;
