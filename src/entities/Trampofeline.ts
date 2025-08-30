@@ -104,7 +104,7 @@ export default class Trampofelines {
       lines.push(line);
 
       line.joints.forEach((j) => {
-        j.addForce(Gravity);
+        settings.gravity && j.addForce(Gravity);
         j.attachCollider(
           new CircleCollider(j.position, state.settings.colliderRadius)
         );
@@ -168,15 +168,13 @@ export class Trampofeline extends ElasticLine {
     // draw the face at the first joint (where the mouse motion started)
     ctx.save();
 
-    const eX = new Point2(1, 0);
-
     const j0 = this.joints[0]._position;
     const j1 = this.joints[1]._position;
-    const dir = j1.sub(j0).normalize();
-    const angle = Math.acos(eX.dot(dir));
+    const dir = j0.sub(j1);
+    const angle = Math.atan2(-dir.x, dir.y);
 
     ctx.translate(j0.x, j0.y);
-    ctx.rotate(angle + Math.PI / 2);
+    ctx.rotate(angle);
 
     // arms & paws
     ctx.strokeStyle = coatColor;
@@ -289,12 +287,12 @@ export class Trampofeline extends ElasticLine {
     {
       const lastJoint = this.joints.at(-1)!._position;
       const sndLastJoint = this.joints.at(-2)!._position;
-      const dir = sndLastJoint.sub(lastJoint).normalize();
-      const angle = Math.acos(eX.dot(dir));
+      const dir = lastJoint.sub(sndLastJoint).normalize();
+      const angle = Math.atan2(-dir.x, dir.y);
 
       ctx.save();
       ctx.translate(lastJoint.x, lastJoint.y);
-      ctx.rotate(angle + Math.PI / 2);
+      ctx.rotate(angle);
 
       // butt
       ctx.fillStyle = coatColor;
@@ -354,6 +352,7 @@ export class Trampofeline extends ElasticLine {
         i < tailSegments;
         i++, y += tailSegmentSize
       ) {
+        // better use arcTo
         ctx.quadraticCurveTo(
           (i % 2 === 0 ? -1 : 1) * tailSwerve,
           tailSegmentSize * 0.5 + i * tailSegmentSize + startY,

@@ -27,7 +27,7 @@ const settings = {
   ballMass: 3,
   ballRadius: 10,
   ballVelocity: new Point2(0, 5),
-  gravity: true,
+  gravity: false,
 };
 
 export interface GameState {
@@ -67,18 +67,18 @@ function init() {
 
   Trampofelines.init(state, canvas);
 
-  lines.push(
-    new Trampofeline(
-      new Point2(cw * 0.2, ch * 0.5),
-      new Point2(cw * 0.8, ch * 0.5),
-      10,
-      {
-        mass: 10,
-        jointsAttraction: 100,
-        jointsRepulsion: 100,
-      }
-    )
-  );
+  // lines.push(
+  //   new Trampofeline(
+  //     new Point2(cw * 0.2, ch * 0.5),
+  //     new Point2(cw * 0.8, ch * 0.5),
+  //     10,
+  //     {
+  //       mass: 10,
+  //       jointsAttraction: 100,
+  //       jointsRepulsion: 100,
+  //     }
+  //   )
+  // );
 
   function makeBall(
     startPos: Point2,
