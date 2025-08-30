@@ -15,6 +15,18 @@ export function damp(
   return lerp(current, target, 1 - Math.exp(-lambda * dt));
 }
 
+export function resolveMousePosition(e: MouseEvent): Point2 {
+  if (e.offsetX) {
+    return new Point2(e.offsetX, e.offsetY);
+  }
+
+  return new Point2(e.layerX, e.layerY);
+}
+
+export function resolveTouchPosition(canvasRect: DOMRect, e: Touch): Point2 {
+  return new Point2(e.clientX - canvasRect.x, e.clientY - canvasRect.y);
+}
+
 export class Point2 {
   constructor(public x: number, public y: number) {}
 

@@ -3,9 +3,10 @@ import { CircleCollider, CollisionManager } from "./lib/Collisions2D";
 import { ElasticLine, ElasticShape } from "./lib/ElasticLine";
 import { Attraction, Ball, Gravity, Repulsion } from "./lib/Physics2D";
 import { Ripple, RippleManager } from "./lib/Ripple";
-import Math2D, { lerp, Point2 } from "./lib/utils";
+import Math2D, { lerp, Point2, resolveMousePosition } from "./lib/utils";
 import { Pane } from "tweakpane";
 import Clock from "./lib/Clock";
+import Trampofelines from "./entities/Trampofeline";
 import "./style.css";
 
 let cw = 480;
@@ -16,15 +17,6 @@ let canvas: HTMLCanvasElement;
 let canvasRect: DOMRect;
 let ctx: CanvasRenderingContext2D;
 let pane: Pane;
-
-let balls: Ball[] = [];
-let lines: ElasticLine[] = [];
-
-let p1: Point2 | undefined;
-let p2: Point2 | undefined;
-let mouseDown = false;
-let distance = 0;
-let drawing = false;
 
 const settings = {
   showJoints: true,
@@ -38,10 +30,21 @@ const settings = {
   gravity: true,
 };
 
-function setSize() {
-  // canvas.width = innerWidth;
-  // canvas.height = innerHeight;
+export interface GameState {
+  balls: Ball[];
+  lines: ElasticLine[];
+  settings: typeof settings;
+}
 
+let state: GameState = {
+  balls: [],
+  lines: [],
+  settings,
+};
+
+const { balls, lines } = state;
+
+function setSize() {
   cw = canvas.width = container.clientWidth;
   ch = canvas.height = container.clientHeight;
 
@@ -57,12 +60,12 @@ function init() {
   canvas.width = cw;
   canvas.height = ch;
 
-  // canvas.style.border = "1px solid #444";
-
   container.appendChild(canvas);
 
   setSize();
   clear();
+
+  Trampofelines.init(state, canvas);
 
   function makeBall(
     startPos: Point2,
@@ -92,104 +95,13 @@ function init() {
     );
   }
 
-  function resolveMousePosition(e: MouseEvent) {
-    if (e.offsetX) {
-      return new Point2(e.offsetX, e.offsetY);
-    }
-
-    return new Point2(e.layerX, e.layerY);
-  }
-
-  canvasRect = canvas.getBoundingClientRect();
-
-  function resolveTouchPosition(e: Touch) {
-    // get canvas relative coordinates
-    const canvasPos = new Point2(canvasRect.left, canvasRect.top);
-    const touchPos = new Point2(e.clientX, e.clientY);
-
-    return touchPos.subI(canvasPos);
-  }
-
-  canvas.addEventListener("mousedown", handleMouseDown, false);
-  canvas.addEventListener("mousemove", handleMouseMove, false);
-  canvas.addEventListener("mouseup", handleMouseUp, false);
-
-  canvas.addEventListener("touchstart", handleTouchStart, false);
-  canvas.addEventListener("touchmove", handleTouchMove, false);
-  canvas.addEventListener("touchend", handleTouchEnd, false);
-
-  function handleTouchStart(e: TouchEvent) {
-    p1 = resolveTouchPosition(e.touches[0]);
-    mouseDown = true;
-  }
-
-  function handleTouchMove(e: TouchEvent) {
-    e.preventDefault();
-
-    if (!mouseDown) {
-      p1 = p2 = undefined;
-      return;
-    }
-
-    distance = p1 && p2 ? p1.sub(p2).l2() : 0;
-    p2 = resolveTouchPosition(e.touches[0]);
-  }
-
-  function handleTouchEnd(e: TouchEvent) {
-    e.preventDefault();
-
-    endStroke();
-  }
-
-  function handleMouseDown(e: MouseEvent) {
-    p1 = resolveMousePosition(e);
-    mouseDown = true;
-  }
-
-  function handleMouseMove(e: MouseEvent) {
-    if (!mouseDown) {
-      p1 = p2 = undefined;
-      return;
-    }
-
-    distance = p1 && p2 ? p1.sub(p2).l2() : 0;
-    p2 = resolveMousePosition(e);
-  }
-
-  function handleMouseUp() {
-    endStroke();
-  }
-
-  function endStroke() {
-    mouseDown = false;
-    drawing = false;
-
-    if (!p1 || !p2 || distance < 100) {
-      distance < 20 && p1 && spawnBall(p1);
-      p1 = p2 = undefined;
-      distance = 0;
-      return;
-    }
-
-    const line = new ElasticLine(p1, p2, 10, {
-      damping: 2,
-      mass: 2,
-      jointsAttraction: 220,
-      jointsRepulsion: 50,
-    });
-
-    lines.push(line);
-
-    line.joints.forEach((j) => {
-      j.addForce(Gravity);
-      j.attachCollider(new CircleCollider(j.position, settings.colliderRadius));
-      balls.forEach((b) => CollisionManager.register(j, b));
-    });
-
-    p1 = p2 = undefined;
-  }
-
   window.addEventListener("resize", setSize);
+
+  canvas.addEventListener("click", (e) => {
+    if (Trampofelines.isDrawing()) return;
+
+    spawnBall(resolveMousePosition(e));
+  });
 
   // Set up panes
   pane = new Pane({ title: "Settings", expanded: false });
@@ -221,15 +133,15 @@ function init() {
       });
     });
   pane.addBinding(settings, "gravity").on("change", (ev) => {
-    ocoGravity.magnitude = ev.value ? 9.81 : 0;
+    Gravity.magnitude = ev.value ? 9.81 : 0;
   });
   pane
     .addButton({
       title: "Reset scene",
     })
     .on("click", () => {
-      balls = [];
-      lines = [];
+      balls.splice(0);
+      lines.splice(0);
     });
 
   requestAnimationFrame(draw);
@@ -256,18 +168,7 @@ function draw(time: number) {
 
   settings.play && CollisionManager.update(dt);
 
-  if (p1 && p2 && distance >= 20) {
-    ctx.lineWidth = 10;
-    ctx.strokeStyle = `rgba(${
-      distance < 100 ? `255,0,0` : `255,255,255`
-    },${lerp(0.3, 0.4, Math.sin(time))})`;
-    ctx.lineCap = "round";
-    ctx.beginPath();
-    ctx.moveTo(p1.x, p1.y);
-    ctx.lineTo(p2.x, p2.y);
-    ctx.closePath();
-    ctx.stroke();
-  }
+  Trampofelines.draw(ctx, time);
 
   lines.forEach((l) => {
     settings.play && l.update(dt);
