@@ -339,20 +339,20 @@ export class Trampofeline extends ElasticLine {
       });
 
       // tail
-      const tailSegmentSize = 25;
-      const tailSwerve = lerp(0, 15, Math.sin(this._time * 0.1));
-      const tailSegments = 3;
+      const tailSegmentSize = 40;
+      const t = Math.sin(this._time * 0.1) * 0.5 + 0.5;
+      const tailSwerve = lerp(-15, 15, t);
+      const tailSegments = 2;
       const startY = -7;
       ctx.strokeStyle = coatColor;
       ctx.lineWidth = 10;
       ctx.beginPath();
-      ctx.moveTo(0, startY);
+      ctx.moveTo(0, 0);
       for (
         let i = 0, y = tailSegmentSize;
         i < tailSegments;
         i++, y += tailSegmentSize
       ) {
-        // better use arcTo
         ctx.quadraticCurveTo(
           (i % 2 === 0 ? -1 : 1) * tailSwerve,
           tailSegmentSize * 0.5 + i * tailSegmentSize + startY,
@@ -360,6 +360,7 @@ export class Trampofeline extends ElasticLine {
           y + startY
         );
       }
+
       ctx.stroke();
 
       ctx.restore();
