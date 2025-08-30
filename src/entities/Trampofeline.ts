@@ -117,15 +117,19 @@ export default class Trampofelines {
   static draw(ctx: CanvasRenderingContext2D, time: number) {
     if (p1 && p2 && distance >= 20) {
       ctx.lineWidth = 10;
-      ctx.strokeStyle = `rgba(${
-        distance < 100 ? `255,0,0` : `255,255,255`
-      },${lerp(0.3, 0.4, Math.sin(time))})`;
+      ctx.setLineDash([5, 15]);
+      ctx.strokeStyle = `rgba(${distance < 100 ? `255,0,0` : `0,0,0`},${lerp(
+        0.3,
+        0.4,
+        Math.sin(time)
+      )})`;
       ctx.lineCap = "round";
       ctx.beginPath();
       ctx.moveTo(p1.x, p1.y);
       ctx.lineTo(p2.x, p2.y);
-      ctx.closePath();
       ctx.stroke();
+
+      ctx.setLineDash([]);
     }
   }
 
@@ -154,12 +158,14 @@ export class Trampofeline extends ElasticLine {
     // draw the face at the first joint (where the mouse motion started)
     ctx.save();
 
+    const eX = new Point2(1, 0);
+
     const j0 = this.joints[0]._position;
     const j1 = this.joints[1]._position;
     const dir = j1.sub(j0).normalize();
+    const angle = Math.acos(eX.dot(dir));
+
     ctx.translate(j0.x, j0.y);
-    const e1 = new Point2(1, 0);
-    const angle = Math.acos(e1.dot(dir));
     ctx.rotate(angle + Math.PI / 2);
 
     // arms & paws
@@ -267,8 +273,87 @@ export class Trampofeline extends ElasticLine {
     ctx.quadraticCurveTo(mouthAngle, 10, mouthWidth, mouthY);
     ctx.stroke();
 
-    // draw the butt & the tail at the last joint (where the mouse was lifted)
-
     ctx.restore();
+
+    // draw the butt & the tail at the last joint (where the mouse was lifted)
+    {
+      const lastJoint = this.joints.at(-1)!._position;
+      const sndLastJoint = this.joints.at(-2)!._position;
+      const dir = sndLastJoint.sub(lastJoint).normalize();
+      const angle = Math.acos(eX.dot(dir));
+
+      ctx.save();
+      ctx.translate(lastJoint.x, lastJoint.y);
+      ctx.rotate(angle + Math.PI / 2);
+
+      // butt
+      ctx.fillStyle = coatColor;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      circle(ctx, new Point2(0, 0), 20);
+      ctx.fill();
+
+      ctx.strokeStyle = coatColor2;
+      ctx.beginPath();
+      ctx.moveTo(2, 4);
+      ctx.lineTo(-2, 0);
+      ctx.moveTo(-2, 4);
+      ctx.lineTo(2, 0);
+      ctx.stroke();
+
+      // arms & paws
+      ctx.strokeStyle = coatColor;
+      ctx.lineWidth = 10;
+      const pawDistance = 10;
+      [pawDistance, -pawDistance].forEach((x) => {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, 40);
+        ctx.stroke();
+
+        ctx.save();
+        ctx.strokeStyle = coatColor2;
+        ctx.lineWidth = 2;
+        ctx.translate(x, 40);
+
+        ctx.fillStyle = coatColor2;
+        ctx.beginPath();
+        circle(ctx, new Point2(0, -3), 3);
+        ctx.closePath();
+        circle(ctx, new Point2(4, 2), 2);
+        ctx.closePath();
+        circle(ctx, new Point2(0, 4), 2);
+        ctx.closePath();
+        circle(ctx, new Point2(-4, 2), 2);
+        ctx.fill();
+
+        ctx.restore();
+      });
+
+      // tail
+      const tailSegmentSize = 25;
+      const tailSwerve = 15;
+      const tailSegments = 3;
+      const startY = -7;
+      ctx.strokeStyle = coatColor;
+      ctx.lineWidth = 10;
+      ctx.beginPath();
+      ctx.moveTo(0, startY);
+      for (
+        let i = 0, y = tailSegmentSize;
+        i < tailSegments;
+        i++, y += tailSegmentSize
+      ) {
+        ctx.quadraticCurveTo(
+          (i % 2 === 0 ? -1 : 1) * tailSwerve,
+          tailSegmentSize * 0.5 + i * tailSegmentSize + startY,
+          0,
+          y + startY
+        );
+      }
+      ctx.stroke();
+
+      ctx.restore();
+    }
   }
 }
