@@ -174,7 +174,6 @@ function clear() {
   });
 
   toranporin(ctx);
-  drawTitle(ctx);
 }
 
 function draw(time: timestamp) {
@@ -182,6 +181,8 @@ function draw(time: timestamp) {
   const dt = Clock.update(time);
 
   clear();
+
+  drawTitle(ctx, time);
 
   settings.play && CollisionManager.update(dt);
 
