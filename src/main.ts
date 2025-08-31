@@ -9,6 +9,7 @@ import Trampofelines, { Trampofeline } from "./entities/Trampofeline";
 import "./style.css";
 import { Clock, type timestamp } from "./lib/TimeUtils";
 import { drawTitle, toranporin } from "./type";
+import { Tube } from "./entities/Tube";
 
 let cw = 480;
 let ch = 480;
@@ -34,12 +35,14 @@ const settings = {
 export interface GameState {
   balls: Ball[];
   lines: ElasticLine[];
+  tubes: Tube[];
   settings: typeof settings;
 }
 
 let state: GameState = {
   balls: [],
   lines: [],
+  tubes: [],
   settings,
 };
 
@@ -158,6 +161,12 @@ function init() {
       lines.splice(0);
     });
 
+  state.tubes.push(
+    new Tube(new Point2(0, 100)),
+    new Tube(new Point2(0, 200), new Point2(40, 200)),
+    new Tube(new Point2(0, 300), new Point2(80, 30))
+  );
+
   requestAnimationFrame(draw);
 }
 
@@ -169,8 +178,8 @@ function clear() {
     color: "#ddd",
     lineWidth: 1,
     sep: 20,
-    offsetX: -10,
-    offsetY: -10,
+    offsetX: 0,
+    offsetY: 0,
   });
 
   toranporin(ctx);
@@ -183,6 +192,8 @@ function draw(time: timestamp) {
   clear();
 
   drawTitle(ctx, time);
+
+  state.tubes.forEach((tube) => tube.draw(ctx));
 
   settings.play && CollisionManager.update(dt);
 

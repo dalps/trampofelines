@@ -72,6 +72,18 @@ export class Point2 {
     return this.clone().addI(p);
   }
 
+  addX(x: number) {
+    const p = this.clone();
+    p.x += x;
+    return p;
+  }
+
+  addY(y: number) {
+    const p = this.clone();
+    p.y += y;
+    return p;
+  }
+
   sub(p: Point2) {
     return this.clone().subI(p);
   }
