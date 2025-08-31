@@ -37,16 +37,29 @@ class Joint extends DynamicBody {
 
 export class ElasticShape {
   public joints: Joint[] = [];
+  mass: number;
+  damping: number;
+  jointsAttraction: number;
+  jointsRepulsion: number;
+  closed: boolean;
 
   constructor(
     points: Point2[],
-    public mass = 0.05,
-    public damping = 20,
-    public jointsAttraction = 100,
-    public jointsRepulsion = 100,
-    public closed = false
+    {
+      mass = 0.05,
+      damping = 20,
+      jointsAttraction = 100,
+      jointsRepulsion = 100,
+      closed = false,
+    } = {}
   ) {
     let prevJoint: Joint | undefined;
+
+    this.mass = mass;
+    this.damping = damping;
+    this.jointsAttraction = jointsAttraction;
+    this.jointsRepulsion = jointsRepulsion;
+    this.closed = closed;
 
     this.joints = points.map((p) => {
       const joint = new Joint(
@@ -68,9 +81,17 @@ export class ElasticShape {
 
   draw(
     ctx: CanvasRenderingContext2D,
-    { color = "black", lineWidth = 1, lineCap = "round" as CanvasLineCap } = {}
+    {
+      fillColor = "black",
+      strokeColor = "black",
+      lineWidth = 1,
+      lineCap = "round" as CanvasLineCap,
+      stroke = true,
+      fill = true,
+    } = {}
   ) {
-    ctx.strokeStyle = color;
+    ctx.fillStyle = fillColor;
+    ctx.strokeStyle = strokeColor;
     ctx.lineWidth = lineWidth;
     ctx.lineCap = lineCap;
 
@@ -80,7 +101,8 @@ export class ElasticShape {
       ctx.lineTo(j.position.x, j.position.y); // consider using bezier curves for a smooth line
     });
     this.closed && ctx.closePath();
-    ctx.stroke();
+    stroke && ctx.stroke();
+    fill && ctx.fill();
   }
 
   drawJoints(
@@ -154,12 +176,7 @@ export class ElasticLine extends ElasticShape {
       jointsRepulsion = 0,
     } = {}
   ) {
-    super([], mass, damping, jointsAttraction, jointsRepulsion);
-
-    this.mass = mass;
-    this.damping = damping;
-    this.jointsAttraction = jointsAttraction;
-    this.jointsRepulsion = jointsRepulsion;
+    super([], { mass, damping, jointsAttraction, jointsRepulsion });
 
     let prevJoint: Joint | undefined = undefined;
 

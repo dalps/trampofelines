@@ -12,6 +12,7 @@ import { drawTitle, toranporin } from "./type";
 import { Tube } from "./entities/Tube";
 import { GAMESTATE as state, settings } from "./GameState";
 import { Ironwool } from "./entities/Ironwool";
+import { JumboCat } from "./entities/JumboCat";
 
 let cw = 480;
 let ch = 480;
@@ -47,7 +48,8 @@ function init() {
 
   Trampofelines.init(state, canvas);
 
-  // lines.push(
+  state.lines.push(new JumboCat(new Point2(500, 500), new Point2(200, 50)));
+
   //   new Trampofeline(
   //     new Point2(cw * 0.2, ch * 0.5),
   //     new Point2(cw * 0.8, ch * 0.5),

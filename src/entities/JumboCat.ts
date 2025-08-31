@@ -1,0 +1,70 @@
+import { GAMESTATE as state, GAMESTATE as St } from "../GameState";
+import { CircleCollider, CollisionManager } from "../lib/Collisions2D";
+import { ElasticShape } from "../lib/ElasticLine";
+import Math2D, { Point2 } from "../lib/utils";
+import { Palette } from "./Trampofeline";
+
+export class JumboCat extends ElasticShape {
+  constructor(public position: Point2, public size: Point2, public subs = 10) {
+    const points: Point2[] = [];
+
+    const cornerTL = position;
+    const cornerTR = position.addX(size.x);
+    const cornerBL = position.addY(size.y);
+    const cornerBR = cornerBL.addX(size.x);
+
+    const subsY = Math.floor(subs * (size.y / size.x));
+
+    const clampIndeces: number[] = [];
+
+    let idx = 0;
+
+    (
+      [
+        [cornerTR, cornerTL, subs],
+        [cornerTL, cornerBL, subsY],
+        [cornerBL, cornerBR, subs],
+        [cornerBR, cornerTR, subsY],
+      ] as [Point2, Point2, number][]
+    ).forEach(([c1, c2, subs]) => {
+      for (let i = 0; i < subs; i++) {
+        i === 0 && clampIndeces.push(idx);
+        idx = points.push(Math2D.lerp2(c1, c2, i / subs));
+      }
+    });
+
+    super(points, {
+      closed: true,
+      jointsAttraction: 200,
+      mass: 2,
+      damping: 10,
+    });
+
+    clampIndeces.forEach((i) => {
+      this.joints.at(i)?.clearForces();
+      this.joints.at(i)?.toggleFixed();
+    });
+
+    this.joints.forEach((j) => {
+      j.attachCollider(
+        new CircleCollider(j.position, St.settings.colliderRadius)
+      );
+      state.balls.forEach((b) => CollisionManager.register(j, b));
+    });
+  }
+
+  draw(ctx: CanvasRenderingContext2D) {
+    super.draw(ctx, { fillColor: Palette.coatColor });
+
+    let {
+      position: { x, y },
+      size: { x: sx, y: sy },
+    } = this;
+    const p = new Path2D();
+
+    p.roundRect(x, y, sx, sy, 5);
+
+    // ctx.fillStyle = Palette.coatColor;
+    // ctx.fill(p);
+  }
+}

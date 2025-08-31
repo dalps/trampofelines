@@ -139,9 +139,11 @@ export default class Trampofelines {
   }
 }
 
-const coatColor = "#011123";
-const coatColor2 = "#112236ff";
-const detailColor = "#556679ff";
+export const Palette = {
+  coatColor: "#011123",
+  coatColor2: "#112236ff",
+  detailColor: "#556679ff",
+};
 
 export class Trampofeline extends ElasticLine {
   private _time: timestamp = 0;
@@ -152,6 +154,8 @@ export class Trampofeline extends ElasticLine {
   }
 
   draw(ctx: CanvasRenderingContext2D): void {
+    const { coatColor, detailColor } = Palette;
+
     ctx.lineWidth = 25;
     ctx.strokeStyle = coatColor;
     ctx.lineJoin = "round";
