@@ -1,3 +1,4 @@
+import type { Ironwool } from "./entities/Ironwool";
 import type { Tube } from "./entities/Tube";
 import type { ElasticLine } from "./lib/ElasticLine";
 import type { Ball } from "./lib/Physics2D";
@@ -19,6 +20,7 @@ export interface GameState {
   balls: Ball[];
   lines: ElasticLine[];
   tubes: Tube[];
+  enemies: Ironwool[];
   settings: typeof settings;
 }
 
@@ -26,5 +28,6 @@ export const GAMESTATE: GameState = {
   balls: [],
   lines: [],
   tubes: [],
+  enemies: [],
   settings,
 };

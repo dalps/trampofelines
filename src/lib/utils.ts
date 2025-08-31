@@ -1,3 +1,6 @@
+export const DEG2RAD = Math.PI / 180;
+export const RAD2DEG = 180 / Math.PI;
+
 export function makeColor(r = 255, g = 255, b = 255, a = 1) {
   return `rgba(${r},${g},${b},${a})`;
 }

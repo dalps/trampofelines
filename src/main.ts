@@ -11,6 +11,7 @@ import { Clock, type timestamp } from "./lib/TimeUtils";
 import { drawTitle, toranporin } from "./type";
 import { Tube } from "./entities/Tube";
 import { GAMESTATE as state, settings } from "./GameState";
+import { Ironwool } from "./entities/Ironwool";
 
 let cw = 480;
 let ch = 480;
@@ -114,6 +115,12 @@ function init() {
     new Tube(new Point2(0, 400), new Point2(80, 50))
   );
 
+  state.enemies.push(
+    new Ironwool(new Point2(200, 500)),
+    new Ironwool(new Point2(350, 500)),
+    new Ironwool(new Point2(500, 500))
+  );
+
   requestAnimationFrame(draw);
 }
 
@@ -141,6 +148,7 @@ function draw(time: timestamp) {
   // drawTitle(ctx, time);
 
   state.tubes.forEach((tube) => tube.draw(ctx));
+  state.enemies.forEach((e) => e.draw(ctx));
 
   settings.play && CollisionManager.update(dt);
 
