@@ -111,7 +111,7 @@ function init() {
   state.tubes.push(
     new Tube(new Point2(0, 100)),
     new Tube(new Point2(0, 200), new Point2(40, 200)),
-    new Tube(new Point2(0, 300), new Point2(80, 30))
+    new Tube(new Point2(0, 400), new Point2(80, 50))
   );
 
   requestAnimationFrame(draw);
@@ -138,7 +138,7 @@ function draw(time: timestamp) {
 
   clear();
 
-  drawTitle(ctx, time);
+  // drawTitle(ctx, time);
 
   state.tubes.forEach((tube) => tube.draw(ctx));
 

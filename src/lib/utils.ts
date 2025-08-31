@@ -30,6 +30,15 @@ export function resolveTouchPosition(canvasRect: DOMRect, e: Touch): Point2 {
 export class Point2 {
   constructor(public x: number, public y: number) {}
 
+  static ZERO = new Point2(0, 0);
+
+  static random(min = new Point2(0, 0), max = new Point2(1, 1)) {
+    return new Point2(
+      lerp(min.x, max.x, Math.random()),
+      lerp(min.y, max.y, Math.random())
+    );
+  }
+
   set(x: number, y: number) {
     this.x = x;
     this.y = y;
@@ -68,20 +77,26 @@ export class Point2 {
     return this;
   }
 
+  incrY(dy: number) {
+    this.y += dy;
+    return this;
+  }
+
+  incrX(dx: number) {
+    this.x += dx;
+    return this;
+  }
+
   add(p: Point2) {
     return this.clone().addI(p);
   }
 
-  addX(x: number) {
-    const p = this.clone();
-    p.x += x;
-    return p;
+  addX(dx: number) {
+    return this.clone().incrX(dx);
   }
 
-  addY(y: number) {
-    const p = this.clone();
-    p.y += y;
-    return p;
+  addY(dy: number) {
+    return this.clone().incrY(dy);
   }
 
   sub(p: Point2) {

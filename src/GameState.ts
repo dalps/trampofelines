@@ -10,8 +10,8 @@ export const settings = {
   colliderRadius: 20,
   lineMass: 2,
   ballMass: 3,
-  ballRadius: 10,
-  ballVelocity: new Point2(0, 5),
+  ballRadius: 20,
+  ballVelocity: new Point2(50, -10),
   gravity: false,
 };
 

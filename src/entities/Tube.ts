@@ -2,7 +2,7 @@ import { GAMESTATE as St } from "../GameState";
 import { CollisionManager } from "../lib/Collisions2D";
 import { Ripple } from "../lib/Ripple";
 import { Clock } from "../lib/TimeUtils";
-import { Point2 } from "../lib/utils";
+import { lerp, Point2 } from "../lib/utils";
 import { YarnBall } from "./YarnBall";
 
 export class Tube {
@@ -20,10 +20,21 @@ export class Tube {
       Math.floor(Math.random() * 3)
     ]
   ) {
+    let {
+      position: { x, y },
+      size: { x: sx, y: sy },
+    } = this;
+
+    const headLength = Math.max(sx * 0.1, 20);
+
     const startPos = this.position
       .clone()
-      .addX(this.size.x)
+      .addX(this.size.x + headLength)
       .addY(this.size.y * 0.5);
+
+    const p1 = startPos.addY(-30);
+    const p2 = startPos.addY(30).addX(20);
+
     const ball = new YarnBall(
       startPos,
       St.settings.ballVelocity,
@@ -32,12 +43,18 @@ export class Tube {
       color
     );
 
-    new Ripple(startPos.clone(), 20, 30);
+    const nRipples = 5;
+    for (let i = 0; i < nRipples; i++) {
+      const startRadius = lerp(10, 20, i / nRipples);
+      new Ripple(Point2.random(p1, p2), startRadius, startRadius + 10);
+    }
+
     St.balls.push(ball);
 
     St.lines.forEach((l) =>
       l.joints.forEach((j) => CollisionManager.register(j, ball))
     );
+    St.balls.forEach((b) => CollisionManager.register(ball, b));
     return ball;
   }
 
