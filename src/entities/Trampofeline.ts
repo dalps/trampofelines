@@ -145,6 +145,8 @@ export const Palette = {
   detailColor: "#556679ff",
 };
 
+const { coatColor, detailColor } = Palette;
+
 export class Trampofeline extends ElasticLine {
   private _time: timestamp = 0;
 
@@ -154,8 +156,6 @@ export class Trampofeline extends ElasticLine {
   }
 
   draw(ctx: CanvasRenderingContext2D): void {
-    const { coatColor, detailColor } = Palette;
-
     ctx.lineWidth = 25;
     ctx.strokeStyle = coatColor;
     ctx.lineJoin = "round";
@@ -170,122 +170,18 @@ export class Trampofeline extends ElasticLine {
     ctx.stroke();
 
     // draw the face at the first joint (where the mouse motion started)
-    ctx.save();
-
-    const j0 = this.joints[0]._position;
-    const j1 = this.joints[1]._position;
-    const dir = j0.sub(j1);
-    const angle = Math.atan2(-dir.x, dir.y);
-
-    ctx.translate(j0.x, j0.y);
-    ctx.rotate(angle);
-
-    // arms & paws
-    ctx.strokeStyle = coatColor;
-    ctx.lineWidth = 10;
-    const pawDistance = 10;
-    [pawDistance, -pawDistance].forEach((x) => {
-      ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, 40);
-      ctx.stroke();
+    {
+      const j0 = this.joints[0]._position;
+      const j1 = this.joints[1]._position;
+      const dir = j0.sub(j1);
+      const angle = Math.atan2(-dir.x, dir.y);
 
       ctx.save();
-      ctx.strokeStyle = detailColor;
-      ctx.lineWidth = 2;
-      ctx.translate(x, 40);
-
-      ctx.beginPath();
-      ctx.moveTo(2, 4);
-      ctx.lineTo(2, 0);
-      ctx.moveTo(-2, 4);
-      ctx.lineTo(-2, 0);
-      ctx.stroke();
+      ctx.translate(j0.x, j0.y);
+      ctx.rotate(angle);
+      drawCatFace(ctx);
       ctx.restore();
-    });
-
-    // mouth
-    ctx.fillStyle = coatColor;
-    ctx.beginPath();
-    ctx.moveTo(20, -20);
-    // ctx.quadraticCurveTo(0, 50, -20, -20);
-    ctx.bezierCurveTo(40, 30, -40, 30, -20, -20);
-    ctx.closePath();
-    ctx.fill();
-
-    // eyes
-    const eyeY = -10;
-    const outerEye = 5;
-    const innerEye = 2;
-
-    ctx.fillStyle = "white";
-    ctx.beginPath();
-    circle(ctx, new Point2(10, eyeY), outerEye);
-    circle(ctx, new Point2(-10, eyeY), outerEye);
-    ctx.closePath();
-    ctx.fill();
-
-    ctx.fillStyle = "black";
-    ctx.beginPath();
-    circle(ctx, new Point2(10, eyeY), innerEye);
-    circle(ctx, new Point2(-10, eyeY), innerEye);
-    ctx.closePath();
-    ctx.fill();
-
-    // whiskers
-    ctx.strokeStyle = "white";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    const start = 5;
-    const end = 20;
-    [
-      [-start, -end],
-      [start, end],
-    ].forEach(([start, end]) => {
-      [-5, 0, 5].forEach((y) => {
-        ctx.moveTo(start, 0);
-        ctx.lineTo(end, y);
-      });
-    });
-    ctx.stroke();
-
-    // ears
-    ctx.fillStyle = coatColor;
-    ctx.strokeStyle = detailColor;
-    const innerEarX = 10;
-    const earY = -18;
-    const earHeight = 10;
-
-    ctx.beginPath();
-    [innerEarX, -innerEarX].forEach((x, i) => {
-      ctx.moveTo(x, earY);
-      ctx.lineTo(x + (i === 1 ? -1 : 1) * 5, earY - earHeight);
-      ctx.lineTo(x + (i === 1 ? -1 : 1) * 10, earY);
-      ctx.stroke();
-      ctx.fill();
-    });
-
-    // snout
-    ctx.fillStyle = "pink";
-    ctx.strokeStyle = "black";
-    ctx.beginPath();
-    circle(ctx, new Point2(0, 0), 4);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-
-    // mouth
-    ctx.strokeStyle = detailColor;
-    ctx.beginPath();
-    const mouthY = 5;
-    const mouthAngle = 5;
-    const mouthWidth = 7;
-    ctx.moveTo(-mouthWidth, mouthY);
-    ctx.quadraticCurveTo(-mouthAngle, 10, 0, mouthY);
-    ctx.quadraticCurveTo(mouthAngle, 10, mouthWidth, mouthY);
-    ctx.stroke();
-
-    ctx.restore();
+    }
 
     // draw the butt & the tail at the last joint (where the mouse was lifted)
     {
@@ -297,77 +193,188 @@ export class Trampofeline extends ElasticLine {
       ctx.save();
       ctx.translate(lastJoint.x, lastJoint.y);
       ctx.rotate(angle);
-
-      // butt
-      ctx.fillStyle = coatColor;
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      circle(ctx, new Point2(0, 0), 20);
-      ctx.fill();
-
-      ctx.strokeStyle = detailColor;
-      ctx.beginPath();
-      ctx.moveTo(2, 4);
-      ctx.lineTo(-2, 0);
-      ctx.moveTo(-2, 4);
-      ctx.lineTo(2, 0);
-      ctx.stroke();
-
-      // arms & paws
-      ctx.strokeStyle = coatColor;
-      ctx.lineWidth = 10;
-      const pawDistance = 10;
-      [pawDistance, -pawDistance].forEach((x) => {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, 40);
-        ctx.stroke();
-
-        ctx.save();
-        ctx.strokeStyle = detailColor;
-        ctx.lineWidth = 2;
-        ctx.translate(x, 40);
-
-        ctx.fillStyle = detailColor;
-        ctx.beginPath();
-        circle(ctx, new Point2(0, -3), 3);
-        ctx.closePath();
-        circle(ctx, new Point2(4, 2), 2);
-        ctx.closePath();
-        circle(ctx, new Point2(0, 4), 2);
-        ctx.closePath();
-        circle(ctx, new Point2(-4, 2), 2);
-        ctx.fill();
-
-        ctx.restore();
-      });
-
-      // tail
-      const tailSegmentSize = 40;
-      const t = Math.sin(this._time * 0.1) * 0.5 + 0.5;
-      const tailSwerve = lerp(-15, 15, t);
-      const tailSegments = 2;
-      const startY = -7;
-      ctx.strokeStyle = coatColor;
-      ctx.lineWidth = 10;
-      ctx.beginPath();
-      ctx.moveTo(0, 0);
-      for (
-        let i = 0, y = tailSegmentSize;
-        i < tailSegments;
-        i++, y += tailSegmentSize
-      ) {
-        ctx.quadraticCurveTo(
-          (i % 2 === 0 ? -1 : 1) * tailSwerve,
-          tailSegmentSize * 0.5 + i * tailSegmentSize + startY,
-          0,
-          y + startY
-        );
-      }
-
-      ctx.stroke();
-
+      drawCatRear(ctx, this._time);
       ctx.restore();
     }
   }
+}
+
+export function drawCatFace(ctx: CanvasRenderingContext2D) {
+  const { coatColor, detailColor } = Palette;
+
+  // arms & paws
+  ctx.strokeStyle = coatColor;
+  ctx.lineWidth = 10;
+  const pawDistance = 10;
+  [pawDistance, -pawDistance].forEach((x) => {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, 40);
+    ctx.stroke();
+
+    ctx.save();
+    ctx.strokeStyle = detailColor;
+    ctx.lineWidth = 2;
+    ctx.translate(x, 40);
+
+    ctx.beginPath();
+    ctx.moveTo(2, 4);
+    ctx.lineTo(2, 0);
+    ctx.moveTo(-2, 4);
+    ctx.lineTo(-2, 0);
+    ctx.stroke();
+    ctx.restore();
+  });
+
+  // face
+  ctx.fillStyle = coatColor;
+  ctx.beginPath();
+  ctx.moveTo(20, -20);
+  // ctx.quadraticCurveTo(0, 50, -20, -20);
+  ctx.bezierCurveTo(40, 30, -40, 30, -20, -20);
+  ctx.closePath();
+  ctx.fill();
+
+  // eyes
+  const eyeY = -10;
+  const outerEye = 5;
+  const innerEye = 2;
+
+  ctx.fillStyle = "white";
+  ctx.beginPath();
+  circle(ctx, new Point2(10, eyeY), outerEye);
+  circle(ctx, new Point2(-10, eyeY), outerEye);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.fillStyle = "black";
+  ctx.beginPath();
+  circle(ctx, new Point2(10, eyeY), innerEye);
+  circle(ctx, new Point2(-10, eyeY), innerEye);
+  ctx.closePath();
+  ctx.fill();
+
+  // whiskers
+  ctx.strokeStyle = "white";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  const start = 5;
+  const end = 20;
+  [
+    [-start, -end],
+    [start, end],
+  ].forEach(([start, end]) => {
+    [-5, 0, 5].forEach((y) => {
+      ctx.moveTo(start, 0);
+      ctx.lineTo(end, y);
+    });
+  });
+  ctx.stroke();
+
+  // ears
+  ctx.fillStyle = coatColor;
+  ctx.strokeStyle = detailColor;
+  const innerEarX = 10;
+  const earY = -18;
+  const earHeight = 10;
+
+  ctx.beginPath();
+  [innerEarX, -innerEarX].forEach((x, i) => {
+    ctx.moveTo(x, earY);
+    ctx.lineTo(x + (i === 1 ? -1 : 1) * 5, earY - earHeight);
+    ctx.lineTo(x + (i === 1 ? -1 : 1) * 10, earY);
+    ctx.stroke();
+    ctx.fill();
+  });
+
+  // snout
+  ctx.fillStyle = "pink";
+  ctx.strokeStyle = "black";
+  ctx.beginPath();
+  circle(ctx, new Point2(0, 0), 4);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  // mouth
+  ctx.strokeStyle = detailColor;
+  ctx.beginPath();
+  const mouthY = 5;
+  const mouthAngle = 5;
+  const mouthWidth = 7;
+  ctx.moveTo(-mouthWidth, mouthY);
+  ctx.quadraticCurveTo(-mouthAngle, 10, 0, mouthY);
+  ctx.quadraticCurveTo(mouthAngle, 10, mouthWidth, mouthY);
+  ctx.stroke();
+}
+
+export function drawCatRear(ctx: CanvasRenderingContext2D, time = 0) {
+  // butt
+  ctx.fillStyle = coatColor;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  circle(ctx, new Point2(0, 0), 20);
+  ctx.fill();
+
+  // that part
+  ctx.strokeStyle = detailColor;
+  ctx.beginPath();
+  ctx.moveTo(2, 4);
+  ctx.lineTo(-2, 0);
+  ctx.moveTo(-2, 4);
+  ctx.lineTo(2, 0);
+  ctx.stroke();
+
+  // arms & paws
+  ctx.strokeStyle = coatColor;
+  ctx.lineWidth = 10;
+  const pawDistance = 10;
+  [pawDistance, -pawDistance].forEach((x) => {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, 40);
+    ctx.stroke();
+
+    ctx.save();
+    ctx.strokeStyle = detailColor;
+    ctx.lineWidth = 2;
+    ctx.translate(x, 40);
+
+    ctx.fillStyle = detailColor;
+    ctx.beginPath();
+    circle(ctx, new Point2(0, -3), 3);
+    ctx.closePath();
+    circle(ctx, new Point2(4, 2), 2);
+    ctx.closePath();
+    circle(ctx, new Point2(0, 4), 2);
+    ctx.closePath();
+    circle(ctx, new Point2(-4, 2), 2);
+    ctx.fill();
+
+    ctx.restore();
+  });
+
+  // tail
+  const tailSegmentSize = 40;
+  const t = Math.sin(time * 0.1) * 0.5 + 0.5;
+  const tailSwerve = lerp(-15, 15, t);
+  const tailSegments = 2;
+  const startY = -7;
+  ctx.strokeStyle = coatColor;
+  ctx.lineWidth = 10;
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  for (
+    let i = 0, y = tailSegmentSize;
+    i < tailSegments;
+    i++, y += tailSegmentSize
+  ) {
+    ctx.quadraticCurveTo(
+      (i % 2 === 0 ? -1 : 1) * tailSwerve,
+      tailSegmentSize * 0.5 + i * tailSegmentSize + startY,
+      0,
+      y + startY
+    );
+  }
+  ctx.stroke();
 }

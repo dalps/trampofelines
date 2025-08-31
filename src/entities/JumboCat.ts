@@ -1,11 +1,12 @@
 import { GAMESTATE as state, GAMESTATE as St } from "../GameState";
+import { circle } from "../lib/CanvasUtils";
 import { CircleCollider, CollisionManager } from "../lib/Collisions2D";
 import { ElasticShape } from "../lib/ElasticLine";
 import Math2D, { Point2 } from "../lib/utils";
-import { Palette } from "./Trampofeline";
+import { drawCatFace, Palette } from "./Trampofeline";
 
 export class JumboCat extends ElasticShape {
-  constructor(public position: Point2, public size: Point2, public subs = 10) {
+  constructor(public position: Point2, public size: Point2, public subs = 7) {
     const points: Point2[] = [];
 
     const cornerTL = position;
@@ -60,9 +61,19 @@ export class JumboCat extends ElasticShape {
       position: { x, y },
       size: { x: sx, y: sy },
     } = this;
+
     const p = new Path2D();
 
     p.roundRect(x, y, sx, sy, 5);
+
+    const jl = this.joints.at(Math.floor(this.subs * 0.5))!._position;
+    const jr = this.joints.at(Math.floor(this.subs * 0.5 + 1))!._position;
+    const center = Math2D.lerp2(jl, jr, 0.5).addY(sy * 0.5);
+
+    ctx.save();
+    ctx.translate(center.x, center.y);
+    drawCatFace(ctx);
+    ctx.restore();
 
     // ctx.fillStyle = Palette.coatColor;
     // ctx.fill(p);

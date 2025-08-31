@@ -48,7 +48,7 @@ function init() {
 
   Trampofelines.init(state, canvas);
 
-  state.lines.push(new JumboCat(new Point2(500, 500), new Point2(200, 50)));
+  state.lines.push(new JumboCat(new Point2(500, 500), new Point2(200, 50), 7));
 
   //   new Trampofeline(
   //     new Point2(cw * 0.2, ch * 0.5),

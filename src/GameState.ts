@@ -6,7 +6,7 @@ import { Point2 } from "./lib/utils";
 
 export const settings = {
   showJoints: false,
-  showForces: true,
+  showForces: false,
   play: true,
   colliderRadius: 20,
   lineMass: 2,
