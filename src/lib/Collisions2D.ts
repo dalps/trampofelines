@@ -53,7 +53,7 @@ export class CollisionManager {
       const aboveJoint = b2._position.y < b1._position.y;
 
       if (info.test && isDescending && aboveJoint) {
-        console.log(`b1: ${b1.name} vs b2: ${b2.name} ${b2._velocity}`);
+        // console.log(`b1: ${b1.name} vs b2: ${b2.name} ${b2._velocity}`);
         b1.addForce(this.collide(b1, b2, info.sep1));
         b2.addForce(this.collide(b2, b1, info.sep2));
       }

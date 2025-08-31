@@ -61,11 +61,11 @@ function init() {
 
   window.addEventListener("resize", setSize);
 
-  canvas.addEventListener("click", (e) => {
-    if (Trampofelines.isDrawing()) return;
+  // canvas.addEventListener("click", (e) => {
+  //   if (Trampofelines.isDrawing()) return;
 
-    spawnBall(resolveMousePosition(e));
-  });
+  //   spawnBall(resolveMousePosition(e));
+  // });
 
   // Set up panes
   pane = new Pane({ title: "Settings", expanded: false });
@@ -158,12 +158,29 @@ function draw(time: timestamp) {
     });
   });
 
-  balls.forEach((b) => {
+  let ballsToRemove: number[] = [];
+
+  balls.forEach((b, i) => {
+    if (
+      b._position.x < b.radius ||
+      b._position.x > cw + b.radius ||
+      b._position.y < b.radius ||
+      b._position.y > ch + b.radius
+    ) {
+      ballsToRemove.push(i);
+      return;
+    }
+
     settings.play && b.update(dt);
 
     b.draw(ctx);
     settings.showForces && b.drawForces(ctx);
     settings.showForces && b.drawCollider(ctx);
+  });
+
+  ballsToRemove.forEach((idx) => {
+    balls.splice(idx, 1);
+    // unregister the body
   });
 
   RippleManager.updateAndDraw(ctx, dt * 0.1);
