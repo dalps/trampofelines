@@ -68,7 +68,24 @@ function init() {
   //   spawnBall(resolveMousePosition(e));
   // });
 
-  // Set up panes
+  setupPanes();
+
+  state.tubes.push(
+    new Tube(new Point2(0, 100)),
+    new Tube(new Point2(0, 200), new Point2(40, 200)),
+    new Tube(new Point2(0, 400), new Point2(80, 50))
+  );
+
+  state.enemies.push(
+    new Ironwool(new Point2(200, 500)),
+    new Ironwool(new Point2(350, 500)),
+    new Ironwool(new Point2(500, 500))
+  );
+
+  requestAnimationFrame(draw);
+}
+
+function setupPanes() {
   pane = new Pane({ title: "Settings", expanded: false });
   pane.addBinding(settings, "showJoints");
   pane.addBinding(settings, "showForces");
@@ -108,20 +125,6 @@ function init() {
       balls.splice(0);
       lines.splice(0);
     });
-
-  state.tubes.push(
-    new Tube(new Point2(0, 100)),
-    new Tube(new Point2(0, 200), new Point2(40, 200)),
-    new Tube(new Point2(0, 400), new Point2(80, 50))
-  );
-
-  state.enemies.push(
-    new Ironwool(new Point2(200, 500)),
-    new Ironwool(new Point2(350, 500)),
-    new Ironwool(new Point2(500, 500))
-  );
-
-  requestAnimationFrame(draw);
 }
 
 function clear() {
