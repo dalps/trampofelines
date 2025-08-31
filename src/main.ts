@@ -1,6 +1,6 @@
 import { drawGrid } from "./lib/CanvasUtils";
 import { CircleCollider, CollisionManager } from "./lib/Collisions2D";
-import { ElasticLine, ElasticShape } from "./lib/ElasticLine";
+import { ElasticShape } from "./lib/ElasticLine";
 import { Attraction, Ball, Gravity, Repulsion } from "./lib/Physics2D";
 import { Ripple, RippleManager } from "./lib/Ripple";
 import Math2D, { lerp, Point2, resolveMousePosition } from "./lib/utils";
@@ -10,6 +10,7 @@ import "./style.css";
 import { Clock, type timestamp } from "./lib/TimeUtils";
 import { drawTitle, toranporin } from "./type";
 import { Tube } from "./entities/Tube";
+import { GAMESTATE as state, settings } from "./GameState";
 
 let cw = 480;
 let ch = 480;
@@ -19,32 +20,6 @@ let canvas: HTMLCanvasElement;
 let canvasRect: DOMRect;
 let ctx: CanvasRenderingContext2D;
 let pane: Pane;
-
-const settings = {
-  showJoints: false,
-  showForces: false,
-  play: true,
-  colliderRadius: 20,
-  lineMass: 2,
-  ballMass: 3,
-  ballRadius: 10,
-  ballVelocity: new Point2(0, 5),
-  gravity: false,
-};
-
-export interface GameState {
-  balls: Ball[];
-  lines: ElasticLine[];
-  tubes: Tube[];
-  settings: typeof settings;
-}
-
-let state: GameState = {
-  balls: [],
-  lines: [],
-  tubes: [],
-  settings,
-};
 
 const { balls, lines } = state;
 
@@ -83,34 +58,6 @@ function init() {
   //     }
   //   )
   // );
-
-  function makeBall(
-    startPos: Point2,
-    color = ["coral", "fuchsia", "chartreuse", "pink"][
-      Math.floor(Math.random() * 3)
-    ]
-  ) {
-    const ball = new Ball(startPos.clone(), settings.ballRadius, color);
-
-    ball.attachCollider(new CircleCollider(ball.position, ball.radius));
-    ball.velocity.set(settings.ballVelocity.x, settings.ballVelocity.y);
-    ball.mass = settings.ballMass;
-    ball.addForce(Gravity);
-
-    balls.push(ball);
-
-    return ball;
-  }
-
-  function spawnBall(pos: Point2) {
-    const ball = makeBall(pos.clone());
-
-    new Ripple(pos.clone(), 20, 30);
-
-    lines.forEach((l) =>
-      l.joints.forEach((j) => CollisionManager.register(j, ball))
-    );
-  }
 
   window.addEventListener("resize", setSize);
 

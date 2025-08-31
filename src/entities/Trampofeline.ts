@@ -9,7 +9,7 @@ import {
   resolveMousePosition,
   resolveTouchPosition,
 } from "../lib/utils";
-import type { GameState } from "../main";
+import type { GameState } from "../GameState";
 
 let canvasRect: DOMRect;
 
