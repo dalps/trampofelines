@@ -1,16 +1,14 @@
-import "./style.css";
+import { Pane } from "tweakpane";
+import Trampofelines from "./entities/Trampofeline";
+import { Tube } from "./entities/Tube";
+import { settings, GAMESTATE as state } from "./GameState";
 import { drawGrid } from "./lib/CanvasUtils";
 import { CollisionManager } from "./lib/Collisions2D";
 import { Gravity } from "./lib/Physics2D";
 import { RippleManager } from "./lib/Ripple";
-import { Point2 } from "./lib/utils";
-import { Pane } from "tweakpane";
-import Trampofelines from "./entities/Trampofeline";
 import { Clock, type timestamp } from "./lib/TimeUtils";
-import { toranporin } from "./type";
-import { Tube } from "./entities/Tube";
-import { GAMESTATE as state, settings } from "./GameState";
-import { JumboCat } from "./entities/JumboCat";
+import { Point2 } from "./lib/utils";
+import "./style.css";
 
 let cw: number;
 let ch: number;

@@ -1,5 +1,5 @@
 import { circle, popsicle } from "./CanvasUtils";
-import type { CircleCollider, Collider } from "./Collisions2D";
+import type { Collider } from "./Collisions2D";
 import type { Color } from "./Color";
 import { damp, Point2 } from "./utils";
 

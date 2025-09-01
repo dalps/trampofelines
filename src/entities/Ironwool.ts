@@ -1,5 +1,4 @@
-import { circle } from "../lib/CanvasUtils";
-import Math2D, { DEG2RAD, Point2 } from "../lib/utils";
+import { DEG2RAD, Point2 } from "../lib/utils";
 
 export class Ironwool {
   constructor(public position: Point2) {}

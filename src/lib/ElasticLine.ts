@@ -1,9 +1,8 @@
 import {
   Attraction,
   DynamicBody,
-  Force,
   Repulsion,
-  type instant,
+  type instant
 } from "./Physics2D";
 import Math2D, { Point2 } from "./utils";
 

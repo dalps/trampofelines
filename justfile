@@ -3,3 +3,6 @@ default:
 
 build:
     npx vite build
+
+linecount:
+    find src/ -name '*.ts' | xargs wc -lc

@@ -1,5 +1,7 @@
+import type { GameState } from "../GameState";
 import { circle } from "../lib/CanvasUtils";
 import { CircleCollider, CollisionManager } from "../lib/Collisions2D";
+import { Palette } from "../lib/Color";
 import { ElasticLine } from "../lib/ElasticLine";
 import { Gravity, State, type instant } from "../lib/Physics2D";
 import type { timestamp } from "../lib/TimeUtils";
@@ -10,8 +12,6 @@ import {
   resolveMousePosition,
   resolveTouchPosition,
 } from "../lib/utils";
-import type { GameState } from "../GameState";
-import { Palette } from "../lib/Color";
 
 let canvasRect: DOMRect;
 
