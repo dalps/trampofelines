@@ -56,7 +56,7 @@ export class JumboCat extends ElasticShape {
   }
 
   draw(ctx: CanvasRenderingContext2D) {
-    super.draw(ctx, { fillColor: Palette.colors.coatColor.toString() });
+    super.draw(ctx, { fillColor: Palette.colors.nightBlue.toString() });
 
     let {
       position: { x, y },

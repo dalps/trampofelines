@@ -1,5 +1,6 @@
 import { circle, popsicle } from "./CanvasUtils";
 import type { CircleCollider, Collider } from "./Collisions2D";
+import type { Color } from "./Color";
 import { damp, Point2 } from "./utils";
 
 export type instant = number;
@@ -254,12 +255,12 @@ export class DynamicBody {
 export const Gravity = new Force(new Point2(0, 1), 9.81);
 
 export class Ball extends DynamicBody {
-  constructor(p: Point2, public radius = 10, public color = "yellow") {
+  constructor(p: Point2, public radius = 10, public color: Color) {
     super(p, { mass: radius, name: "ball", friction: 0.1 });
   }
 
   draw(ctx: CanvasRenderingContext2D) {
-    ctx.fillStyle = this.color;
+    ctx.fillStyle = this.color.toString();
     ctx.strokeStyle = "black";
     ctx.lineWidth = 2;
     ctx.beginPath();

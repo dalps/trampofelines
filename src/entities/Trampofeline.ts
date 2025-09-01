@@ -21,7 +21,13 @@ let mouseDown = false;
 let distance = 0;
 let drawing = false;
 
-const { coatColor, detailColor, white, black, pink } = Palette.colors;
+const {
+  nightBlue: coatColor,
+  blueGray: detailColor,
+  white,
+  black,
+  pink,
+} = Palette.colors;
 
 export default class Trampofelines {
   static init(state: GameState, canvas: HTMLCanvasElement) {

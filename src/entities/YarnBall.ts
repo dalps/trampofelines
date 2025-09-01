@@ -1,4 +1,5 @@
 import { CircleCollider } from "../lib/Collisions2D";
+import type { HSLColor } from "../lib/Color";
 import { ElasticLine, ElasticShape } from "../lib/ElasticLine";
 import { Ball, Gravity } from "../lib/Physics2D";
 import type { Point2 } from "../lib/utils";
@@ -13,12 +14,13 @@ export class YarnBall extends Ball {
     startVelocity: Point2,
     mass: number,
     radius: number | undefined,
-    color: string | undefined
+    color: HSLColor
   ) {
-    super(startPos, radius, color);
+    super(startPos, radius);
 
     this._velocity = startVelocity.clone();
     this.mass = mass;
+    this.color = color;
 
     this.attachCollider(new CircleCollider(this.position, this.radius));
     this.addForce(Gravity);
@@ -59,12 +61,12 @@ export class YarnBall extends Ball {
   draw(ctx: CanvasRenderingContext2D): void {
     this.thread.draw(ctx, {
       fill: false,
-      strokeColor: this.color,
+      strokeColor: this.color.toString(),
       lineWidth: 4,
     });
 
     const col1 = this.color;
-    const col2 = "rgb(230, 50, 50)";
+    const col2 = this.color.lighten(1.1);
     const { x, y } = this._position;
 
     // super.draw(ctx);

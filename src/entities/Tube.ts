@@ -1,5 +1,6 @@
 import { GAMESTATE as St } from "../GameState";
 import { CollisionManager } from "../lib/Collisions2D";
+import { HSLColor, Palette } from "../lib/Color";
 import { Ripple } from "../lib/Ripple";
 import { Clock } from "../lib/TimeUtils";
 import { lerp, Point2 } from "../lib/utils";
@@ -12,22 +13,23 @@ export class Tube {
   constructor(position: Point2, size = new Point2(100, 100)) {
     this.position = position;
     this.size = size;
-    Clock.every(50, () => {
+    Clock.every(10, () => {
       if (St.balls.length < 25) this.spawnYarnBall();
     });
   }
 
-  spawnYarnBall(
-    color = ["coral", "fuchsia", "chartreuse", "pink"][
-      Math.floor(Math.random() * 3)
-    ]
-  ) {
+  spawnYarnBall() {
     let {
       position: { x, y },
       size: { x: sx, y: sy },
     } = this;
 
     const headLength = Math.max(sx * 0.1, 20);
+
+    const colorOptions = ["coral", "fuchsia", "chartreuse", "hotPink"];
+    const color = Palette.colors[
+      colorOptions[Math.floor(Math.random() * colorOptions.length)]
+    ] as HSLColor;
 
     const startPos = this.position
       .clone()
