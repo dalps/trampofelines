@@ -1,9 +1,10 @@
 import { GAMESTATE as state, GAMESTATE as St } from "../GameState";
 import { circle } from "../lib/CanvasUtils";
 import { CircleCollider, CollisionManager } from "../lib/Collisions2D";
+import { Palette } from "../lib/Color";
 import { ElasticShape } from "../lib/ElasticLine";
 import Math2D, { Point2 } from "../lib/utils";
-import { drawCatFace, Palette } from "./Trampofeline";
+import { drawCatFace } from "./Trampofeline";
 
 export class JumboCat extends ElasticShape {
   constructor(public position: Point2, public size: Point2, public subs = 7) {
@@ -55,7 +56,7 @@ export class JumboCat extends ElasticShape {
   }
 
   draw(ctx: CanvasRenderingContext2D) {
-    super.draw(ctx, { fillColor: Palette.coatColor });
+    super.draw(ctx, { fillColor: Palette.colors.coatColor.toString() });
 
     let {
       position: { x, y },

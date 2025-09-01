@@ -12,7 +12,7 @@ export class Tube {
   constructor(position: Point2, size = new Point2(100, 100)) {
     this.position = position;
     this.size = size;
-    Clock.every(10, () => {
+    Clock.every(50, () => {
       if (St.balls.length < 25) this.spawnYarnBall();
     });
   }
@@ -56,7 +56,7 @@ export class Tube {
     St.lines.forEach((l) =>
       l.joints.forEach((j) => CollisionManager.register(j, ball))
     );
-    // St.balls.forEach((b) => CollisionManager.register(ball, b));
+
     return ball;
   }
 

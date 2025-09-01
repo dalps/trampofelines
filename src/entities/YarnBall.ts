@@ -77,7 +77,6 @@ export class YarnBall extends Ball {
         const dStart = theta + subs * i;
         const dEnd = theta + 180 - subs * i;
 
-        console.log(dStart, dEnd);
         ctx.beginPath();
         ctx.arc(x, y, this.radius, dStart * DEG2RAD, dEnd * DEG2RAD, false);
         ctx.closePath();

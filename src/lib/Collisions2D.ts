@@ -1,61 +1,104 @@
 import {
   ContactForce,
-  Force,
+  State,
   type DynamicBody,
   type instant,
 } from "./Physics2D";
-import { damp, Point2 } from "./utils";
+import { Point2 } from "./utils";
 
 const contactForceFactor = 20;
 
 interface CollisionPair {
+  id1: string;
+  id2: string;
   r1: WeakRef<DynamicBody>;
   r2: WeakRef<DynamicBody>;
+  filter?: (b1: DynamicBody, b2: DynamicBody) => boolean;
+  cb?: Function;
 }
 
 export class CollisionManager {
   private static _id = 0;
-  private static _bodies: Map<number, CollisionPair> = new Map();
+  private static _bodies: CollisionPair[] = [];
 
-  static register(b1: DynamicBody, b2: DynamicBody): number {
+  static getID(b: DynamicBody) {
+    if (b.state !== State.Alive) {
+      console.log(`Refusing to assign an id to dead body ${b.name}`);
+      return undefined;
+    }
+
+    if (!b.collisionID) {
+      const id = `${b.name}_${this._id++}`;
+      console.log(
+        `${b.name} doesn't have an id yet. Creating new one... ${id}`
+      );
+      return (b.collisionID = id);
+    }
+
+    return b.collisionID;
+  }
+
+  static register(
+    b1: DynamicBody,
+    b2: DynamicBody,
+    filter?: (b1: DynamicBody, b2: DynamicBody) => boolean,
+    cb?: Function
+  ): void {
     if (!b1.collider || !b2.collider) {
       throw new Error("Cannot register a body without an attached collider.");
+    }
+
+    let id1 = this.getID(b1);
+    let id2 = this.getID(b2);
+
+    if (!id1 || !id2) {
+      console.log(`Couldn't schedule collisions for ${b1.name} or ${b2.name}.`);
+      return;
     }
 
     const r1 = new WeakRef(b1);
     const r2 = new WeakRef(b2);
 
-    this._bodies.set(this._id++, { r1, r2 });
-    return this._id;
+    this._bodies.push({ id1, id2, r1, r2, filter, cb });
   }
 
-  static unregister(id: number) {
-    this._bodies.delete(id);
+  static unregister(id: string) {
+    const entriesToRemove: number[] = [];
+
+    console.log(`Searching for entries with ${id}...`);
+    this._bodies.forEach(({ id1, id2 }, idx) => {
+      if (id === id1 || id === id2) {
+        console.log(`Unregistered pair ${id1}~${id2}.`);
+        entriesToRemove.push(idx);
+      }
+    });
+
+    entriesToRemove.forEach((idx) => this._bodies.splice(idx, 1));
   }
 
   static update(dt: instant) {
-    this._bodies.forEach(({ r1, r2 }) => {
+    this._bodies.forEach(({ r1, r2, filter, cb }) => {
       const b1 = r1.deref();
       const b2 = r2.deref();
 
       if (!b1 || !b2) {
-        console.log("A body's missing");
+        console.log(
+          `A registered body was dropped.\nb1: ${b1?.name} b2: ${b2?.name}`
+        );
         return;
       }
 
       const c1 = b1.collider!;
       const c2 = b2.collider!;
 
+      if (filter && !filter(b1, b2)) return;
+
       const info = c1.checkContact(c2);
 
-      // only react if ball is in descending motion AND strictly above the joint
-      const isDescending = b2._velocity.y >= 0;
-      const aboveJoint = b2._position.y < b1._position.y;
-
-      if (info.test && isDescending && aboveJoint) {
-        // console.log(`b1: ${b1.name} vs b2: ${b2.name} ${b2._velocity}`);
+      if (info.test) {
         b1.addForce(this.collide(b1, b2, info.sep1));
         b2.addForce(this.collide(b2, b1, info.sep2));
+        cb && cb();
       }
     });
   }

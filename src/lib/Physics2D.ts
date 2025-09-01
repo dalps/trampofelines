@@ -102,6 +102,12 @@ export class ContactForce extends Force {
   }
 }
 
+export enum State {
+  Alive,
+  Asleep,
+  Dead,
+}
+
 export class DynamicBody {
   public _position: Point2;
   public _velocity: Point2;
@@ -112,6 +118,8 @@ export class DynamicBody {
   public collider?: Collider;
   public name?: string;
   public ref?: WeakRef<DynamicBody>;
+  public collisionID?: string;
+  public state: State = State.Alive;
   public mass: number;
   public friction: number;
 

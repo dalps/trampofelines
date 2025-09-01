@@ -1,15 +1,17 @@
 import { circle } from "../lib/CanvasUtils";
 import { CircleCollider, CollisionManager } from "../lib/Collisions2D";
 import { ElasticLine } from "../lib/ElasticLine";
-import { Ball, Gravity, type instant } from "../lib/Physics2D";
+import { Gravity, State, type instant } from "../lib/Physics2D";
 import type { timestamp } from "../lib/TimeUtils";
 import {
+  damp,
   lerp,
   Point2,
   resolveMousePosition,
   resolveTouchPosition,
 } from "../lib/utils";
 import type { GameState } from "../GameState";
+import { Palette } from "../lib/Color";
 
 let canvasRect: DOMRect;
 
@@ -18,6 +20,8 @@ let p2: Point2 | undefined;
 let mouseDown = false;
 let distance = 0;
 let drawing = false;
+
+const { coatColor, detailColor, white, black, pink } = Palette.colors;
 
 export default class Trampofelines {
   static init(state: GameState, canvas: HTMLCanvasElement) {
@@ -108,7 +112,23 @@ export default class Trampofelines {
         j.attachCollider(
           new CircleCollider(j.position, state.settings.colliderRadius)
         );
-        balls.forEach((b) => CollisionManager.register(j, b));
+
+        balls.forEach((b) =>
+          CollisionManager.register(
+            j,
+            b,
+            (b1, b2) => {
+              // only react if ball is in descending motion AND strictly above the joint
+              const isDescending = b2._velocity.y >= 0;
+              const aboveJoint = b2._position.y < b1._position.y;
+              return isDescending && aboveJoint;
+            },
+            () => {
+              console.log("hello?");
+              line.kill();
+            }
+          )
+        );
       });
 
       p1 = p2 = undefined;
@@ -139,25 +159,31 @@ export default class Trampofelines {
   }
 }
 
-export const Palette = {
-  coatColor: "#011123",
-  coatColor2: "#112236ff",
-  detailColor: "#556679ff",
-};
-
-const { coatColor, detailColor } = Palette;
-
 export class Trampofeline extends ElasticLine {
   private _time: timestamp = 0;
+  private _transparency = 1;
+  private _killed = false;
+
+  kill() {
+    // this._killed = true;
+    console.log(`Killing trampoline...`);
+    this.joints.forEach((j) => {
+      j.state = State.Dead;
+      CollisionManager.unregister(j.collisionID!);
+    });
+  }
 
   update(dt: instant): void {
     super.update(dt);
+    this._killed && (this._transparency = damp(this._transparency, 0, 0.5, dt));
     this._time += dt;
   }
 
   draw(ctx: CanvasRenderingContext2D): void {
+    Palette.setTransparency(this._transparency);
+
     ctx.lineWidth = 25;
-    ctx.strokeStyle = coatColor;
+    ctx.strokeStyle = `${coatColor}`;
     ctx.lineJoin = "round";
     ctx.lineCap = "round";
 
@@ -200,10 +226,8 @@ export class Trampofeline extends ElasticLine {
 }
 
 export function drawCatFace(ctx: CanvasRenderingContext2D) {
-  const { coatColor, detailColor } = Palette;
-
   // arms & paws
-  ctx.strokeStyle = coatColor;
+  ctx.strokeStyle = coatColor.toString();
   ctx.lineWidth = 10;
   const pawDistance = 10;
   [pawDistance, -pawDistance].forEach((x) => {
@@ -213,7 +237,7 @@ export function drawCatFace(ctx: CanvasRenderingContext2D) {
     ctx.stroke();
 
     ctx.save();
-    ctx.strokeStyle = detailColor;
+    ctx.strokeStyle = detailColor.toString();
     ctx.lineWidth = 2;
     ctx.translate(x, 40);
 
@@ -227,7 +251,7 @@ export function drawCatFace(ctx: CanvasRenderingContext2D) {
   });
 
   // face
-  ctx.fillStyle = coatColor;
+  ctx.fillStyle = coatColor.toString();
   ctx.beginPath();
   ctx.moveTo(20, -20);
   // ctx.quadraticCurveTo(0, 50, -20, -20);
@@ -240,14 +264,14 @@ export function drawCatFace(ctx: CanvasRenderingContext2D) {
   const outerEye = 5;
   const innerEye = 2;
 
-  ctx.fillStyle = "white";
+  ctx.fillStyle = `${white}`;
   ctx.beginPath();
   circle(ctx, new Point2(10, eyeY), outerEye);
   circle(ctx, new Point2(-10, eyeY), outerEye);
   ctx.closePath();
   ctx.fill();
 
-  ctx.fillStyle = "black";
+  ctx.fillStyle = `${black}`;
   ctx.beginPath();
   circle(ctx, new Point2(10, eyeY), innerEye);
   circle(ctx, new Point2(-10, eyeY), innerEye);
@@ -255,7 +279,7 @@ export function drawCatFace(ctx: CanvasRenderingContext2D) {
   ctx.fill();
 
   // whiskers
-  ctx.strokeStyle = "white";
+  ctx.strokeStyle = `${white}`;
   ctx.lineWidth = 2;
   ctx.beginPath();
   const start = 5;
@@ -272,8 +296,8 @@ export function drawCatFace(ctx: CanvasRenderingContext2D) {
   ctx.stroke();
 
   // ears
-  ctx.fillStyle = coatColor;
-  ctx.strokeStyle = detailColor;
+  ctx.fillStyle = coatColor.toString();
+  ctx.strokeStyle = detailColor.toString();
   const innerEarX = 10;
   const earY = -18;
   const earHeight = 10;
@@ -288,8 +312,8 @@ export function drawCatFace(ctx: CanvasRenderingContext2D) {
   });
 
   // snout
-  ctx.fillStyle = "pink";
-  ctx.strokeStyle = "black";
+  ctx.fillStyle = `${pink}`;
+  ctx.strokeStyle = `${black}`;
   ctx.beginPath();
   circle(ctx, new Point2(0, 0), 4);
   ctx.closePath();
@@ -297,7 +321,7 @@ export function drawCatFace(ctx: CanvasRenderingContext2D) {
   ctx.stroke();
 
   // mouth
-  ctx.strokeStyle = detailColor;
+  ctx.strokeStyle = detailColor.toString();
   ctx.beginPath();
   const mouthY = 5;
   const mouthAngle = 5;
@@ -310,14 +334,14 @@ export function drawCatFace(ctx: CanvasRenderingContext2D) {
 
 export function drawCatRear(ctx: CanvasRenderingContext2D, time = 0) {
   // butt
-  ctx.fillStyle = coatColor;
+  ctx.fillStyle = coatColor.toString();
   ctx.lineWidth = 2;
   ctx.beginPath();
   circle(ctx, new Point2(0, 0), 20);
   ctx.fill();
 
   // that part
-  ctx.strokeStyle = detailColor;
+  ctx.strokeStyle = detailColor.toString();
   ctx.beginPath();
   ctx.moveTo(2, 4);
   ctx.lineTo(-2, 0);
@@ -326,7 +350,7 @@ export function drawCatRear(ctx: CanvasRenderingContext2D, time = 0) {
   ctx.stroke();
 
   // arms & paws
-  ctx.strokeStyle = coatColor;
+  ctx.strokeStyle = coatColor.toString();
   ctx.lineWidth = 10;
   const pawDistance = 10;
   [pawDistance, -pawDistance].forEach((x) => {
@@ -336,11 +360,11 @@ export function drawCatRear(ctx: CanvasRenderingContext2D, time = 0) {
     ctx.stroke();
 
     ctx.save();
-    ctx.strokeStyle = detailColor;
+    ctx.strokeStyle = detailColor.toString();
     ctx.lineWidth = 2;
     ctx.translate(x, 40);
 
-    ctx.fillStyle = detailColor;
+    ctx.fillStyle = detailColor.toString();
     ctx.beginPath();
     circle(ctx, new Point2(0, -3), 3);
     ctx.closePath();
@@ -360,7 +384,7 @@ export function drawCatRear(ctx: CanvasRenderingContext2D, time = 0) {
   const tailSwerve = lerp(-15, 15, t);
   const tailSegments = 2;
   const startY = -7;
-  ctx.strokeStyle = coatColor;
+  ctx.strokeStyle = coatColor.toString();
   ctx.lineWidth = 10;
   ctx.beginPath();
   ctx.moveTo(0, 0);
