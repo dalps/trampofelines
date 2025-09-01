@@ -41,7 +41,7 @@ h1 {
 canvas {
   user-select: none;
   touch-action: none;
-  image-rendering: pixelated;
+  image-rendering: optimizeQuality;
 }
 
 #app {

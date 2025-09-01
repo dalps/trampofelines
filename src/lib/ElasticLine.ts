@@ -170,10 +170,10 @@ export class ElasticLine extends ElasticShape {
     {
       toggleX = false,
       toggleY = false,
-      mass = 0.05,
-      damping = 20,
+      mass = 1,
+      damping = 1,
       jointsAttraction = 100,
-      jointsRepulsion = 0,
+      jointsRepulsion = 100,
     } = {}
   ) {
     super([], { mass, damping, jointsAttraction, jointsRepulsion });

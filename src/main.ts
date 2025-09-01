@@ -1,22 +1,19 @@
-import { drawGrid } from "./lib/CanvasUtils";
-import { CircleCollider, CollisionManager } from "./lib/Collisions2D";
-import { ElasticShape } from "./lib/ElasticLine";
-import { Attraction, Ball, Gravity, Repulsion } from "./lib/Physics2D";
-import { Ripple, RippleManager } from "./lib/Ripple";
-import Math2D, { lerp, Point2, resolveMousePosition } from "./lib/utils";
-import { Pane } from "tweakpane";
-import Trampofelines, { Trampofeline } from "./entities/Trampofeline";
 import "./style.css";
+import { drawGrid } from "./lib/CanvasUtils";
+import { CollisionManager } from "./lib/Collisions2D";
+import { Gravity } from "./lib/Physics2D";
+import { RippleManager } from "./lib/Ripple";
+import { Point2 } from "./lib/utils";
+import { Pane } from "tweakpane";
+import Trampofelines from "./entities/Trampofeline";
 import { Clock, type timestamp } from "./lib/TimeUtils";
-import { drawTitle, toranporin } from "./type";
+import { toranporin } from "./type";
 import { Tube } from "./entities/Tube";
 import { GAMESTATE as state, settings } from "./GameState";
-import { Ironwool } from "./entities/Ironwool";
 import { JumboCat } from "./entities/JumboCat";
 
-let cw = 480;
-let ch = 480;
-
+let cw: number;
+let ch: number;
 let container: HTMLDivElement;
 let canvas: HTMLCanvasElement;
 let canvasRect: DOMRect;
@@ -48,41 +45,11 @@ function init() {
 
   Trampofelines.init(state, canvas);
 
-  state.lines.push(new JumboCat(new Point2(500, 500), new Point2(200, 50), 7));
-
-  //   new Trampofeline(
-  //     new Point2(cw * 0.2, ch * 0.5),
-  //     new Point2(cw * 0.8, ch * 0.5),
-  //     10,
-  //     {
-  //       mass: 10,
-  //       jointsAttraction: 100,
-  //       jointsRepulsion: 100,
-  //     }
-  //   )
-  // );
-
   window.addEventListener("resize", setSize);
-
-  // canvas.addEventListener("click", (e) => {
-  //   if (Trampofelines.isDrawing()) return;
-
-  //   spawnBall(resolveMousePosition(e));
-  // });
 
   setupPanes();
 
-  state.tubes.push(
-    new Tube(new Point2(0, 100)),
-    new Tube(new Point2(0, 200), new Point2(40, 200)),
-    new Tube(new Point2(0, 400), new Point2(80, 50))
-  );
-
-  state.enemies.push(
-    new Ironwool(new Point2(200, 500)),
-    new Ironwool(new Point2(350, 500)),
-    new Ironwool(new Point2(500, 500))
-  );
+  state.tubes.push(new Tube(new Point2(0, 100)));
 
   requestAnimationFrame(draw);
 }
@@ -140,8 +107,6 @@ function clear() {
     offsetX: 0,
     offsetY: 0,
   });
-
-  toranporin(ctx);
 }
 
 function draw(time: timestamp) {
@@ -177,7 +142,7 @@ function draw(time: timestamp) {
     if (
       b._position.x < b.radius ||
       b._position.x > cw + b.radius ||
-      b._position.y < b.radius ||
+      // b._position.y < b.radius ||
       b._position.y > ch + b.radius
     ) {
       ballsToRemove.push(i);
