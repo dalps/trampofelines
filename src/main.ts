@@ -1,4 +1,3 @@
-import { Pane } from "tweakpane";
 import Trampofelines from "./entities/Trampofeline";
 import { Tube } from "./entities/Tube";
 import { settings, GAMESTATE as state } from "./GameState";
@@ -8,7 +7,6 @@ import { Gravity } from "./lib/Physics2D";
 import { RippleManager } from "./lib/Ripple";
 import { Clock, type timestamp } from "./lib/TimeUtils";
 import { Point2 } from "./lib/utils";
-import "./style.css";
 
 let cw: number;
 let ch: number;
@@ -16,7 +14,6 @@ let container: HTMLDivElement;
 let canvas: HTMLCanvasElement;
 let canvasRect: DOMRect;
 let ctx: CanvasRenderingContext2D;
-let pane: Pane;
 
 const { balls, lines } = state;
 
@@ -45,53 +42,11 @@ function init() {
 
   window.addEventListener("resize", setSize);
 
-  setupPanes();
+  // setupPanes();
 
   state.tubes.push(new Tube(new Point2(0, 100)));
 
   requestAnimationFrame(draw);
-}
-
-function setupPanes() {
-  pane = new Pane({ title: "Settings", expanded: false });
-  pane.addBinding(settings, "showJoints");
-  pane.addBinding(settings, "showForces");
-  pane.addBinding(settings, "play");
-  pane.addBinding(settings, "ballRadius", { min: 1, max: 20 });
-  pane.addBinding(settings, "ballMass", {
-    min: 0,
-    max: 10,
-  });
-  pane.addBinding(settings, "ballVelocity");
-  pane
-    .addBinding(settings, "colliderRadius", { min: 0, max: 20 })
-    .on("change", (ev) => {
-      lines.forEach((l) => {
-        l.joints.forEach((j) => {
-          j.collider!.radius = ev.value;
-        });
-      });
-    });
-  pane
-    .addBinding(settings, "lineMass", { min: 0, max: 20 })
-    .on("change", (ev) => {
-      lines.forEach((l) => {
-        l.joints.forEach((j) => {
-          j.mass = ev.value;
-        });
-      });
-    });
-  pane.addBinding(settings, "gravity").on("change", (ev) => {
-    Gravity.magnitude = ev.value ? 9.81 : 0;
-  });
-  pane
-    .addButton({
-      title: "Reset scene",
-    })
-    .on("click", () => {
-      balls.splice(0);
-      lines.splice(0);
-    });
 }
 
 function clear() {
