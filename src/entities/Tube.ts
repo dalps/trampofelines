@@ -126,54 +126,99 @@ export class Tube {
 
     hole.ellipse(x2 + 2, y + sy * 0.5, 8, sy * 0.4, 0, 0, Math.PI * 2);
 
+    const [highlightL, highlightR] = [x + sx, x2].map((x2) => {
+      const p = new Path2D();
+      p.moveTo(x2, y - o);
+      p.bezierCurveTo(
+        // cp1
+        x2 - cpx,
+        y - o,
+        // cp2
+        x2 - cpx,
+        y + sy + o,
+        // end
+        x2,
+        y + sy + o
+      );
+
+      return p;
+    });
+
     const makeGradient = (
       cp1: Point2,
       cp2: Point2,
       {
         color1 = "#00ff00",
         color2 = "#009c00",
+        shineColor = "#fff",
         shinePos = 0.1,
         shineSize = 0.2,
       } = {}
     ) => {
-      const greenGradient = ctx.createLinearGradient(
-        cp1.x,
-        cp1.y,
-        cp2.x,
-        cp2.y
-      );
+      const g = ctx.createLinearGradient(cp1.x, cp1.y, cp2.x, cp2.y);
 
-      greenGradient.addColorStop(0, color1);
+      g.addColorStop(0, color1);
       if (shineSize > 0) {
-        greenGradient.addColorStop(shinePos, color1);
-        greenGradient.addColorStop(shinePos + shineSize * 0.5, "#fff");
-        greenGradient.addColorStop(shinePos + shineSize, color1);
+        g.addColorStop(shinePos, color1);
+        g.addColorStop(shinePos + shineSize * 0.5, shineColor);
+        g.addColorStop(shinePos + shineSize, color1);
       }
-      greenGradient.addColorStop(1, color2);
-      return greenGradient;
+      g.addColorStop(1, color2);
+
+      return g;
     };
     // ctx.stroke(hole);
 
     ctx.fillStyle = makeGradient(this.position, this.position.addY(sy));
     ctx.strokeStyle = "#2cbb2c";
     ctx.fill(body);
-    ctx.stroke(body);
+    // ctx.stroke(body);
     ctx.fillStyle = makeGradient(
       this.position.addY(-o),
       this.position.addY(sy + o),
       { shinePos: 0.05 }
     );
     ctx.fill(head);
-    ctx.stroke(head);
+    // ctx.stroke(head);
     ctx.fillStyle = makeGradient(
       this.position.addY(-o),
       this.position.addY(sy + o),
       { shineSize: 0 }
     );
     ctx.fill(lid);
-    ctx.stroke(lid);
-    ctx.fillStyle = "black";
+    // ctx.stroke(lid);
+    ctx.fillStyle = makeGradient(
+      new Point2(x2 - 10, this.position.y),
+      new Point2(x2 + 10, this.position.y),
+      { color1: "black", color2: "#298529ff", shineSize: 0 }
+    );
     ctx.fill(hole);
     // ctx.stroke(hole);
+
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = ctx.fillStyle = makeGradient(
+      this.position.addY(-o * 3),
+      this.position.addY(sy + o * 3),
+      {
+        color1: "rgba(255, 255, 255, 0)",
+        color2: "rgba(255, 2, 2, 0)",
+        shineColor: "#ffffff7f",
+        shineSize: 0.55,
+        shinePos: 0,
+      }
+    );
+    ctx.stroke(highlightL);
+    ctx.strokeStyle = ctx.fillStyle = makeGradient(
+      this.position.addY(-o * 3),
+      this.position.addY(sy + o * 3),
+      {
+        color1: "rgba(255, 255, 255, 0)",
+        color2: "rgba(255, 2, 2, 0)",
+        shineColor: "#ffffffbf",
+        shineSize: 0.55,
+        shinePos: 0,
+      }
+    );
+    ctx.stroke(highlightR);
   }
 }
