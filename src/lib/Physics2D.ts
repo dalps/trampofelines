@@ -1,6 +1,7 @@
 import { circle, popsicle } from "./CanvasUtils";
 import type { Collider } from "./Collisions2D";
 import type { Color } from "./Color";
+import { Stage } from "./Stage";
 import { damp, Point2 } from "./utils";
 
 export type instant = number;
@@ -210,7 +211,6 @@ export class DynamicBody {
     // draw each individual force
     this._forces.forEach((f) => {
       popsicle(
-        ctx,
         this.position,
         this.position.add(f.direction.multiplyScalar(f.magnitude)),
         "green"
@@ -219,13 +219,12 @@ export class DynamicBody {
 
     // draw the total force
     popsicle(
-      ctx,
       this.position,
       this.position.add(this.totalForce.multiplyScalar(1)),
       "hotpink"
     );
 
-    popsicle(ctx, this.position, this.position.add(this.velocity), "magenta");
+    popsicle(this.position, this.position.add(this.velocity), "magenta");
 
     // popsicle(
     //   ctx,
@@ -236,13 +235,14 @@ export class DynamicBody {
   }
 
   drawCollider() {
+    const ctx = Stage.ctx;
     if (!this.collider) return;
 
     ctx.lineWidth = 1;
     ctx.strokeStyle = "yellowgreen";
 
     ctx.beginPath();
-    circle(ctx, this.collider?.center, this.collider?.radius);
+    circle(this.collider?.center, this.collider?.radius);
     ctx.closePath();
     ctx.stroke();
   }
@@ -253,21 +253,3 @@ export class DynamicBody {
 }
 
 export const Gravity = new Force(new Point2(0, 1), 9.81);
-
-export class Ball extends DynamicBody {
-  constructor(p: Point2, public radius = 10, public color: Color) {
-    super(p, { mass: radius, name: "ball", friction: 0.1 });
-  }
-
-  draw() {
-    ctx.fillStyle = this.color.toString();
-    ctx.strokeStyle = "black";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
-    ctx.closePath();
-
-    ctx.fill();
-    ctx.stroke();
-  }
-}
