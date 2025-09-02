@@ -36,7 +36,6 @@ export class YarnBall extends DynamicBody {
     }
 
     this.thread = points.map((p) => new DynamicBody(p));
-    console.log(this.thread);
   }
 
   update(dt: number): void {

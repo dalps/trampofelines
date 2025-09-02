@@ -1,15 +1,17 @@
 import { GAMESTATE } from "../GameState";
 import { Stage } from "../lib/Stage";
-import { circle } from "../lib/CanvasUtils";
+import { circle, popsicle } from "../lib/CanvasUtils";
 import { CircleCollider, CollisionManager } from "../lib/Collisions2D";
 import { Palette } from "../lib/Color";
 import { ElasticLine } from "../lib/ElasticLine";
 import { Gravity, State, type instant } from "../lib/Physics2D";
 import type { timestamp } from "../lib/TimeUtils";
-import {
+import Math2D, {
   damp,
+  DEG2RAD,
   lerp,
   Point2,
+  RAD2DEG,
   resolveMousePosition,
   resolveTouchPosition,
 } from "../lib/utils";
@@ -18,6 +20,8 @@ let canvasRect: DOMRect;
 
 let p1: Point2 | undefined;
 let p2: Point2 | undefined;
+let p3: Point2 | undefined;
+let p4: Point2 | undefined;
 let mouseDown = false;
 let distance = 0;
 let drawing = false;
@@ -106,7 +110,7 @@ export default class Trampofelines {
         return;
       }
 
-      if (trampolines.length >= MAX_CATS) {
+      if (!Trampofelines.testPlacement()) {
         p1 = p2 = undefined;
         return;
       }
@@ -138,7 +142,7 @@ export default class Trampofelines {
             },
             () => {
               console.log("hello?");
-              cat.kill();
+              // cat.kill();
             }
           )
         );
@@ -148,6 +152,26 @@ export default class Trampofelines {
     }
   }
 
+  static testPlacement(): boolean {
+    const longEnough = distance >= 100;
+    const belowLimit = GAMESTATE.trampolines.length < MAX_CATS;
+    const intersections = GAMESTATE.trampolines.filter(({ joints }) => {
+      p3 = joints.at(-1)._position;
+      p4 = joints.at(0)._position;
+      const res = Math2D.checkLineIntersection(p1, p2, p3, p4);
+      console.log(
+        `Checking intersection between (${p1}~~${p2}) and ${p3}~~${p4}: ${res}`
+      );
+      return res;
+    });
+    const noIntersections = intersections.length === 0;
+    const sep = p2.sub(p1);
+    const angle = Math.abs(Math.atan2(sep.y, sep.x)) * RAD2DEG;
+    const maxSteepness = 25;
+    const goodAngle = angle <= 90 - maxSteepness || angle >= 90 + maxSteepness;
+    return longEnough && belowLimit && noIntersections && goodAngle;
+  }
+
   static draw(time: number) {
     const ctx = Stage.ctx;
 
@@ -155,10 +179,8 @@ export default class Trampofelines {
       ctx.lineWidth = 10;
       ctx.setLineDash([5, 15]);
       ctx.strokeStyle = `rgba(${
-        distance < 100 || GAMESTATE.trampolines.length >= MAX_CATS
-          ? `255,0,0`
-          : `0,0,0`
-      },${lerp(0.3, 0.4, Math.sin(time))})`;
+        this.testPlacement() ? `0,0,0` : `255,0,0`
+      },${lerp(0.6, 0.8, Math.sin(time))})`;
       ctx.lineCap = "round";
       ctx.beginPath();
       ctx.moveTo(p1.x, p1.y);
@@ -237,6 +259,11 @@ export class Trampofeline extends ElasticLine {
       ctx.rotate(angle);
       drawCatRear(this._time);
       ctx.restore();
+    }
+
+    if (p1 && p2 && p3 && p4) {
+      popsicle(p1, p2, "red");
+      popsicle(p3, p4, "blue");
     }
   }
 }

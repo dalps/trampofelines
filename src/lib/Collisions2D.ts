@@ -8,6 +8,12 @@ import { Point2 } from "./utils";
 
 const contactForceFactor = 20;
 
+const DEBUG = false;
+
+function log(msg: string) {
+  DEBUG && console.log(msg);
+}
+
 interface CollisionPair {
   id1: string;
   id2: string;
@@ -23,15 +29,13 @@ export class CollisionManager {
 
   static getID(b: DynamicBody) {
     if (b.state !== State.Alive) {
-      console.log(`Refusing to assign an id to dead body ${b.name}`);
+      log(`Refusing to assign an id to dead body ${b.name}`);
       return undefined;
     }
 
     if (!b.collisionID) {
       const id = `${b.name}_${this._id++}`;
-      console.log(
-        `${b.name} doesn't have an id yet. Creating new one... ${id}`
-      );
+      log(`${b.name} doesn't have an id yet. Creating new one... ${id}`);
       return (b.collisionID = id);
     }
 
@@ -52,7 +56,7 @@ export class CollisionManager {
     let id2 = this.getID(b2);
 
     if (!id1 || !id2) {
-      console.log(`Couldn't schedule collisions for ${b1.name} or ${b2.name}.`);
+      log(`Couldn't schedule collisions for ${b1.name} or ${b2.name}.`);
       return;
     }
 
@@ -65,10 +69,10 @@ export class CollisionManager {
   static unregister(id: string) {
     const entriesToRemove: number[] = [];
 
-    console.log(`Searching for entries with ${id}...`);
+    log(`Searching for entries with ${id}...`);
     this._bodies.forEach(({ id1, id2 }, idx) => {
       if (id === id1 || id === id2) {
-        console.log(`Unregistered pair ${id1}~${id2}.`);
+        log(`Unregistered pair ${id1}~${id2}.`);
         entriesToRemove.push(idx);
       }
     });
@@ -82,9 +86,7 @@ export class CollisionManager {
       const b2 = r2.deref();
 
       if (!b1 || !b2) {
-        console.log(
-          `A registered body was dropped.\nb1: ${b1?.name} b2: ${b2?.name}`
-        );
+        log(`A registered body was dropped.\nb1: ${b1?.name} b2: ${b2?.name}`);
         return;
       }
 

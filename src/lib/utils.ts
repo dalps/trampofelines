@@ -188,4 +188,36 @@ export default class Math2D {
     current.y = damp(current.y, target.y, lambda, dt);
     return current;
   }
+
+  static checkLineIntersection(p1: Point2, p2: Point2, p3: Point2, p4: Point2) {
+    const t =
+      ((p1.x - p3.x) * (p3.y - p4.y) - (p1.y - p3.y) * (p3.x - p4.x)) /
+      ((p1.x - p2.x) * (p3.y - p4.y) - (p1.y - p2.y) * (p3.x - p4.x));
+
+    const u =
+      ((p1.x - p2.x) * (p1.y - p3.y) - (p1.y - p2.y) * (p1.x - p3.x)) /
+      ((p1.x - p2.x) * (p3.y - p4.y) - (p1.y - p2.y) * (p3.x - p4.x));
+      
+    console.log(t, u);
+
+    return 0 <= t && t <= 1 && 0 <= u && u <= 1;
+  }
 }
+
+function testLineIntersection() {
+  let p1 = new Point2(0, 0);
+  let p2 = new Point2(0, 1);
+  let p3 = new Point2(0.5, -1);
+  let p4 = new Point2(0.5, 1);
+
+  const check = () => {
+    const res = Math2D.checkLineIntersection(p1, p2, p3, p4);
+    console.log(
+      `Checking intersection between (${p1}~~${p2}) and ${p3}~~${p4}: ${res}`
+    );
+  };
+
+  check();
+}
+
+testLineIntersection();

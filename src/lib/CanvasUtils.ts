@@ -36,6 +36,7 @@ export function popsicle(from: Point2, to: Point2, color = "black") {
   ctx.lineCap = "round";
   ctx.strokeStyle = color;
   ctx.fillStyle = color;
+  ctx.lineWidth = 2;
 
   const arrowSize = 4;
 
