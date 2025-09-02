@@ -32,14 +32,42 @@ export type LayerName = "background" | "game" | "ui";
 
 export class Stage {
   public static stage: HTMLElement;
-  private static _currentCtx: CanvasRenderingContext2D;
+  private static _activeLayer: MyCanvas;
 
-  public static get ctx(): CanvasRenderingContext2D {
-    return this._currentCtx;
+  /**
+   *  Set the active layer.
+   */
+  public static setActiveLayer(layer: LayerName) {
+    this._activeLayer = this.layers.get(layer);
+    return this._activeLayer;
   }
 
-  public static set ctx(layer: LayerName) {
-    this._currentCtx = this.layers.get(layer).ctx;
+  /**
+   *  The active layer.
+   */
+  public static get activeLayer(): MyCanvas {
+    return this._activeLayer;
+  }
+
+  /**
+   *  The width of the active layer.
+   */
+  public static get cw(): number {
+    return this.activeLayer.width;
+  }
+
+  /**
+   *  The height of the active layer.
+   */
+  public static get ch(): number {
+    return this.activeLayer.height;
+  }
+
+  /**
+   *  The working context of the active layer.
+   */
+  public static get ctx(): CanvasRenderingContext2D {
+    return this.activeLayer.ctx;
   }
 
   public static layers: Map<LayerName, MyCanvas> = new Map();
@@ -63,7 +91,7 @@ export class Stage {
       stage.appendChild(layer);
     });
 
-    this.ctx = "game";
+    this.setActiveLayer("game");
     this.setSizes();
     window.addEventListener("resize", this.setSizes.bind(this));
   }

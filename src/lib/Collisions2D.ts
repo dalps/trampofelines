@@ -7,7 +7,6 @@ import {
 import { Point2 } from "./utils";
 
 const contactForceFactor = 20;
-console.log("In Collisions2D")
 
 interface CollisionPair {
   id1: string;

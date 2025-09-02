@@ -8,28 +8,24 @@ import { RippleManager } from "./lib/Ripple";
 import { Clock, type timestamp } from "./lib/TimeUtils";
 import { Point2 } from "./lib/utils";
 
-const { balls, trampolines: lines } = state;
-
-let ctx: CanvasRenderingContext2D;
-let cw: any;
-let ch: any;
+const { balls, trampolines } = state;
 
 function init() {
   Stage.init(document.getElementById("stage"));
 
   {
-    const { ctx, width: cw, height: ch } = Stage.layers.get("background");
+    const { ctx, width: cw, height: ch } = Stage.setActiveLayer("background");
     ctx.fillStyle = Palette.colors.cardboard.toString();
     ctx.fillRect(0, 0, cw, ch);
   }
 
   {
-    const { ctx, width: cw, height: ch } = Stage.layers.get("ui");
+    const { ctx, width: cw, height: ch } = Stage.setActiveLayer("ui");
     ctx.fillStyle = "blue";
     ctx.clearRect(0, 0, cw, ch);
   }
 
-  Stage.workingCtx = "game";
+  Stage.setActiveLayer("game");
 
   Trampofelines.init();
 
@@ -63,7 +59,7 @@ function draw(time: timestamp) {
 
   Trampofelines.draw(time);
 
-  lines.forEach((l) => {
+  trampolines.forEach((l) => {
     settings.play && l.update(dt);
 
     l.draw();
