@@ -1,5 +1,5 @@
 default:
-    parallel -j 2 ::: 'just serve' 'just watch'
+    parallel -j 2 just ::: serve watch
 
 serve:
     cp index.html dist
