@@ -156,13 +156,13 @@ export default class Trampofelines {
     const longEnough = distance >= 100;
     const belowLimit = GAMESTATE.trampolines.length < MAX_CATS;
     const intersections = GAMESTATE.trampolines.filter(({ joints }) => {
-      p3 = joints.at(-1)._position;
-      p4 = joints.at(0)._position;
-      const res = Math2D.checkLineIntersection(p1, p2, p3, p4);
+      p3 = joints.at(0)._position;
+      p4 = joints.at(-1)._position;
+      const res = Math2D.properInter(p1, p2, p3, p4);
       console.log(
         `Checking intersection between (${p1}~~${p2}) and ${p3}~~${p4}: ${res}`
       );
-      return res;
+      return res !== undefined;
     });
     const noIntersections = intersections.length === 0;
     const sep = p2.sub(p1);

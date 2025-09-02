@@ -106,8 +106,23 @@ export class Point2 {
     return this.clone().multiplyScalarI(n);
   }
 
+  /**
+   * Get a new point rotated 90 degrees counterclockwise.
+   */
+  perp() {
+    return new Point2(this.y, -this.x);
+  }
+
   dot(p: Point2): number {
     return this.x * p.x + this.y * p.y;
+  }
+
+  cross(p: Point2): number {
+    return this.x * p.y - this.y * p.x;
+  }
+
+  onSegment(a: Point2, b: Point2) {
+    return Math2D.orient(a, b, this) === 0 && Math2D.inDisk(a, b, this);
   }
 
   projectI(i: Point2, j: Point2) {
@@ -136,7 +151,7 @@ export default class Math2D {
     difference.y = minuend.y - subtrahend.y;
   }
 
-  static L2(a: Point2) {
+  static l2(a: Point2) {
     return Math.hypot(a.x, a.y);
   }
 
@@ -148,24 +163,12 @@ export default class Math2D {
     return new Point2(p.x * n, p.y * n);
   }
 
-  /* Find point on line defined parametrically by
-   * L = P0 + t * direction */
-  static linePointAt(p0: Point2, t: number, dir: Point2) {
-    return new Point2(p0.x + t * dir.x, p0.y + t * dir.y);
+  static inDisk(a: Point2, b: Point2, p: Point2) {
+    return a.sub(p).dot(b.sub(p)) <= 0;
   }
 
-  /* Find point on line defined parametrically by
-   * L = P0 + t * direction */
-  static linePoint(p0: Point2, t: number, dir: number | "V" | "H") {
-    if (dir === "V") {
-      return new Point2(p0.x + t, p0.y);
-    }
-
-    if (dir === "H") {
-      return new Point2(p0.x, p0.y + t);
-    }
-
-    return new Point2(p0.x + t, p0.y + t * dir);
+  static onSegment(a: Point2, b: Point2, p: Point2) {
+    return this.orient(a, b, p) === 0 && this.inDisk(a, b, p);
   }
 
   static lerp2(min: Point2, max: Point2, t: number): Point2 {
@@ -189,35 +192,64 @@ export default class Math2D {
     return current;
   }
 
-  static checkLineIntersection(p1: Point2, p2: Point2, p3: Point2, p4: Point2) {
-    const t =
-      ((p1.x - p3.x) * (p3.y - p4.y) - (p1.y - p3.y) * (p3.x - p4.x)) /
-      ((p1.x - p2.x) * (p3.y - p4.y) - (p1.y - p2.y) * (p3.x - p4.x));
+  /**
+   * The orientation of `c` with respect to the line going through `a` and `b`. Positive if `c` is to the left, negative if to the right, zero if they are collinear.
+   */
+  static orient(a: Point2, b: Point2, c: Point2) {
+    return b.sub(a).cross(c.sub(a));
+  }
 
-    const u =
-      ((p1.x - p2.x) * (p1.y - p3.y) - (p1.y - p2.y) * (p1.x - p3.x)) /
-      ((p1.x - p2.x) * (p3.y - p4.y) - (p1.y - p2.y) * (p3.x - p4.x));
-      
-    console.log(t, u);
+  static properInter(a: Point2, b: Point2, c: Point2, d: Point2) {
+    let oa = this.orient(c, d, a);
+    let ob = this.orient(c, d, b);
+    let oc = this.orient(a, b, c);
+    let od = this.orient(a, b, d);
 
-    return 0 <= t && t <= 1 && 0 <= u && u <= 1;
+    console.log(oa, ob, oc, od);
+
+    if (oa * ob < 0 && oc * od < 0) {
+      return a
+        .multiplyScalar(ob)
+        .sub(b.multiplyScalar(oa))
+        .multiplyScalar(1 / (ob - oa));
+    }
+
+    return undefined;
   }
 }
 
 function testLineIntersection() {
-  let p1 = new Point2(0, 0);
-  let p2 = new Point2(0, 1);
-  let p3 = new Point2(0.5, -1);
-  let p4 = new Point2(0.5, 1);
+  const assertTruthy = (b) => {
+    if (!b) {
+      throw new Error("Assertion failed.");
+    }
+  };
+
+  const assertFalsy = (b) => {
+    if (b) {
+      throw new Error("Assertion failed.");
+    }
+  };
 
   const check = () => {
-    const res = Math2D.checkLineIntersection(p1, p2, p3, p4);
+    const res = Math2D.properInter(p1, p2, p3, p4);
     console.log(
       `Checking intersection between (${p1}~~${p2}) and ${p3}~~${p4}: ${res}`
     );
+    return res;
   };
 
-  check();
+  let p1 = new Point2(0, 0);
+  let p2 = new Point2(1, 1);
+  let p3 = new Point2(0.5, 1);
+  let p4 = new Point2(0.5, -1);
+  assertTruthy(check());
+
+  p1 = new Point2(25, 526);
+  p2 = new Point2(62, 424);
+  p3 = new Point2(4, 454);
+  p4 = new Point2(307, 462);
+  assertTruthy(check());
 }
 
 testLineIntersection();
