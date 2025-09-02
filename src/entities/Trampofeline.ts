@@ -35,7 +35,7 @@ const MAX_CATS = 3;
 export default class Trampofelines {
   static init() {
     const { trampolines, balls, settings } = GAMESTATE;
-    const canvas = Stage.layers.get("game");
+    const canvas = Stage.layers.get("ui");
 
     canvas.addEventListener("mousedown", handleMouseDown, false);
     canvas.addEventListener("mousemove", handleMouseMove, false);
