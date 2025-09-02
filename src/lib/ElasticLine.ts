@@ -1,11 +1,12 @@
+import Math2D, { Point } from "./MathUtils";
+import { Attraction, DynamicBody, Repulsion } from "./Physics2D";
 import { Stage } from "./Stage";
-import { Attraction, DynamicBody, Repulsion, type instant } from "./Physics2D";
-import Math2D, { Point2 } from "./MathUtils";
+import { instant } from "./TimeUtils";
 
 class Joint extends DynamicBody {
   public neighbors: Joint[] = [];
   constructor(
-    position: Point2,
+    position: Point,
     mass = 0.1,
     damping = 1,
     public attraction = 100,
@@ -39,7 +40,7 @@ export class ElasticShape {
   closed: boolean;
 
   constructor(
-    points: Point2[],
+    points: Point[],
     {
       mass = 0.05,
       damping = 20,
@@ -124,14 +125,20 @@ export class ElasticShape {
 
 export class ElasticTightLoop extends ElasticShape {
   constructor(
-    points: Point2[],
+    points: Point[],
     public mass = 0.05,
     public damping = 20,
     public jointsAttraction = 100,
     public jointsRepulsion = 100,
     public closed = false
   ) {
-    super([], mass, damping, jointsAttraction, jointsRepulsion, true);
+    super([], {
+      mass,
+      damping,
+      jointsAttraction,
+      jointsRepulsion,
+      closed: true,
+    });
 
     this.joints = points.map((p) => {
       const joint = new Joint(
@@ -157,8 +164,8 @@ export class ElasticTightLoop extends ElasticShape {
 /* o<--->o<--->o<--->o<--.. */
 export class ElasticLine extends ElasticShape {
   constructor(
-    start: Point2,
-    end: Point2,
+    start: Point,
+    end: Point,
     nJoints: number,
     {
       toggleX = false,

@@ -4,7 +4,7 @@ import {
   type DynamicBody,
   type instant,
 } from "./Physics2D";
-import { Point2 } from "./MathUtils";
+import { Point } from "./MathUtils";
 
 const contactForceFactor = 20;
 
@@ -108,7 +108,7 @@ export class CollisionManager {
   static collide(
     body: DynamicBody,
     against: DynamicBody,
-    sep: Point2
+    sep: Point
   ): ContactForce {
     const massFactor = (2 * against.mass) / (body.mass + against.mass);
 
@@ -128,8 +128,8 @@ type ColliderType = "Circle" | "Box" | "Line";
 
 interface ContactInfo {
   test: boolean;
-  sep1: Point2;
-  sep2: Point2;
+  sep1: Point;
+  sep2: Point;
 }
 
 export abstract class Collider {
@@ -138,13 +138,13 @@ export abstract class Collider {
 }
 
 export class CircleCollider extends Collider {
-  constructor(public center: Point2, public radius: number) {
+  constructor(public center: Point, public radius: number) {
     super("Circle");
   }
 
   checkContact(that: CircleCollider) {
     const sep = this.center.sub(that.center);
-    const distance = sep.l2();
+    const distance = sep.abs();
     return {
       test: distance <= this.radius + that.radius,
       sep1: sep,
@@ -158,10 +158,10 @@ export class BoxCollider extends Collider {
   public right: number;
   public top: number;
   public bottom: number;
-  public center: Point2;
+  public center: Point;
 
   constructor(
-    public origin: Point2,
+    public origin: Point,
     public width: number,
     public height: number,
     public rotation: number = 0
@@ -172,7 +172,7 @@ export class BoxCollider extends Collider {
     this.right = origin.x + width;
     this.top = origin.y;
     this.bottom = origin.y + height;
-    this.center = new Point2(this.left + width * 0.5, this.top + height * 0.5);
+    this.center = new Point(this.left + width * 0.5, this.top + height * 0.5);
   }
 
   checkContact(that: Collider) {
@@ -191,23 +191,23 @@ export class BoxCollider extends Collider {
 }
 
 export class LineCollider extends Collider {
-  public direction: Point2;
-  constructor(public p1: Point2, public p2: Point2) {
+  public direction: Point;
+  constructor(public p1: Point, public p2: Point) {
     super("Line");
 
     this.direction = p1.sub(p2).normalize();
   }
 
   get length(): number {
-    return this.p1.sub(this.p2).l2();
+    return this.p1.sub(this.p2).abs();
   }
 
   checkContact(that: Collider) {
     switch (that.type) {
       case "Circle": {
         const { center, radius } = that as CircleCollider;
-        const d1 = this.p1.sub(center).l2();
-        const d2 = this.p2.sub(center).l2();
+        const d1 = this.p1.sub(center).abs();
+        const d2 = this.p2.sub(center).abs();
         const sum = d1 + d2;
         return {
           test:

@@ -14,15 +14,13 @@ export function damp(
   return lerp(current, target, 1 - Math.exp(-lambda * dt));
 }
 
-
-
-export class Point2 {
+export class Point {
   constructor(public x: number, public y: number) {}
 
-  static ZERO = new Point2(0, 0);
+  static ZERO = new Point(0, 0);
 
-  static random(min = new Point2(0, 0), max = new Point2(1, 1)) {
-    return new Point2(
+  static random(min = new Point(0, 0), max = new Point(1, 1)) {
+    return new Point(
       lerp(min.x, max.x, Math.random()),
       lerp(min.y, max.y, Math.random())
     );
@@ -33,28 +31,28 @@ export class Point2 {
     this.y = y;
   }
 
-  l2(): number {
+  abs(): number {
     return Math.hypot(this.x, this.y);
   }
 
-  normalize(): Point2 {
-    const l2 = this.l2();
+  normalize(): Point {
+    const l2 = this.abs();
     this.x /= l2;
     this.y /= l2;
     return this;
   }
 
   clone() {
-    return new Point2(this.x, this.y);
+    return new Point(this.x, this.y);
   }
 
-  addI(p: Point2) {
+  addI(p: Point) {
     this.x += p.x;
     this.y += p.y;
     return this;
   }
 
-  subI(p: Point2) {
+  subI(p: Point) {
     this.x -= p.x;
     this.y -= p.y;
     return this;
@@ -76,7 +74,7 @@ export class Point2 {
     return this;
   }
 
-  add(p: Point2) {
+  add(p: Point) {
     return this.clone().addI(p);
   }
 
@@ -88,11 +86,11 @@ export class Point2 {
     return this.clone().incrY(dy);
   }
 
-  sub(p: Point2) {
+  sub(p: Point) {
     return this.clone().subI(p);
   }
 
-  multiplyScalar(n: number): Point2 {
+  multiplyScalar(n: number): Point {
     return this.clone().multiplyScalarI(n);
   }
 
@@ -100,26 +98,26 @@ export class Point2 {
    * Get a new point rotated 90 degrees counterclockwise.
    */
   perp() {
-    return new Point2(this.y, -this.x);
+    return new Point(this.y, -this.x);
   }
 
-  dot(p: Point2): number {
+  dot(p: Point): number {
     return this.x * p.x + this.y * p.y;
   }
 
-  cross(p: Point2): number {
+  cross(p: Point): number {
     return this.x * p.y - this.y * p.x;
   }
 
-  onSegment(a: Point2, b: Point2) {
+  onSegment(a: Point, b: Point) {
     return Math2D.orient(a, b, this) === 0 && Math2D.inDisk(a, b, this);
   }
 
-  projectI(i: Point2, j: Point2) {
+  projectI(i: Point, j: Point) {
     return this.set(this.dot(i), this.dot(j));
   }
 
-  project(i: Point2, j: Point2) {
+  project(i: Point, j: Point) {
     return this.clone().projectI(i, j);
   }
 
@@ -128,55 +126,53 @@ export class Point2 {
   }
 }
 
-export const Vec2 = Point2;
-
 export default class Math2D {
-  static add(sum: Point2, addend1: Point2, addend2: Point2) {
+  static add(sum: Point, addend1: Point, addend2: Point) {
     sum.x = addend1.x + addend2.x;
     sum.y = addend1.y + addend2.y;
   }
 
-  static subtract(difference: Point2, minuend: Point2, subtrahend: Point2) {
+  static subtract(difference: Point, minuend: Point, subtrahend: Point) {
     difference.x = minuend.x - subtrahend.x;
     difference.y = minuend.y - subtrahend.y;
   }
 
-  static l2(a: Point2) {
+  static l2(a: Point) {
     return Math.hypot(a.x, a.y);
   }
 
-  static dot(a: Point2, b: Point2) {
+  static dot(a: Point, b: Point) {
     return a.x * b.x + a.y * b.y;
   }
 
-  static multiplyScalar(p: Point2, n: number): Point2 {
-    return new Point2(p.x * n, p.y * n);
+  static multiplyScalar(p: Point, n: number): Point {
+    return new Point(p.x * n, p.y * n);
   }
 
-  static inDisk(a: Point2, b: Point2, p: Point2) {
+  static inDisk(a: Point, b: Point, p: Point) {
     return a.sub(p).dot(b.sub(p)) <= 0;
   }
 
-  static onSegment(a: Point2, b: Point2, p: Point2) {
+  static onSegment(a: Point, b: Point, p: Point) {
     return this.orient(a, b, p) === 0 && this.inDisk(a, b, p);
   }
 
-  static lerp2(min: Point2, max: Point2, t: number): Point2 {
-    return new Point2(lerp(min.x, max.x, t), lerp(min.y, max.y, t));
+  static lerp2(min: Point, max: Point, t: number): Point {
+    return new Point(lerp(min.x, max.x, t), lerp(min.y, max.y, t));
   }
 
-  static lerp2I(min: Point2, max: Point2, t: number): Point2 {
+  static lerp2I(min: Point, max: Point, t: number): Point {
     min.x = lerp(min.x, max.x, t);
     min.y = lerp(min.y, max.y, t);
     return min;
   }
 
   static damp2I(
-    current: Point2,
-    target: Point2,
+    current: Point,
+    target: Point,
     lambda: number,
     dt: number
-  ): Point2 {
+  ): Point {
     current.x = damp(current.x, target.x, lambda, dt);
     current.y = damp(current.y, target.y, lambda, dt);
     return current;
@@ -185,17 +181,15 @@ export default class Math2D {
   /**
    * The orientation of `c` with respect to the line going through `a` and `b`. Positive if `c` is to the left, negative if to the right, zero if they are collinear.
    */
-  static orient(a: Point2, b: Point2, c: Point2) {
+  static orient(a: Point, b: Point, c: Point) {
     return b.sub(a).cross(c.sub(a));
   }
 
-  static properInter(a: Point2, b: Point2, c: Point2, d: Point2) {
+  static properInter(a: Point, b: Point, c: Point, d: Point) {
     let oa = this.orient(c, d, a);
     let ob = this.orient(c, d, b);
     let oc = this.orient(a, b, c);
     let od = this.orient(a, b, d);
-
-    console.log(oa, ob, oc, od);
 
     if (oa * ob < 0 && oc * od < 0) {
       return a
@@ -215,12 +209,6 @@ function testLineIntersection() {
     }
   };
 
-  const assertFalsy = (b) => {
-    if (b) {
-      throw new Error("Assertion failed.");
-    }
-  };
-
   const check = () => {
     const res = Math2D.properInter(p1, p2, p3, p4);
     console.log(
@@ -229,16 +217,16 @@ function testLineIntersection() {
     return res;
   };
 
-  let p1 = new Point2(0, 0);
-  let p2 = new Point2(1, 1);
-  let p3 = new Point2(0.5, 1);
-  let p4 = new Point2(0.5, -1);
+  let p1 = new Point(0, 0);
+  let p2 = new Point(1, 1);
+  let p3 = new Point(0.5, 1);
+  let p4 = new Point(0.5, -1);
   assertTruthy(check());
 
-  p1 = new Point2(25, 526);
-  p2 = new Point2(62, 424);
-  p3 = new Point2(4, 454);
-  p4 = new Point2(307, 462);
+  p1 = new Point(25, 526);
+  p2 = new Point(62, 424);
+  p3 = new Point(4, 454);
+  p4 = new Point(307, 462);
   assertTruthy(check());
 }
 

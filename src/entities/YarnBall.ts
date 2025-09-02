@@ -2,7 +2,7 @@ import { CircleCollider } from "../lib/Collisions2D";
 import { Palette, type Color } from "../lib/Color";
 import { DynamicBody, Gravity } from "../lib/Physics2D";
 import { Stage } from "../lib/Stage";
-import type { Point2 } from "../lib/MathUtils";
+import type { Point } from "../lib/MathUtils";
 import Math2D, { damp, DEG2RAD } from "../lib/MathUtils";
 
 export class YarnBall extends DynamicBody {
@@ -12,8 +12,8 @@ export class YarnBall extends DynamicBody {
   public color: Color;
 
   constructor(
-    startPos: Point2,
-    startVelocity: Point2,
+    startPos: Point,
+    startVelocity: Point,
     mass: number,
     radius: number = 10,
     color: Color
@@ -25,14 +25,14 @@ export class YarnBall extends DynamicBody {
     this.radius = radius;
 
     this.attachCollider(new CircleCollider(this.position, this.radius));
-    this._velocity = startVelocity.clone();
+    this.velocity = startVelocity.clone();
     this.addForce(Gravity);
 
-    const points = [this._position];
+    const points = [this.position];
     const subs = 10;
 
     for (let i = 1; i < subs; i++) {
-      points.push(this._position.clone());
+      points.push(this.position.clone());
     }
 
     this.thread = points.map((p) => new DynamicBody(p));
@@ -47,8 +47,8 @@ export class YarnBall extends DynamicBody {
     let lambda = 1;
 
     this.thread.forEach((joint) => {
-      Math2D.damp2I(joint._position, prevJoint._position, lambda, dt);
-      // Math2D.lerp2I(joint._position, prevJoint._position, dt);
+      Math2D.damp2I(joint.position, prevJoint.position, lambda, dt);
+      // Math2D.lerp2I(joint.position, prevJoint.position, dt);
       prevJoint = joint;
     });
   }
@@ -69,7 +69,7 @@ export class YarnBall extends DynamicBody {
 
     const col1 = this.color;
     const col2 = this.color.lighten(1.1);
-    const { x, y } = this._position;
+    const { x, y } = this.position;
 
     const subs = 10;
     const n = 90 / subs;

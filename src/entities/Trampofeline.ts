@@ -3,16 +3,16 @@ import { circle } from "../lib/CanvasUtils";
 import { CircleCollider, CollisionManager } from "../lib/Collisions2D";
 import { Palette } from "../lib/Color";
 import { ElasticLine } from "../lib/ElasticLine";
-import Math2D, { damp, lerp, Point2, RAD2DEG } from "../lib/MathUtils";
-import { Gravity, State, type instant } from "../lib/Physics2D";
+import Math2D, { damp, lerp, Point, RAD2DEG } from "../lib/MathUtils";
+import { Gravity, State } from "../lib/Physics2D";
 import { Stage } from "../lib/Stage";
-import type { timestamp } from "../lib/TimeUtils";
+import type { instant, timestamp } from "../lib/TimeUtils";
 
-let p1: Point2 | undefined;
-let p2: Point2 | undefined;
-let p3: Point2 | undefined;
-let p4: Point2 | undefined;
-let inter: Point2 | undefined;
+let p1: Point | undefined;
+let p2: Point | undefined;
+let p3: Point | undefined;
+let p4: Point | undefined;
+let inter: Point | undefined;
 let mouseDown = false;
 let distance = 0;
 let drawing = false;
@@ -55,7 +55,7 @@ export default class Trampofelines {
       }
 
       drawing = true;
-      distance = p1 && p2 ? p1.sub(p2).l2() : 0;
+      distance = p1 && p2 ? p1.sub(p2).abs() : 0;
       p2 = canvas.resolveTouchPosition(e.touches[0]);
     }
 
@@ -82,7 +82,7 @@ export default class Trampofelines {
       }
 
       drawing = true;
-      distance = p1 && p2 ? p1.sub(p2).l2() : 0;
+      distance = p1 && p2 ? p1.sub(p2).abs() : 0;
       p2 = canvas.resolveMousePosition(e);
     }
 
@@ -128,8 +128,8 @@ export default class Trampofelines {
             b,
             (b1, b2) => {
               // only react if ball is in descending motion AND strictly above the joint
-              const isDescending = b2._velocity.y >= 0;
-              const aboveJoint = b2._position.y < b1._position.y;
+              const isDescending = b2.velocity.y >= 0;
+              const aboveJoint = b2.position.y < b1.position.y;
               return isDescending && aboveJoint;
             },
             () => {
@@ -148,8 +148,8 @@ export default class Trampofelines {
     const longEnough = distance >= MIN_LENGTH;
     const belowLimit = GAMESTATE.trampolines.length < MAX_CATS;
     const intersections = GAMESTATE.trampolines.filter(({ joints }) => {
-      p3 = joints.at(0)._position;
-      p4 = joints.at(-1)._position;
+      p3 = joints.at(0).position;
+      p4 = joints.at(-1).position;
       inter = Math2D.properInter(p1, p2, p3, p4);
       return inter;
     });
@@ -224,8 +224,8 @@ export class Trampofeline extends ElasticLine {
 
     // draw the face at the first joint (where the mouse motion started)
     {
-      const j0 = this.joints[0]._position;
-      const j1 = this.joints[1]._position;
+      const j0 = this.joints[0].position;
+      const j1 = this.joints[1].position;
       const dir = j0.sub(j1);
       const angle = Math.atan2(-dir.x, dir.y);
 
@@ -238,8 +238,8 @@ export class Trampofeline extends ElasticLine {
 
     // draw the butt & the tail at the last joint (where the mouse was lifted)
     {
-      const lastJoint = this.joints.at(-1)!._position;
-      const sndLastJoint = this.joints.at(-2)!._position;
+      const lastJoint = this.joints.at(-1)!.position;
+      const sndLastJoint = this.joints.at(-2)!.position;
       const dir = lastJoint.sub(sndLastJoint).normalize();
       const angle = Math.atan2(-dir.x, dir.y);
 
@@ -301,15 +301,15 @@ export function drawCatFace() {
 
   ctx.fillStyle = `${white}`;
   ctx.beginPath();
-  circle(new Point2(10, eyeY), outerEye);
-  circle(new Point2(-10, eyeY), outerEye);
+  circle(new Point(10, eyeY), outerEye);
+  circle(new Point(-10, eyeY), outerEye);
   ctx.closePath();
   ctx.fill();
 
   ctx.fillStyle = `${black}`;
   ctx.beginPath();
-  circle(new Point2(10, eyeY), innerEye);
-  circle(new Point2(-10, eyeY), innerEye);
+  circle(new Point(10, eyeY), innerEye);
+  circle(new Point(-10, eyeY), innerEye);
   ctx.closePath();
   ctx.fill();
 
@@ -350,7 +350,7 @@ export function drawCatFace() {
   ctx.fillStyle = `${pink}`;
   ctx.strokeStyle = `${black}`;
   ctx.beginPath();
-  circle(new Point2(0, 0), 4);
+  circle(new Point(0, 0), 4);
   ctx.closePath();
   ctx.fill();
   ctx.stroke();
@@ -374,7 +374,7 @@ export function drawCatRear(time = 0) {
   ctx.fillStyle = coatColor.toString();
   ctx.lineWidth = 2;
   ctx.beginPath();
-  circle(new Point2(0, 0), 20);
+  circle(new Point(0, 0), 20);
   ctx.fill();
 
   // that part
@@ -403,13 +403,13 @@ export function drawCatRear(time = 0) {
 
     ctx.fillStyle = detailColor.toString();
     ctx.beginPath();
-    circle(new Point2(0, -3), 3);
+    circle(new Point(0, -3), 3);
     ctx.closePath();
-    circle(new Point2(4, 2), 2);
+    circle(new Point(4, 2), 2);
     ctx.closePath();
-    circle(new Point2(0, 4), 2);
+    circle(new Point(0, 4), 2);
     ctx.closePath();
-    circle(new Point2(-4, 2), 2);
+    circle(new Point(-4, 2), 2);
     ctx.fill();
 
     ctx.restore();

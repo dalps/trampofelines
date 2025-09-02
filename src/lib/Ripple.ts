@@ -1,7 +1,7 @@
 import { Stage } from "./Stage";
 import { circle } from "./CanvasUtils";
 import { instant } from "./Physics2D";
-import { damp, type Point2 } from "./MathUtils";
+import { damp, type Point } from "./MathUtils";
 
 const EPSILON = 0.001;
 
@@ -42,7 +42,7 @@ export class Ripple {
   private _ref: WeakRef<Ripple>;
 
   constructor(
-    public position: Point2,
+    public position: Point,
     public initialRadius = 5,
     public finalRadius = 10,
     public initialTransparency = 1,

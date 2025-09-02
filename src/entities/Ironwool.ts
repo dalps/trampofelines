@@ -1,7 +1,7 @@
-import { DEG2RAD, Point2 } from "../lib/MathUtils";
+import { DEG2RAD, Point } from "../lib/MathUtils";
 
 export class Ironwool {
-  constructor(public position: Point2) {}
+  constructor(public position: Point) {}
 
   draw() {
     const { x, y } = this.position;

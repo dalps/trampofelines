@@ -1,17 +1,15 @@
 import { circle, popsicle } from "./CanvasUtils";
 import type { Collider } from "./Collisions2D";
-import type { Color } from "./Color";
+import { damp, Point } from "./MathUtils";
 import { Stage } from "./Stage";
-import { damp, Point2 } from "./MathUtils";
-
-export type instant = number;
+import { instant } from "./TimeUtils";
 
 /**
  * A static force that can be applied to a dynamic body
  */
 export class Force {
   constructor(
-    protected _direction: Point2 = new Point2(0, 0),
+    protected _direction: Point = new Point(0, 0),
     protected _magnitude: number = 1
   ) {}
 
@@ -27,7 +25,7 @@ export class Force {
     return this._magnitude;
   }
 
-  get direction(): Point2 {
+  get direction(): Point {
     return this._direction;
   }
 
@@ -43,8 +41,8 @@ type AttractionStrengthBehavior = "Additive" | "Multiplicative";
  */
 export class Attraction extends Force {
   constructor(
-    public from: Point2,
-    public to: Point2,
+    public from: Point,
+    public to: Point,
     public strength = 1,
     public behavior: AttractionStrengthBehavior = "Additive"
   ) {
@@ -54,21 +52,21 @@ export class Attraction extends Force {
   override get magnitude(): number {
     switch (this.behavior) {
       case "Additive":
-        return this.strength + this.to.sub(this.from).l2();
+        return this.strength + this.to.sub(this.from).abs();
       case "Multiplicative":
-        return this.strength * this.to.sub(this.from).l2();
+        return this.strength * this.to.sub(this.from).abs();
     }
   }
 
-  override get direction(): Point2 {
+  override get direction(): Point {
     return this.to.sub(this.from).normalize();
   }
 }
 
 export class Repulsion extends Force {
   constructor(
-    public from: Point2,
-    public to: Point2,
+    public from: Point,
+    public to: Point,
     public strength = 1,
     public behavior: AttractionStrengthBehavior = "Additive"
   ) {
@@ -78,13 +76,13 @@ export class Repulsion extends Force {
   override get magnitude(): number {
     switch (this.behavior) {
       case "Additive":
-        return this.strength - this.from.sub(this.to).l2();
+        return this.strength - this.from.sub(this.to).abs();
       case "Multiplicative":
-        return this.strength / this.from.sub(this.to).l2();
+        return this.strength / this.from.sub(this.to).abs();
     }
   }
 
-  override get direction(): Point2 {
+  override get direction(): Point {
     return this.from.sub(this.to).normalize();
   }
 }
@@ -92,7 +90,7 @@ export class Repulsion extends Force {
 export class ContactForce extends Force {
   static EPSILON = 0.000001;
 
-  constructor(d: Point2, m: number, public lambda = 1) {
+  constructor(d: Point, m: number, public lambda = 1) {
     super(d, m);
   }
 
@@ -111,37 +109,29 @@ export enum State {
 }
 
 export class DynamicBody {
-  public _position: Point2;
-  public _velocity: Point2;
+  public position: Point;
+  public velocity: Point;
   private _forces: Force[] = [];
-  private _aux = new Point2(0, 0);
+  private _aux = new Point(0, 0);
   private _locks = { x: false, y: false };
   private _fixed = false;
   public collider?: Collider;
   public name?: string;
   public ref?: WeakRef<DynamicBody>;
   public collisionID?: string;
-  public state: State = State.Alive;
+  public state = State.Alive;
   public mass: number;
   public friction: number;
 
   constructor(
-    position: Point2,
+    position: Point,
     { name = "__body__", mass = 1, friction = 1 } = {}
   ) {
-    this._position = position;
-    this._velocity = new Point2(0, 0);
+    this.position = position;
+    this.velocity = new Point(0, 0);
     this.mass = mass;
     this.friction = friction;
     this.name = name;
-  }
-
-  get position() {
-    return this._position;
-  }
-
-  get velocity() {
-    return this._velocity;
   }
 
   translate(x: number, y: number) {
@@ -169,10 +159,10 @@ export class DynamicBody {
     return this._aux;
   }
 
-  public get acceleration(): Point2 {
+  public get acceleration(): Point {
     return this.totalForce
       .multiplyScalarI(1 / this.mass)
-      .subI(this._velocity.multiplyScalar(this.friction));
+      .subI(this.velocity.multiplyScalar(this.friction));
   }
 
   toggleX() {
@@ -195,15 +185,15 @@ export class DynamicBody {
     );
 
     if (!this._locks.x) {
-      this._velocity.x += this.acceleration.x * dt;
-      this._position.x +=
-        this._velocity.x * dt + this.acceleration.x * dt * dt * 0.5;
+      this.velocity.x += this.acceleration.x * dt;
+      this.position.x +=
+        this.velocity.x * dt + this.acceleration.x * dt * dt * 0.5;
     }
 
     if (!this._locks.y) {
-      this._velocity.y += this.acceleration.y * dt;
-      this._position.y +=
-        this._velocity.y * dt + this.acceleration.y * dt * dt * 0.5;
+      this.velocity.y += this.acceleration.y * dt;
+      this.position.y +=
+        this.velocity.y * dt + this.acceleration.y * dt * dt * 0.5;
     }
   }
 
@@ -252,4 +242,4 @@ export class DynamicBody {
   }
 }
 
-export const Gravity = new Force(new Point2(0, 1), 9.81);
+export const Gravity = new Force(new Point(0, 1), 9.81);

@@ -6,7 +6,7 @@ import { CollisionManager } from "./lib/Collisions2D";
 import { Palette } from "./lib/Color";
 import { RippleManager } from "./lib/Ripple";
 import { Clock, type timestamp } from "./lib/TimeUtils";
-import { Point2 } from "./lib/MathUtils";
+import { Point } from "./lib/MathUtils";
 
 const { balls, trampolines } = state;
 
@@ -29,7 +29,7 @@ function init() {
 
   Trampofelines.init();
 
-  state.tubes.push(new Tube(new Point2(0, 100)));
+  state.tubes.push(new Tube(new Point(0, 100)));
 
   clear();
 
@@ -75,10 +75,10 @@ function draw(time: timestamp) {
 
   balls.forEach((b, i) => {
     if (
-      b._position.x < b.radius ||
-      b._position.x > cw + b.radius ||
-      // b._position.y < b.radius ||
-      b._position.y > ch + b.radius
+      b.position.x < b.radius ||
+      b.position.x > cw + b.radius ||
+      // b.position.y < b.radius ||
+      b.position.y > ch + b.radius
     ) {
       ballsToRemove.push(i);
       return;

@@ -2,7 +2,7 @@ import type { Ironwool } from "./entities/Ironwool";
 import { Trampofeline } from "./entities/Trampofeline";
 import type { Tube } from "./entities/Tube";
 import type { Ball } from "./lib/Physics2D";
-import { Point2 } from "./lib/MathUtils";
+import { Point } from "./lib/MathUtils";
 
 export const settings = {
   showJoints: false,
@@ -12,7 +12,7 @@ export const settings = {
   lineMass: 2,
   ballMass: 3,
   ballRadius: 20,
-  ballVelocity: new Point2(50, -10),
+  ballVelocity: new Point(50, -10),
   gravity: true,
 };
 

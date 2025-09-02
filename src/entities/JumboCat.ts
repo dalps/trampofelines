@@ -1,15 +1,14 @@
-import { GAMESTATE as state, GAMESTATE as St } from "../GameState";
-import { Stage } from "../lib/Stage";
-import { circle } from "../lib/CanvasUtils";
+import { GAMESTATE as St, GAMESTATE as state } from "../GameState";
 import { CircleCollider, CollisionManager } from "../lib/Collisions2D";
 import { Palette } from "../lib/Color";
 import { ElasticShape } from "../lib/ElasticLine";
-import Math2D, { Point2 } from "../lib/utils";
+import { Stage } from "../lib/Stage";
+import Math2D, { Point } from "../lib/MathUtils";
 import { drawCatFace } from "./Trampofeline";
 
 export class JumboCat extends ElasticShape {
-  constructor(public position: Point2, public size: Point2, public subs = 7) {
-    const points: Point2[] = [];
+  constructor(public position: Point, public size: Point, public subs = 7) {
+    const points: Point[] = [];
 
     const cornerTL = position;
     const cornerTR = position.addX(size.x);
@@ -28,7 +27,7 @@ export class JumboCat extends ElasticShape {
         [cornerTL, cornerBL, subsY],
         [cornerBL, cornerBR, subs],
         [cornerBR, cornerTR, subsY],
-      ] as [Point2, Point2, number][]
+      ] as [Point, Point, number][]
     ).forEach(([c1, c2, subs]) => {
       for (let i = 0; i < subs; i++) {
         i === 0 && clampIndeces.push(idx);
@@ -70,8 +69,8 @@ export class JumboCat extends ElasticShape {
 
     p.roundRect(x, y, sx, sy, 5);
 
-    const jl = this.joints.at(Math.floor(this.subs * 0.5))!._position;
-    const jr = this.joints.at(Math.floor(this.subs * 0.5 + 1))!._position;
+    const jl = this.joints.at(Math.floor(this.subs * 0.5))!.position;
+    const jr = this.joints.at(Math.floor(this.subs * 0.5 + 1))!.position;
     const center = Math2D.lerp2(jl, jr, 0.5).addY(sy * 0.5);
 
     ctx.save();

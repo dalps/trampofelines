@@ -4,14 +4,14 @@ import { CollisionManager } from "../lib/Collisions2D";
 import { HSLColor, Palette } from "../lib/Color";
 import { Ripple } from "../lib/Ripple";
 import { Clock, timestamp } from "../lib/TimeUtils";
-import { lerp, Point2 } from "../lib/MathUtils";
+import { lerp, Point } from "../lib/MathUtils";
 import { YarnBall } from "./YarnBall";
 
 export class Tube {
-  public position: Point2;
-  public size: Point2;
+  public position: Point;
+  public size: Point;
 
-  constructor(position: Point2, size = new Point2(100, 100)) {
+  constructor(position: Point, size = new Point(100, 100)) {
     this.position = position;
     this.size = size;
     Clock.every(10, () => {
@@ -51,7 +51,7 @@ export class Tube {
     const nRipples = 5;
     for (let i = 0; i < nRipples; i++) {
       const startRadius = lerp(10, 20, i / nRipples);
-      new Ripple(Point2.random(p1, p2), startRadius, startRadius + 10);
+      new Ripple(Point.random(p1, p2), startRadius, startRadius + 10);
     }
 
     St.balls.push(ball);
@@ -148,8 +148,8 @@ export class Tube {
     });
 
     const makeGradient = (
-      cp1: Point2,
-      cp2: Point2,
+      cp1: Point,
+      cp2: Point,
       {
         color1 = "#00ff00",
         color2 = "#009c00",
@@ -191,8 +191,8 @@ export class Tube {
     ctx.fill(lid);
     // ctx.stroke(lid);
     ctx.fillStyle = makeGradient(
-      new Point2(x2 - 10, this.position.y),
-      new Point2(x2 + 10, this.position.y),
+      new Point(x2 - 10, this.position.y),
+      new Point(x2 + 10, this.position.y),
       { color1: "black", color2: "#298529ff", shineSize: 0 }
     );
     ctx.fill(hole);

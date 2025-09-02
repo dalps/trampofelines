@@ -1,36 +1,7 @@
+import type { Point } from "./MathUtils";
 import { Stage } from "./Stage";
-import type { Point2 } from "./MathUtils";
-import Math2D from "./MathUtils";
 
-export function drawArrow(from: Point2, to: Point2, color = "black") {
-  const ctx = Stage.ctx;
-
-  ctx.lineCap = "round";
-  ctx.strokeStyle = color;
-
-  const arrowSize = 4;
-  const dy = to.y - from.y;
-  const dx = to.x - from.x;
-  const perpDir = dx === 0 ? "V" : dy === 0 ? "H" : -dx / dy;
-
-  const p = Math2D.lerp2(from, to, 0.8);
-  const p1 = Math2D.linePoint(p, -arrowSize, perpDir);
-  const p2 = Math2D.linePoint(p, arrowSize, perpDir);
-
-  ctx.beginPath();
-  ctx.moveTo(from.x, from.y);
-  ctx.lineTo(to.x, to.y);
-  ctx.stroke();
-
-  ctx.moveTo(p1.x, p1.y);
-  ctx.lineTo(to.x, to.y);
-  ctx.lineTo(p2.x, p2.y);
-  ctx.stroke();
-
-  ctx.closePath();
-}
-
-export function popsicle(from: Point2, to: Point2, color = "black") {
+export function popsicle(from: Point, to: Point, color = "black") {
   const ctx = Stage.ctx;
 
   ctx.lineCap = "round";
@@ -57,7 +28,7 @@ export function popsicle(from: Point2, to: Point2, color = "black") {
   ctx.closePath();
 }
 
-export function circle(p: Point2, r: number) {
+export function circle(p: Point, r: number) {
   const ctx = Stage.ctx;
 
   ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
