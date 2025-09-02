@@ -171,4 +171,21 @@ export default class Math2D {
   static lerp2(min: Point2, max: Point2, t: number): Point2 {
     return new Point2(lerp(min.x, max.x, t), lerp(min.y, max.y, t));
   }
+
+  static lerp2I(min: Point2, max: Point2, t: number): Point2 {
+    min.x = lerp(min.x, max.x, t);
+    min.y = lerp(min.y, max.y, t);
+    return min;
+  }
+
+  static damp2I(
+    current: Point2,
+    target: Point2,
+    lambda: number,
+    dt: number
+  ): Point2 {
+    current.x = damp(current.x, target.x, lambda, dt);
+    current.y = damp(current.y, target.y, lambda, dt);
+    return current;
+  }
 }

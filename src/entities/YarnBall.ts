@@ -1,7 +1,5 @@
-import { circle } from "../lib/CanvasUtils";
 import { CircleCollider } from "../lib/Collisions2D";
-import { Palette, type Color, type HSLColor } from "../lib/Color";
-import { ElasticShape } from "../lib/ElasticLine";
+import { Palette, type Color } from "../lib/Color";
 import { DynamicBody, Gravity } from "../lib/Physics2D";
 import { Stage } from "../lib/Stage";
 import type { Point2 } from "../lib/utils";
@@ -47,21 +45,11 @@ export class YarnBall extends DynamicBody {
     this.threadLength += dt * 0.01;
 
     let prevJoint: DynamicBody = this.thread[0];
-
     let lambda = 1;
-    this.thread.forEach((joint, i) => {
-      joint._position.x = damp(
-        joint._position.x,
-        prevJoint._position.x,
-        lambda,
-        dt
-      );
-      joint._position.y = damp(
-        joint._position.y,
-        prevJoint._position.y,
-        lambda,
-        dt
-      );
+
+    this.thread.forEach((joint) => {
+      Math2D.damp2I(joint._position, prevJoint._position, lambda, dt);
+      // Math2D.lerp2I(joint._position, prevJoint._position, dt);
       prevJoint = joint;
     });
   }
@@ -72,7 +60,8 @@ export class YarnBall extends DynamicBody {
     Palette.setTransparency(1);
 
     ctx.beginPath();
-    ctx.strokeStyle = this.color.toString();
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = this.color.setAlpha(0.9).toString();
     ctx.moveTo(this.position.x, this.position.y);
     this.thread.forEach((joint, i) => {
       i >= 0 && ctx.lineTo(joint.position.x, joint.position.y);

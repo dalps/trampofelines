@@ -1,5 +1,9 @@
 export abstract class Color {
   abstract alpha: number;
+  setAlpha(v: number): this {
+    this.alpha = v;
+    return this;
+  }
   abstract clone(): Color;
   abstract toString(): string;
 }
