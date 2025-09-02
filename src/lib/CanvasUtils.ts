@@ -1,12 +1,10 @@
+import { Stage } from "./Stage";
 import type { Point2 } from "./utils";
 import Math2D from "./utils";
 
-export function drawArrow(
-  ctx: CanvasRenderingContext2D,
-  from: Point2,
-  to: Point2,
-  color = "black"
-) {
+export function drawArrow(from: Point2, to: Point2, color = "black") {
+  const ctx = Stage.ctx;
+
   ctx.lineCap = "round";
   ctx.strokeStyle = color;
 
@@ -32,12 +30,9 @@ export function drawArrow(
   ctx.closePath();
 }
 
-export function popsicle(
-  ctx: CanvasRenderingContext2D,
-  from: Point2,
-  to: Point2,
-  color = "black"
-) {
+export function popsicle(from: Point2, to: Point2, color = "black") {
+  const ctx = Stage.ctx;
+
   ctx.lineCap = "round";
   ctx.strokeStyle = color;
   ctx.fillStyle = color;
@@ -61,15 +56,19 @@ export function popsicle(
   ctx.closePath();
 }
 
-export function circle(ctx: CanvasRenderingContext2D, p: Point2, r: number) {
+export function circle(p: Point2, r: number) {
+  const ctx = Stage.ctx;
+
   ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
 }
 
 export function drawGrid(
   canvas: HTMLCanvasElement,
-  ctx: CanvasRenderingContext2D,
+
   { sep = 20, lineWidth = 2, color = "#ccc", offsetX = 0, offsetY = 0 } = {}
 ) {
+  const ctx = Stage.ctx;
+
   ctx.lineWidth = lineWidth;
   ctx.strokeStyle = color;
 

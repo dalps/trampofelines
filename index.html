@@ -28,17 +28,19 @@
         user-select: none;
         touch-action: none;
         image-rendering: optimizeQuality;
+        position: absolute;
       }
 
-      #app {
+      #stage {
         width: 100vw;
         height: 100svh;
         overflow: hidden;
+        position: relative;
       }
     </style>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="stage"></div>
     <script type="module" src="./main.js"></script>
   </body>
 </html>

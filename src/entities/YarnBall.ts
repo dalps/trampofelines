@@ -1,3 +1,4 @@
+import { Stage } from "../lib/Stage";
 import { CircleCollider } from "../lib/Collisions2D";
 import type { HSLColor } from "../lib/Color";
 import { ElasticLine, ElasticShape } from "../lib/ElasticLine";
@@ -58,8 +59,10 @@ export class YarnBall extends Ball {
     this.thread.update(dt);
   }
 
-  draw(ctx: CanvasRenderingContext2D): void {
-    this.thread.draw(ctx, {
+  draw() {
+    const ctx = Stage.ctx;
+
+    this.thread.draw({
       fill: false,
       strokeColor: this.color.toString(),
       lineWidth: 4,
@@ -69,7 +72,7 @@ export class YarnBall extends Ball {
     const col2 = this.color.lighten(1.1);
     const { x, y } = this._position;
 
-    // super.draw(ctx);
+    // super.draw();
 
     const subs = 10;
     const n = 90 / subs;

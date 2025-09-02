@@ -3,14 +3,14 @@ import { DEG2RAD, Point2 } from "../lib/utils";
 export class Ironwool {
   constructor(public position: Point2) {}
 
-  draw(ctx: CanvasRenderingContext2D) {
+  draw() {
     const { x, y } = this.position;
     let path = new Path2D();
     path.addPath(
       new Path2D(`M 9,16 4.1,15 1.1,19 -2.5,15.5
 l -4.7,1.7 -1.1,-4.9 -4.9,-1.1 1.7,-4.7 -3.5,-3.6 4,-3 -1,-4.9 5,-0.4 1.8,-4.7 4.4,2.3 4,-2.9 2.4,4.3 5,-0.3 -0.3,5 4.4,2.4 -2.9,4 2.3,4.4 -4.7,1.8
 z`),
-      new DOMMatrix().translate(x + 25, y + 17.5).scale(2,2)
+      new DOMMatrix().translate(x + 25, y + 17.5).scale(2, 2)
     );
 
     ctx.lineWidth = 3;

@@ -206,7 +206,7 @@ export class DynamicBody {
     }
   }
 
-  drawForces(ctx: CanvasRenderingContext2D) {
+  drawForces() {
     // draw each individual force
     this._forces.forEach((f) => {
       popsicle(
@@ -235,7 +235,7 @@ export class DynamicBody {
     // );
   }
 
-  drawCollider(ctx: CanvasRenderingContext2D) {
+  drawCollider() {
     if (!this.collider) return;
 
     ctx.lineWidth = 1;
@@ -259,7 +259,7 @@ export class Ball extends DynamicBody {
     super(p, { mass: radius, name: "ball", friction: 0.1 });
   }
 
-  draw(ctx: CanvasRenderingContext2D) {
+  draw() {
     ctx.fillStyle = this.color.toString();
     ctx.strokeStyle = "black";
     ctx.lineWidth = 2;

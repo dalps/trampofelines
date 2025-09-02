@@ -1,8 +1,9 @@
 import { GAMESTATE as St } from "../GameState";
+import { Stage } from "../lib/Stage";
 import { CollisionManager } from "../lib/Collisions2D";
 import { HSLColor, Palette } from "../lib/Color";
 import { Ripple } from "../lib/Ripple";
-import { Clock } from "../lib/TimeUtils";
+import { Clock, timestamp } from "../lib/TimeUtils";
 import { lerp, Point2 } from "../lib/utils";
 import { YarnBall } from "./YarnBall";
 
@@ -62,9 +63,11 @@ export class Tube {
     return ball;
   }
 
-  update(dt: time) {}
+  update(dt: timestamp) {}
 
-  draw(ctx: CanvasRenderingContext2D) {
+  draw() {
+    const ctx = Stage.ctx;
+
     let {
       position: { x, y },
       size: { x: sx, y: sy },

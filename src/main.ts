@@ -1,69 +1,54 @@
+import { Stage } from "./lib/Stage";
 import Trampofelines from "./entities/Trampofeline";
 import { Tube } from "./entities/Tube";
 import { settings, GAMESTATE as state } from "./GameState";
-import { drawGrid } from "./lib/CanvasUtils";
 import { CollisionManager } from "./lib/Collisions2D";
 import { Palette } from "./lib/Color";
-import { Gravity } from "./lib/Physics2D";
 import { RippleManager } from "./lib/Ripple";
 import { Clock, type timestamp } from "./lib/TimeUtils";
 import { Point2 } from "./lib/utils";
 
-let cw: number;
-let ch: number;
-let container: HTMLDivElement;
-let canvas: HTMLCanvasElement;
-let canvasRect: DOMRect;
-let ctx: CanvasRenderingContext2D;
-
 const { balls, trampolines: lines } = state;
 
-function setSize() {
-  cw = canvas.width = container.clientWidth;
-  ch = canvas.height = container.clientHeight;
-
-  canvasRect = canvas.getBoundingClientRect();
-}
+let ctx: CanvasRenderingContext2D;
+let cw: any;
+let ch: any;
 
 function init() {
-  canvas = document.createElement("canvas");
-  container = document.getElementById("app");
+  Stage.init(document.getElementById("stage"));
 
-  ctx = canvas.getContext("2d")!;
+  {
+    const { ctx, width: cw, height: ch } = Stage.layers.get("background");
+    ctx.fillStyle = Palette.colors.cardboard.toString();
+    ctx.fillRect(0, 0, cw, ch);
+  }
 
-  canvas.width = cw;
-  canvas.height = ch;
+  {
+    const { ctx, width: cw, height: ch } = Stage.layers.get("ui");
+    ctx.fillStyle = "blue";
+    ctx.clearRect(0, 0, cw, ch);
+  }
 
-  container.appendChild(canvas);
+  Stage.workingCtx = "game";
 
-  setSize();
-  clear();
-
-  Trampofelines.init(state, canvas);
-
-  window.addEventListener("resize", setSize);
-
-  // setupPanes();
+  Trampofelines.init();
 
   state.tubes.push(new Tube(new Point2(0, 100)));
+
+  clear();
 
   requestAnimationFrame(draw);
 }
 
 function clear() {
-  ctx.fillStyle = Palette.colors.cardboard.toString();
-  ctx.fillRect(0, 0, cw, ch);
+  const { ctx, width: cw, height: ch } = Stage.layers.get("game");
 
-  // drawGrid(canvas, ctx, {
-  //   color: "#ddd",
-  //   lineWidth: 1,
-  //   sep: 20,
-  //   offsetX: 0,
-  //   offsetY: 0,
-  // });
+  ctx.clearRect(0, 0, cw, ch);
 }
 
 function draw(time: timestamp) {
+  const { width: cw, height: ch } = Stage.layers.get("game");
+
   time *= 0.01;
   const dt = Clock.update(time);
 
@@ -71,22 +56,22 @@ function draw(time: timestamp) {
 
   // drawTitle(ctx, time);
 
-  state.tubes.forEach((tube) => tube.draw(ctx));
-  state.enemies.forEach((e) => e.draw(ctx));
+  state.tubes.forEach((tube) => tube.draw());
+  state.enemies.forEach((e) => e.draw());
 
   settings.play && CollisionManager.update(dt);
 
-  Trampofelines.draw(ctx, time);
+  Trampofelines.draw(time);
 
   lines.forEach((l) => {
     settings.play && l.update(dt);
 
-    l.draw(ctx);
-    settings.showJoints && l.drawJoints(ctx);
+    l.draw();
+    settings.showJoints && l.drawJoints();
 
     l.joints.forEach((j) => {
-      settings.showForces && j.drawForces(ctx);
-      settings.showForces && j.drawCollider(ctx);
+      settings.showForces && j.drawForces();
+      settings.showForces && j.drawCollider();
     });
   });
 
@@ -105,9 +90,9 @@ function draw(time: timestamp) {
 
     settings.play && b.update(dt);
 
-    b.draw(ctx);
-    settings.showForces && b.drawForces(ctx);
-    settings.showForces && b.drawCollider(ctx);
+    b.draw();
+    settings.showForces && b.drawForces();
+    settings.showForces && b.drawCollider();
   });
 
   ballsToRemove.forEach((idx) => {
@@ -115,7 +100,7 @@ function draw(time: timestamp) {
     // unregister the body
   });
 
-  RippleManager.updateAndDraw(ctx, dt * 0.1);
+  RippleManager.updateAndDraw(dt * 0.1);
 
   requestAnimationFrame(draw);
 }

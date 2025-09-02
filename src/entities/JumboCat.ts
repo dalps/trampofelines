@@ -1,4 +1,5 @@
 import { GAMESTATE as state, GAMESTATE as St } from "../GameState";
+import { Stage } from "../lib/Stage";
 import { circle } from "../lib/CanvasUtils";
 import { CircleCollider, CollisionManager } from "../lib/Collisions2D";
 import { Palette } from "../lib/Color";
@@ -55,8 +56,10 @@ export class JumboCat extends ElasticShape {
     });
   }
 
-  draw(ctx: CanvasRenderingContext2D) {
-    super.draw(ctx, { fillColor: Palette.colors.nightBlue.toString() });
+  draw() {
+    const ctx = Stage.ctx;
+
+    super.draw({ fillColor: Palette.colors.nightBlue.toString() });
 
     let {
       position: { x, y },
@@ -73,7 +76,7 @@ export class JumboCat extends ElasticShape {
 
     ctx.save();
     ctx.translate(center.x, center.y);
-    drawCatFace(ctx);
+    drawCatFace();
     ctx.restore();
 
     // ctx.fillStyle = Palette.coatColor;

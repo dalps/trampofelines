@@ -1,4 +1,5 @@
-import { GAMESTATE, type GameState } from "../GameState";
+import { GAMESTATE } from "../GameState";
+import { Stage } from "../lib/Stage";
 import { circle } from "../lib/CanvasUtils";
 import { CircleCollider, CollisionManager } from "../lib/Collisions2D";
 import { Palette } from "../lib/Color";
@@ -32,10 +33,9 @@ const {
 const MAX_CATS = 3;
 
 export default class Trampofelines {
-  static init(state: GameState, canvas: HTMLCanvasElement) {
-    const { trampolines, balls, settings } = state;
-
-    canvasRect = canvas.getBoundingClientRect();
+  static init() {
+    const { trampolines, balls, settings } = GAMESTATE;
+    const canvas = Stage.layers.get("game");
 
     canvas.addEventListener("mousedown", handleMouseDown, false);
     canvas.addEventListener("mousemove", handleMouseMove, false);
@@ -123,7 +123,7 @@ export default class Trampofelines {
       cat.joints.forEach((j) => {
         settings.gravity && j.addForce(Gravity);
         j.attachCollider(
-          new CircleCollider(j.position, state.settings.colliderRadius)
+          new CircleCollider(j.position, GAMESTATE.settings.colliderRadius)
         );
 
         balls.forEach((b) =>
@@ -148,7 +148,9 @@ export default class Trampofelines {
     }
   }
 
-  static draw(ctx: CanvasRenderingContext2D, time: number) {
+  static draw(time: number) {
+    const ctx = Stage.ctx;
+
     if (p1 && p2 && distance >= 20) {
       ctx.lineWidth = 10;
       ctx.setLineDash([5, 15]);
@@ -192,7 +194,8 @@ export class Trampofeline extends ElasticLine {
     this._time += dt;
   }
 
-  draw(ctx: CanvasRenderingContext2D): void {
+  draw(): void {
+    const ctx = Stage.ctx;
     Palette.setTransparency(this._transparency);
 
     ctx.lineWidth = 25;
@@ -218,7 +221,7 @@ export class Trampofeline extends ElasticLine {
       ctx.save();
       ctx.translate(j0.x, j0.y);
       ctx.rotate(angle);
-      drawCatFace(ctx);
+      drawCatFace();
       ctx.restore();
     }
 
@@ -232,13 +235,15 @@ export class Trampofeline extends ElasticLine {
       ctx.save();
       ctx.translate(lastJoint.x, lastJoint.y);
       ctx.rotate(angle);
-      drawCatRear(ctx, this._time);
+      drawCatRear(this._time);
       ctx.restore();
     }
   }
 }
 
-export function drawCatFace(ctx: CanvasRenderingContext2D) {
+export function drawCatFace() {
+  const ctx = Stage.ctx;
+
   // arms & paws
   ctx.strokeStyle = coatColor.toString();
   ctx.lineWidth = 10;
@@ -279,15 +284,15 @@ export function drawCatFace(ctx: CanvasRenderingContext2D) {
 
   ctx.fillStyle = `${white}`;
   ctx.beginPath();
-  circle(ctx, new Point2(10, eyeY), outerEye);
-  circle(ctx, new Point2(-10, eyeY), outerEye);
+  circle(new Point2(10, eyeY), outerEye);
+  circle(new Point2(-10, eyeY), outerEye);
   ctx.closePath();
   ctx.fill();
 
   ctx.fillStyle = `${black}`;
   ctx.beginPath();
-  circle(ctx, new Point2(10, eyeY), innerEye);
-  circle(ctx, new Point2(-10, eyeY), innerEye);
+  circle(new Point2(10, eyeY), innerEye);
+  circle(new Point2(-10, eyeY), innerEye);
   ctx.closePath();
   ctx.fill();
 
@@ -328,7 +333,7 @@ export function drawCatFace(ctx: CanvasRenderingContext2D) {
   ctx.fillStyle = `${pink}`;
   ctx.strokeStyle = `${black}`;
   ctx.beginPath();
-  circle(ctx, new Point2(0, 0), 4);
+  circle(new Point2(0, 0), 4);
   ctx.closePath();
   ctx.fill();
   ctx.stroke();
@@ -345,12 +350,14 @@ export function drawCatFace(ctx: CanvasRenderingContext2D) {
   ctx.stroke();
 }
 
-export function drawCatRear(ctx: CanvasRenderingContext2D, time = 0) {
+export function drawCatRear(time = 0) {
+  const ctx = Stage.ctx;
+
   // butt
   ctx.fillStyle = coatColor.toString();
   ctx.lineWidth = 2;
   ctx.beginPath();
-  circle(ctx, new Point2(0, 0), 20);
+  circle(new Point2(0, 0), 20);
   ctx.fill();
 
   // that part
@@ -379,13 +386,13 @@ export function drawCatRear(ctx: CanvasRenderingContext2D, time = 0) {
 
     ctx.fillStyle = detailColor.toString();
     ctx.beginPath();
-    circle(ctx, new Point2(0, -3), 3);
+    circle(new Point2(0, -3), 3);
     ctx.closePath();
-    circle(ctx, new Point2(4, 2), 2);
+    circle(new Point2(4, 2), 2);
     ctx.closePath();
-    circle(ctx, new Point2(0, 4), 2);
+    circle(new Point2(0, 4), 2);
     ctx.closePath();
-    circle(ctx, new Point2(-4, 2), 2);
+    circle(new Point2(-4, 2), 2);
     ctx.fill();
 
     ctx.restore();

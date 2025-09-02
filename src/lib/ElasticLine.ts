@@ -1,9 +1,5 @@
-import {
-  Attraction,
-  DynamicBody,
-  Repulsion,
-  type instant
-} from "./Physics2D";
+import { Stage } from "./Stage";
+import { Attraction, DynamicBody, Repulsion, type instant } from "./Physics2D";
 import Math2D, { Point2 } from "./utils";
 
 class Joint extends DynamicBody {
@@ -78,17 +74,16 @@ export class ElasticShape {
     }
   }
 
-  draw(
-    ctx: CanvasRenderingContext2D,
-    {
-      fillColor = "black",
-      strokeColor = "black",
-      lineWidth = 1,
-      lineCap = "round" as CanvasLineCap,
-      stroke = true,
-      fill = true,
-    } = {}
-  ) {
+  draw({
+    fillColor = "black",
+    strokeColor = "black",
+    lineWidth = 1,
+    lineCap = "round" as CanvasLineCap,
+    stroke = true,
+    fill = true,
+  } = {}) {
+    const ctx = Stage.ctx;
+
     ctx.fillStyle = fillColor;
     ctx.strokeStyle = strokeColor;
     ctx.lineWidth = lineWidth;
@@ -104,10 +99,9 @@ export class ElasticShape {
     fill && ctx.fill();
   }
 
-  drawJoints(
-    ctx: CanvasRenderingContext2D,
-    colors = ["yellow", "magenta", "cyan"]
-  ) {
+  drawJoints(colors = ["yellow", "magenta", "cyan"]) {
+    const ctx = Stage.ctx;
+
     ctx.lineWidth = 2;
     ctx.strokeStyle = "black";
     this.joints.forEach((j, i) => {

@@ -10,10 +10,10 @@ serve-esbuild:
     esbuild --minify --bundle src/main.ts --outdir=dist --watch --serve --servedir=dist
 
 watch:
-    esbuild --minify --bundle src/main.ts --outdir=dist --watch=forever
+    esbuild --bundle src/main.ts --outdir=dist --format=esm --watch=forever --sourcemap
 
 build:
-    esbuild --minify --bundle src/main.ts --outdir=dist
+    esbuild --minify --bundle src/main.ts --outdir=dist --format=esm
 
 linecount:
     find src/ -name '*.ts' | xargs wc -lc
