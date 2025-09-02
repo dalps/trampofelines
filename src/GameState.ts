@@ -1,6 +1,6 @@
 import type { Ironwool } from "./entities/Ironwool";
+import { Trampofeline } from "./entities/Trampofeline";
 import type { Tube } from "./entities/Tube";
-import type { ElasticShape } from "./lib/ElasticLine";
 import type { Ball } from "./lib/Physics2D";
 import { Point2 } from "./lib/utils";
 
@@ -18,7 +18,7 @@ export const settings = {
 
 export interface GameState {
   balls: Ball[];
-  lines: ElasticShape[];
+  trampolines: Trampofeline[];
   tubes: Tube[];
   enemies: Ironwool[];
   lives: number;
@@ -28,7 +28,7 @@ export interface GameState {
 
 export const GAMESTATE: GameState = {
   balls: [],
-  lines: [],
+  trampolines: [],
   tubes: [],
   enemies: [],
   lives: 3,

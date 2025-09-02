@@ -55,7 +55,7 @@ export class Tube {
 
     St.balls.push(ball);
 
-    St.lines.forEach((l) =>
+    St.trampolines.forEach((l) =>
       l.joints.forEach((j) => CollisionManager.register(j, ball))
     );
 

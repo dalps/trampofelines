@@ -3,6 +3,7 @@ import { Tube } from "./entities/Tube";
 import { settings, GAMESTATE as state } from "./GameState";
 import { drawGrid } from "./lib/CanvasUtils";
 import { CollisionManager } from "./lib/Collisions2D";
+import { Palette } from "./lib/Color";
 import { Gravity } from "./lib/Physics2D";
 import { RippleManager } from "./lib/Ripple";
 import { Clock, type timestamp } from "./lib/TimeUtils";
@@ -15,7 +16,7 @@ let canvas: HTMLCanvasElement;
 let canvasRect: DOMRect;
 let ctx: CanvasRenderingContext2D;
 
-const { balls, lines } = state;
+const { balls, trampolines: lines } = state;
 
 function setSize() {
   cw = canvas.width = container.clientWidth;
@@ -50,16 +51,16 @@ function init() {
 }
 
 function clear() {
-  ctx.fillStyle = "#eee";
+  ctx.fillStyle = Palette.colors.cardboard.toString();
   ctx.fillRect(0, 0, cw, ch);
 
-  drawGrid(canvas, ctx, {
-    color: "#ddd",
-    lineWidth: 1,
-    sep: 20,
-    offsetX: 0,
-    offsetY: 0,
-  });
+  // drawGrid(canvas, ctx, {
+  //   color: "#ddd",
+  //   lineWidth: 1,
+  //   sep: 20,
+  //   offsetX: 0,
+  //   offsetY: 0,
+  // });
 }
 
 function draw(time: timestamp) {

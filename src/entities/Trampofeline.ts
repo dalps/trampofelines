@@ -1,4 +1,4 @@
-import type { GameState } from "../GameState";
+import { GAMESTATE, type GameState } from "../GameState";
 import { circle } from "../lib/CanvasUtils";
 import { CircleCollider, CollisionManager } from "../lib/Collisions2D";
 import { Palette } from "../lib/Color";
@@ -29,9 +29,11 @@ const {
   pink,
 } = Palette.colors;
 
+const MAX_CATS = 3;
+
 export default class Trampofelines {
   static init(state: GameState, canvas: HTMLCanvasElement) {
-    const { lines, balls, settings } = state;
+    const { trampolines, balls, settings } = state;
 
     canvasRect = canvas.getBoundingClientRect();
 
@@ -104,16 +106,21 @@ export default class Trampofelines {
         return;
       }
 
-      const line = new Trampofeline(p2, p1, 10, {
+      if (trampolines.length >= MAX_CATS) {
+        p1 = p2 = undefined;
+        return;
+      }
+
+      const cat = new Trampofeline(p2, p1, 10, {
         damping: 2,
         mass: 2,
         jointsAttraction: 220,
         jointsRepulsion: 50,
       });
 
-      lines.push(line);
+      trampolines.push(cat);
 
-      line.joints.forEach((j) => {
+      cat.joints.forEach((j) => {
         settings.gravity && j.addForce(Gravity);
         j.attachCollider(
           new CircleCollider(j.position, state.settings.colliderRadius)
@@ -131,7 +138,7 @@ export default class Trampofelines {
             },
             () => {
               console.log("hello?");
-              line.kill();
+              cat.kill();
             }
           )
         );
@@ -145,11 +152,11 @@ export default class Trampofelines {
     if (p1 && p2 && distance >= 20) {
       ctx.lineWidth = 10;
       ctx.setLineDash([5, 15]);
-      ctx.strokeStyle = `rgba(${distance < 100 ? `255,0,0` : `0,0,0`},${lerp(
-        0.3,
-        0.4,
-        Math.sin(time)
-      )})`;
+      ctx.strokeStyle = `rgba(${
+        distance < 100 || GAMESTATE.trampolines.length >= MAX_CATS
+          ? `255,0,0`
+          : `0,0,0`
+      },${lerp(0.3, 0.4, Math.sin(time))})`;
       ctx.lineCap = "round";
       ctx.beginPath();
       ctx.moveTo(p1.x, p1.y);

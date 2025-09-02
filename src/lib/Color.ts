@@ -5,7 +5,12 @@ export abstract class Color {
 }
 
 export class RGBColor extends Color {
-  constructor(public r = 255, public g = 255, public b = 255, public alpha = 1) {
+  constructor(
+    public r = 255,
+    public g = 255,
+    public b = 255,
+    public alpha = 1
+  ) {
     super();
   }
 
@@ -19,7 +24,12 @@ export class RGBColor extends Color {
 }
 
 export class HSLColor extends Color {
-  constructor(public h = 120, public s = 100, public l = 100, public alpha = 1) {
+  constructor(
+    public h = 120,
+    public s = 100,
+    public l = 100,
+    public alpha = 1
+  ) {
     super();
   }
 
@@ -50,6 +60,7 @@ export class Palette {
     nightBlue: new RGBColor(1, 17, 35), // "#011123"
     darkBlue: new RGBColor(17, 34, 54), // "#112236"
     blueGray: new RGBColor(85, 102, 121), // "#556679"
+    cardboard: new HSLColor(56, 38, 58), // "hsla(56, 38%, 58%, 1.00)"
   };
 
   static setTransparency(a: number) {
