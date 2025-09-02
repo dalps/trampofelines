@@ -1,7 +1,7 @@
 import { Stage } from "./Stage";
 import { circle } from "./CanvasUtils";
 import { instant } from "./Physics2D";
-import { damp, type Point2 } from "./utils";
+import { damp, type Point2 } from "./MathUtils";
 
 const EPSILON = 0.001;
 

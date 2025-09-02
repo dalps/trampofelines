@@ -1,4 +1,4 @@
-import { DEG2RAD, Point2 } from "../lib/utils";
+import { DEG2RAD, Point2 } from "../lib/MathUtils";
 
 export class Ironwool {
   constructor(public position: Point2) {}

@@ -1,3 +1,5 @@
+import { Point2 } from "./MathUtils";
+
 export class MyCanvas extends HTMLCanvasElement {
   private _ctx: CanvasRenderingContext2D;
   private _rect: DOMRect;
@@ -25,6 +27,18 @@ export class MyCanvas extends HTMLCanvasElement {
 
   get rect(): DOMRect {
     return this._rect ?? (this._rect = this.getBoundingClientRect());
+  }
+
+  resolveMousePosition(e: MouseEvent): Point2 {
+    if (e.offsetX) {
+      return new Point2(e.offsetX, e.offsetY);
+    }
+
+    return new Point2(e.layerX, e.layerY);
+  }
+
+  resolveTouchPosition(e: Touch): Point2 {
+    return new Point2(e.clientX - this.rect.x, e.clientY - this.rect.y);
   }
 }
 

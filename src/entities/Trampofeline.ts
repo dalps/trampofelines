@@ -1,27 +1,18 @@
 import { GAMESTATE } from "../GameState";
-import { Stage } from "../lib/Stage";
-import { circle, popsicle } from "../lib/CanvasUtils";
+import { circle } from "../lib/CanvasUtils";
 import { CircleCollider, CollisionManager } from "../lib/Collisions2D";
 import { Palette } from "../lib/Color";
 import { ElasticLine } from "../lib/ElasticLine";
+import Math2D, { damp, lerp, Point2, RAD2DEG } from "../lib/MathUtils";
 import { Gravity, State, type instant } from "../lib/Physics2D";
+import { Stage } from "../lib/Stage";
 import type { timestamp } from "../lib/TimeUtils";
-import Math2D, {
-  damp,
-  DEG2RAD,
-  lerp,
-  Point2,
-  RAD2DEG,
-  resolveMousePosition,
-  resolveTouchPosition,
-} from "../lib/utils";
-
-let canvasRect: DOMRect;
 
 let p1: Point2 | undefined;
 let p2: Point2 | undefined;
 let p3: Point2 | undefined;
 let p4: Point2 | undefined;
+let inter: Point2 | undefined;
 let mouseDown = false;
 let distance = 0;
 let drawing = false;
@@ -33,8 +24,9 @@ const {
   black,
   pink,
 } = Palette.colors;
-
 const MAX_CATS = 3;
+const MIN_LENGTH = 100;
+const MAX_STEEPNESS_TO_90 = 25;
 
 export default class Trampofelines {
   static init() {
@@ -50,7 +42,7 @@ export default class Trampofelines {
     canvas.addEventListener("touchend", handleTouchEnd, false);
 
     function handleTouchStart(e: TouchEvent) {
-      p1 = resolveTouchPosition(canvasRect, e.touches[0]);
+      p1 = canvas.resolveTouchPosition(e.touches[0]);
       mouseDown = true;
     }
 
@@ -64,7 +56,7 @@ export default class Trampofelines {
 
       drawing = true;
       distance = p1 && p2 ? p1.sub(p2).l2() : 0;
-      p2 = resolveTouchPosition(canvasRect, e.touches[0]);
+      p2 = canvas.resolveTouchPosition(e.touches[0]);
     }
 
     function handleTouchEnd(e: TouchEvent) {
@@ -76,7 +68,7 @@ export default class Trampofelines {
     function handleMouseDown(e: MouseEvent) {
       e.preventDefault();
 
-      p1 = resolveMousePosition(e);
+      p1 = canvas.resolveMousePosition(e);
       mouseDown = true;
     }
 
@@ -91,7 +83,7 @@ export default class Trampofelines {
 
       drawing = true;
       distance = p1 && p2 ? p1.sub(p2).l2() : 0;
-      p2 = resolveMousePosition(e);
+      p2 = canvas.resolveMousePosition(e);
     }
 
     function handleMouseUp(e: MouseEvent) {
@@ -153,22 +145,19 @@ export default class Trampofelines {
   }
 
   static testPlacement(): boolean {
-    const longEnough = distance >= 100;
+    const longEnough = distance >= MIN_LENGTH;
     const belowLimit = GAMESTATE.trampolines.length < MAX_CATS;
     const intersections = GAMESTATE.trampolines.filter(({ joints }) => {
       p3 = joints.at(0)._position;
       p4 = joints.at(-1)._position;
-      const res = Math2D.properInter(p1, p2, p3, p4);
-      console.log(
-        `Checking intersection between (${p1}~~${p2}) and ${p3}~~${p4}: ${res}`
-      );
-      return res !== undefined;
+      inter = Math2D.properInter(p1, p2, p3, p4);
+      return inter;
     });
     const noIntersections = intersections.length === 0;
     const sep = p2.sub(p1);
     const angle = Math.abs(Math.atan2(sep.y, sep.x)) * RAD2DEG;
-    const maxSteepness = 25;
-    const goodAngle = angle <= 90 - maxSteepness || angle >= 90 + maxSteepness;
+    const goodAngle =
+      angle <= 90 - MAX_STEEPNESS_TO_90 || angle >= 90 + MAX_STEEPNESS_TO_90;
     return longEnough && belowLimit && noIntersections && goodAngle;
   }
 
@@ -261,10 +250,11 @@ export class Trampofeline extends ElasticLine {
       ctx.restore();
     }
 
-    if (p1 && p2 && p3 && p4) {
-      popsicle(p1, p2, "red");
-      popsicle(p3, p4, "blue");
-    }
+    // if (p1 && p2 && p3 && p4 && inter) {
+    //   popsicle(p1, p2, "red");
+    //   popsicle(p3, p4, "blue");
+    //   popsicle(inter, inter, "yellow");
+    // }
   }
 }
 

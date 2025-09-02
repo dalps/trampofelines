@@ -4,7 +4,7 @@ import {
   type DynamicBody,
   type instant,
 } from "./Physics2D";
-import { Point2 } from "./utils";
+import { Point2 } from "./MathUtils";
 
 const contactForceFactor = 20;
 

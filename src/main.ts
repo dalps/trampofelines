@@ -6,7 +6,7 @@ import { CollisionManager } from "./lib/Collisions2D";
 import { Palette } from "./lib/Color";
 import { RippleManager } from "./lib/Ripple";
 import { Clock, type timestamp } from "./lib/TimeUtils";
-import { Point2 } from "./lib/utils";
+import { Point2 } from "./lib/MathUtils";
 
 const { balls, trampolines } = state;
 

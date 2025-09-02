@@ -2,7 +2,7 @@ import { circle, popsicle } from "./CanvasUtils";
 import type { Collider } from "./Collisions2D";
 import type { Color } from "./Color";
 import { Stage } from "./Stage";
-import { damp, Point2 } from "./utils";
+import { damp, Point2 } from "./MathUtils";
 
 export type instant = number;
 

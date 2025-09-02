@@ -1,6 +1,6 @@
 import { Stage } from "./Stage";
 import { Attraction, DynamicBody, Repulsion, type instant } from "./Physics2D";
-import Math2D, { Point2 } from "./utils";
+import Math2D, { Point2 } from "./MathUtils";
 
 class Joint extends DynamicBody {
   public neighbors: Joint[] = [];

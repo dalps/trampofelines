@@ -1,6 +1,6 @@
 import { Stage } from "./Stage";
-import type { Point2 } from "./utils";
-import Math2D from "./utils";
+import type { Point2 } from "./MathUtils";
+import Math2D from "./MathUtils";
 
 export function drawArrow(from: Point2, to: Point2, color = "black") {
   const ctx = Stage.ctx;

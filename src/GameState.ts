@@ -2,7 +2,7 @@ import type { Ironwool } from "./entities/Ironwool";
 import { Trampofeline } from "./entities/Trampofeline";
 import type { Tube } from "./entities/Tube";
 import type { Ball } from "./lib/Physics2D";
-import { Point2 } from "./lib/utils";
+import { Point2 } from "./lib/MathUtils";
 
 export const settings = {
   showJoints: false,

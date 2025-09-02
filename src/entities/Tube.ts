@@ -4,7 +4,7 @@ import { CollisionManager } from "../lib/Collisions2D";
 import { HSLColor, Palette } from "../lib/Color";
 import { Ripple } from "../lib/Ripple";
 import { Clock, timestamp } from "../lib/TimeUtils";
-import { lerp, Point2 } from "../lib/utils";
+import { lerp, Point2 } from "../lib/MathUtils";
 import { YarnBall } from "./YarnBall";
 
 export class Tube {

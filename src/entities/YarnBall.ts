@@ -2,8 +2,8 @@ import { CircleCollider } from "../lib/Collisions2D";
 import { Palette, type Color } from "../lib/Color";
 import { DynamicBody, Gravity } from "../lib/Physics2D";
 import { Stage } from "../lib/Stage";
-import type { Point2 } from "../lib/utils";
-import Math2D, { damp, DEG2RAD } from "../lib/utils";
+import type { Point2 } from "../lib/MathUtils";
+import Math2D, { damp, DEG2RAD } from "../lib/MathUtils";
 
 export class YarnBall extends DynamicBody {
   public thread: DynamicBody[];
