@@ -1,8 +1,9 @@
 import { Palette } from "../lib/Color";
 import { DEG2RAD, Point } from "../lib/MathUtils";
-import { Stage } from "../lib/Stage";
+import { MyCanvas, Stage } from "../lib/Stage";
+import { timestamp } from "../lib/TimeUtils";
 
-export class Basket {
+export class BasketballCourt {
   constructor(public position: Point) {}
 
   static draw() {
@@ -118,3 +119,72 @@ M 20,42 24,62.4 20,67 23.7,72.2 20,77.4`);
     ctx.restore();
   }
 }
+
+const pcanvas = document.createElement("canvas");
+const pcw = 16;
+const pch = 16;
+pcanvas.width = pcw;
+pcanvas.height = pch;
+const pctx = pcanvas.getContext("2d");
+
+const basketColor2 = "#9d5d2cff";
+const basketColor1 = "#c07b3aff";
+
+export class Basket {
+  static drawPattern(time: timestamp) {
+    time *= 0.001;
+
+    pctx.clearRect(0, 0, pcw, pch);
+    pctx.fillStyle = basketColor1;
+
+    pctx.fillRect(0, 0, pcw, pch);
+    pctx.strokeStyle = basketColor2;
+    pctx.lineWidth = 2;
+    pctx.beginPath();
+    pctx.moveTo(0, 0);
+    pctx.lineTo(pcw, pch);
+    pctx.moveTo(pcw, 0);
+    pctx.lineTo(0, pch);
+    pctx.stroke();
+  }
+
+  static draw(time: timestamp) {
+    const { ctx, cw, ch } = Stage;
+
+    ctx.save();
+    ctx.translate(500, 500);
+    ctx.strokeStyle = basketColor2;
+    ctx.lineWidth = 2;
+    let basket = new Path2D(`M -69 -12.5
+      C -106.6 62.7 106.6 62.7 69 -12.5`);
+    const empty = new Path2D(`m 0,0
+c -38.2,0 -69,-5.7 -69,-12.5 -0,-6.9 30.7,-12.5 68.7,-12.5 38.3,-0 69.3,5.6 69.3,12.5
+C 69,-5.7 38.2,0 0,0
+Z`);
+
+    ctx.fillStyle = ctx.createPattern(pcanvas, "repeat");
+    ctx.fill(basket);
+    ctx.stroke(basket);
+    ctx.fill(empty);
+    ctx.lineWidth = 5;
+
+    ctx.fillStyle = "#00000077";
+    ctx.fill(empty);
+    ctx.stroke(empty);
+
+    const handle = new Path2D(`M 21.9 -0.9
+      C 21.9 -0.9 25.1 -50.2 0 -50.2
+      C -25.1 -50.2 -21.9 -25.1 -21.9 -25.1
+      L -28.2 -25.1
+      C -28.2 -25.1 -31.3 -56.4 0 -56.4
+      C 31.3 -56.4 28.2 -0.9 28.2 -0.9
+      Z`);
+    ctx.lineWidth = 2;
+    ctx.fillStyle = ctx.createPattern(pcanvas, "repeat");
+    ctx.fill(handle);
+    ctx.stroke(handle);
+    ctx.restore();
+  }
+}
+
+Basket.drawPattern();

@@ -7,7 +7,7 @@ import { Palette } from "./lib/Color";
 import { RippleManager } from "./lib/Ripple";
 import { Clock, type timestamp } from "./lib/TimeUtils";
 import { Point } from "./lib/MathUtils";
-import { Basket } from "./entities/Basket";
+import { Basket, BasketballCourt } from "./entities/Basket";
 
 const { balls, trampolines } = state;
 
@@ -18,7 +18,7 @@ function init() {
     const { ctx, width: cw, height: ch } = Stage.setActiveLayer("background");
     ctx.fillStyle = "#F5DEB3";
     ctx.fillRect(0, 0, cw, ch);
-    Basket.draw();
+    BasketballCourt.draw();
   }
 
   {
@@ -44,12 +44,14 @@ function clear() {
 }
 
 function draw(time: timestamp) {
-  const { width: cw, height: ch } = Stage.layers.get("game");
+  const { width: cw, height: ch } = Stage.setActiveLayer("game");
+
+  clear();
+
+  Basket.draw(time);
 
   time *= 0.01;
   const dt = Clock.update(time);
-
-  clear();
 
   // drawTitle(ctx, time);
 

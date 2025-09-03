@@ -53,7 +53,7 @@ export class HSLColor extends Color {
 }
 
 export class Palette {
-  public static colors: Record<string, Color> = {
+  public static colors = {
     white: new RGBColor(),
     black: new RGBColor(0, 0, 0),
     pink: new RGBColor(255, 192, 203), // "#ffc0cb"

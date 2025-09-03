@@ -15,5 +15,8 @@ watch:
 build:
     esbuild --minify --bundle src/main.ts --outdir=dist --format=esm
 
+zip: build
+    advzip pack.zip -a dist/index.html dist/main.js
+
 linecount:
     find src/ -name '*.ts' | xargs wc -lc
