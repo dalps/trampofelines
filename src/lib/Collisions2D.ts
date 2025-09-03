@@ -2,9 +2,9 @@ import {
   ContactForce,
   State,
   type DynamicBody,
-  type instant,
 } from "./Physics2D";
 import { Point } from "./MathUtils";
+import { instant } from "./TimeUtils";
 
 const contactForceFactor = 20;
 

@@ -35,6 +35,16 @@ export class Point {
     return Math.hypot(this.x, this.y);
   }
 
+  rotate(phi: number) {
+    const cos = Math.cos(phi);
+    const sin = Math.sin(phi);
+    return new Point(this.x * cos - this.y * sin, this.x * sin + this.y * cos);
+  }
+
+  rotateAbout(c: Point, phi: number) {
+    return c.add(this.sub(c).rotate(phi));
+  }
+
   normalize(): Point {
     const l2 = this.abs();
     this.x /= l2;

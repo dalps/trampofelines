@@ -1,5 +1,5 @@
 import { circle, popsicle } from "./CanvasUtils";
-import type { Collider } from "./Collisions2D";
+import type { CircleCollider, Collider } from "./Collisions2D";
 import { damp, Point } from "./MathUtils";
 import { Stage } from "./Stage";
 import { instant } from "./TimeUtils";
@@ -109,29 +109,39 @@ export enum State {
 }
 
 export class DynamicBody {
+  public name?: string;
   public position: Point;
   public velocity: Point;
+  public orientation: number;
+  public angularVelocity: number;
+  public mass: number;
+  public friction: number;
   private _forces: Force[] = [];
   private _aux = new Point(0, 0);
   private _locks = { x: false, y: false };
   private _fixed = false;
   public collider?: Collider;
-  public name?: string;
   public ref?: WeakRef<DynamicBody>;
   public collisionID?: string;
   public state = State.Alive;
-  public mass: number;
-  public friction: number;
 
   constructor(
     position: Point,
-    { name = "__body__", mass = 1, friction = 1 } = {}
+    {
+      name = "DynamicBody",
+      mass = 1,
+      friction = 1,
+      orientation = 0,
+      angularVelocity = 0,
+    } = {}
   ) {
+    this.name = name;
     this.position = position;
     this.velocity = new Point(0, 0);
     this.mass = mass;
     this.friction = friction;
-    this.name = name;
+    this.orientation = orientation;
+    this.angularVelocity = angularVelocity;
   }
 
   translate(x: number, y: number) {
@@ -184,6 +194,9 @@ export class DynamicBody {
       (f) => (f as ContactForce).update && (f as ContactForce).update(dt)
     );
 
+    const o = this.orientation + this.angularVelocity * dt;
+    this.orientation = o > Math.PI * 2 ? 0 : o;
+
     if (!this._locks.x) {
       this.velocity.x += this.acceleration.x * dt;
       this.position.x +=
@@ -232,7 +245,10 @@ export class DynamicBody {
     ctx.strokeStyle = "yellowgreen";
 
     ctx.beginPath();
-    circle(this.collider?.center, this.collider?.radius);
+    circle(
+      (this.collider as CircleCollider).center,
+      (this.collider as CircleCollider).radius
+    );
     ctx.closePath();
     ctx.stroke();
   }

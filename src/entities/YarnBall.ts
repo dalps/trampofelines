@@ -1,9 +1,9 @@
 import { CircleCollider } from "../lib/Collisions2D";
 import { Palette, type Color } from "../lib/Color";
+import { Point } from "../lib/MathUtils";
+import Math2D, { DEG2RAD } from "../lib/MathUtils";
 import { DynamicBody, Gravity } from "../lib/Physics2D";
 import { Stage } from "../lib/Stage";
-import type { Point } from "../lib/MathUtils";
-import Math2D, { damp, DEG2RAD } from "../lib/MathUtils";
 
 export class YarnBall extends DynamicBody {
   public thread: DynamicBody[];
@@ -18,7 +18,7 @@ export class YarnBall extends DynamicBody {
     radius: number = 10,
     color: Color
   ) {
-    super(startPos, { friction: 0.1 });
+    super(startPos, { friction: 0.1, angularVelocity: 0.5 });
 
     this.mass = mass;
     this.color = color;
@@ -28,10 +28,10 @@ export class YarnBall extends DynamicBody {
     this.velocity = startVelocity.clone();
     this.addForce(Gravity);
 
-    const points = [this.position];
+    const points = [];
     const subs = 10;
 
-    for (let i = 1; i < subs; i++) {
+    for (let i = 0; i < subs; i++) {
       points.push(this.position.clone());
     }
 
@@ -42,6 +42,9 @@ export class YarnBall extends DynamicBody {
     super.update(dt);
 
     this.threadLength += dt * 0.01;
+    this.thread[0].position = this.position
+      .add(new Point(this.radius * 0.5, 0))
+      .rotateAbout(this.position, this.orientation);
 
     let prevJoint: DynamicBody = this.thread[0];
     let lambda = 1;
@@ -60,6 +63,8 @@ export class YarnBall extends DynamicBody {
 
     ctx.beginPath();
     ctx.lineWidth = 4;
+    ctx.lineCap = "butt";
+    ctx.lineJoin = "bevel";
     ctx.strokeStyle = this.color.setAlpha(0.9).toString();
     ctx.moveTo(this.position.x, this.position.y);
     this.thread.forEach((joint, i) => {
@@ -70,9 +75,10 @@ export class YarnBall extends DynamicBody {
     const col1 = this.color;
     const col2 = this.color.lighten(1.1);
     const { x, y } = this.position;
-
     const subs = 10;
     const n = 90 / subs;
+    const slices = 3;
+    const theta = 360 / slices;
 
     const drawSector = (theta = 0) => {
       for (let i = 0; i < n; i++) {
@@ -80,7 +86,7 @@ export class YarnBall extends DynamicBody {
         const dEnd = theta + 180 - subs * i;
 
         ctx.beginPath();
-        ctx.arc(x, y, this.radius, dStart * DEG2RAD, dEnd * DEG2RAD, false);
+        ctx.arc(0, 0, this.radius, dStart * DEG2RAD, dEnd * DEG2RAD, false);
         ctx.closePath();
         ctx.closePath();
 
@@ -89,10 +95,12 @@ export class YarnBall extends DynamicBody {
       }
     };
 
-    const slices = 3;
-    const theta = 360 / slices;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(this.orientation);
     for (let i = 0; i < slices; i++) {
       drawSector(theta * i);
     }
+    ctx.restore();
   }
 }
