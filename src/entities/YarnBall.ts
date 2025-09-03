@@ -72,13 +72,22 @@ export class YarnBall extends DynamicBody {
     });
     ctx.stroke();
 
-    const col1 = this.color;
-    const col2 = this.color.lighten(1.1);
+    ctx.save();
     const { x, y } = this.position;
+    ctx.translate(x, y);
+    ctx.rotate(this.orientation);
+    YarnBall.drawYarnball(new Point(0, 0), this.radius, this.color);
+    ctx.restore();
+  }
+
+  static drawYarnball(position: Point, radius: number, color: Color) {
+    const { ctx } = Stage;
     const subs = 10;
     const n = 90 / subs;
     const slices = 3;
     const theta = 360 / slices;
+    const col1 = color;
+    const col2 = color.lighten(1.1);
 
     const drawSector = (theta = 0) => {
       for (let i = 0; i < n; i++) {
@@ -86,7 +95,14 @@ export class YarnBall extends DynamicBody {
         const dEnd = theta + 180 - subs * i;
 
         ctx.beginPath();
-        ctx.arc(0, 0, this.radius, dStart * DEG2RAD, dEnd * DEG2RAD, false);
+        ctx.arc(
+          position.x,
+          position.y,
+          radius,
+          dStart * DEG2RAD,
+          dEnd * DEG2RAD,
+          false
+        );
         ctx.closePath();
         ctx.closePath();
 
@@ -95,12 +111,8 @@ export class YarnBall extends DynamicBody {
       }
     };
 
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.rotate(this.orientation);
     for (let i = 0; i < slices; i++) {
       drawSector(theta * i);
     }
-    ctx.restore();
   }
 }

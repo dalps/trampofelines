@@ -1,7 +1,9 @@
+import { popsicle } from "../lib/CanvasUtils";
 import { Palette } from "../lib/Color";
 import { DEG2RAD, Point } from "../lib/MathUtils";
 import { MyCanvas, Stage } from "../lib/Stage";
 import { timestamp } from "../lib/TimeUtils";
+import { YarnBall } from "./YarnBall";
 
 export class BasketballCourt {
   constructor(public position: Point) {}
@@ -153,25 +155,18 @@ export class Basket {
 
     ctx.save();
     ctx.translate(500, 500);
-    ctx.strokeStyle = basketColor2;
+
     ctx.lineWidth = 2;
-    let basket = new Path2D(`M -69 -12.5
-      C -106.6 62.7 106.6 62.7 69 -12.5`);
+    ctx.lineJoin = "round";
+    const basket = new Path2D(`m -69,-12.5
+c -37.6,75.2 175.6,75.2 137.9,0 0,16.5 -137.9,16.3 -137.9,0
+z`);
     const empty = new Path2D(`m 0,0
 c -38.2,0 -69,-5.7 -69,-12.5 -0,-6.9 30.7,-12.5 68.7,-12.5 38.3,-0 69.3,5.6 69.3,12.5
 C 69,-5.7 38.2,0 0,0
 Z`);
-
-    ctx.fillStyle = ctx.createPattern(pcanvas, "repeat");
-    ctx.fill(basket);
-    ctx.stroke(basket);
-    ctx.fill(empty);
-    ctx.lineWidth = 5;
-
-    ctx.fillStyle = "#00000077";
-    ctx.fill(empty);
-    ctx.stroke(empty);
-
+    const emptyDown = new Path2D(`m -69,-12.5
+c -0,16.4 137.9,16.4 137.9,0`);
     const handle = new Path2D(`M 21.9 -0.9
       C 21.9 -0.9 25.1 -50.2 0 -50.2
       C -25.1 -50.2 -21.9 -25.1 -21.9 -25.1
@@ -179,10 +174,40 @@ Z`);
       C -28.2 -25.1 -31.3 -56.4 0 -56.4
       C 31.3 -56.4 28.2 -0.9 28.2 -0.9
       Z`);
+
+    const pattern = ctx.createPattern(pcanvas, "repeat");
+
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = basketColor2;
+    ctx.fillStyle = pattern;
+    ctx.stroke(empty);
+    ctx.fill(empty);
+
+    ctx.fillStyle = "#00000077";
+    ctx.fill(empty);
+
+    popsicle(new Point(30, 0), new Point(30, -70), "#bbb");
+    popsicle(new Point(20, 0), new Point(50, -60), "#bbb");
+
+    YarnBall.drawYarnball(new Point(30, -10), 20, Palette.colors.fuchsia);
+    YarnBall.drawYarnball(new Point(50, -5), 20, Palette.colors.chartreuse);
+    YarnBall.drawYarnball(new Point(-48, -5), 20, Palette.colors.coral);
+
+    ctx.fillStyle = pattern;
+    ctx.fill(basket);
+
+    ctx.strokeStyle = basketColor2;
+    ctx.stroke(basket);
+
+    ctx.strokeStyle = basketColor2;
+    ctx.lineWidth = 5;
+    ctx.stroke(emptyDown);
+
     ctx.lineWidth = 2;
-    ctx.fillStyle = ctx.createPattern(pcanvas, "repeat");
+    ctx.fillStyle = pattern;
     ctx.fill(handle);
     ctx.stroke(handle);
+
     ctx.restore();
   }
 }
