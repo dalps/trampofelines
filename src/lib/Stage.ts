@@ -107,7 +107,7 @@ export class Stage {
 
     this.setActiveLayer("game");
     this.setSizes();
-    window.addEventListener("resize", this.setSizes.bind(this));
+    // window.addEventListener("resize", this.setSizes.bind(this));
   }
 
   static setSizes() {

@@ -7,6 +7,7 @@ import { Palette } from "./lib/Color";
 import { RippleManager } from "./lib/Ripple";
 import { Clock, type timestamp } from "./lib/TimeUtils";
 import { Point } from "./lib/MathUtils";
+import { Basket } from "./entities/Basket";
 
 const { balls, trampolines } = state;
 
@@ -15,13 +16,13 @@ function init() {
 
   {
     const { ctx, width: cw, height: ch } = Stage.setActiveLayer("background");
-    ctx.fillStyle = Palette.colors.cardboard.toString();
+    ctx.fillStyle = "#F5DEB3";
     ctx.fillRect(0, 0, cw, ch);
+    Basket.draw();
   }
 
   {
     const { ctx, width: cw, height: ch } = Stage.setActiveLayer("ui");
-    ctx.fillStyle = "blue";
     ctx.clearRect(0, 0, cw, ch);
   }
 
