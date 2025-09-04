@@ -56,6 +56,10 @@ export class Point {
     return new Point(this.x, this.y);
   }
 
+  equals(p: Point) {
+    return this.x === p.x && this.y === p.y;
+  }
+
   addI(p: Point) {
     this.x += p.x;
     this.y += p.y;
@@ -159,10 +163,16 @@ export default class Math2D {
     return new Point(p.x * n, p.y * n);
   }
 
+  /**
+   * Does `p` lie in the disk spanning the diameter `ab`?
+   */
   static inDisk(a: Point, b: Point, p: Point) {
     return a.sub(p).dot(b.sub(p)) <= 0;
   }
 
+  /**
+   * Does `p` lie on segment `ab`?
+   */
   static onSegment(a: Point, b: Point, p: Point) {
     return this.orient(a, b, p) === 0 && this.inDisk(a, b, p);
   }
@@ -189,12 +199,38 @@ export default class Math2D {
   }
 
   /**
-   * The orientation of `c` with respect to the line going through `a` and `b`. Positive if `c` is to the left, negative if to the right, zero if they are collinear.
+   * Compare the projections of `p` and `q` on the line of direction `v`
+   */
+  static cmpProj(v: Point, p: Point, q: Point) {
+    return v.dot(p) < v.dot(q);
+  }
+
+  /**
+   * The distance between the point `p` and the segment `ab`
+   */
+  static segPointDistance(a: Point, b: Point, p: Point) {
+    if (!a.equals(b)) {
+      const v = b.sub(a); // direction
+
+      // Is `p` closest to its projection on `ab`?
+      if (this.cmpProj(v, a, p) && this.cmpProj(v, p, b)) {
+        return Math.abs(v.cross(p) - v.cross(a)) / v.abs(); // distance to line: see Lecomte p. 57
+      }
+    }
+
+    return Math.min(p.sub(a).abs(), p.sub(b).abs());
+  }
+
+  /**
+   * Returns a positive number if `c` is to the left of the segment `ab`, negative if `c` is to the right, zero if the three are collinear.
    */
   static orient(a: Point, b: Point, c: Point) {
     return b.sub(a).cross(c.sub(a));
   }
 
+  /**
+   * Do segments `ab` and `cd` intersect?
+   */
   static properInter(a: Point, b: Point, c: Point, d: Point) {
     let oa = this.orient(c, d, a);
     let ob = this.orient(c, d, b);

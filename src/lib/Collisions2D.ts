@@ -1,9 +1,5 @@
-import {
-  ContactForce,
-  State,
-  type DynamicBody,
-} from "./Physics2D";
-import { Point } from "./MathUtils";
+import { ContactForce, State, type DynamicBody } from "./Physics2D";
+import Math2D, { Point } from "./MathUtils";
 import { instant } from "./TimeUtils";
 
 const contactForceFactor = 20;
@@ -25,7 +21,7 @@ interface CollisionPair {
 
 export class CollisionManager {
   private static _id = 0;
-  private static _bodies: CollisionPair[] = [];
+  private static _pairsToWatch: CollisionPair[] = [];
 
   static getID(b: DynamicBody) {
     if (b.state !== State.Alive) {
@@ -63,25 +59,25 @@ export class CollisionManager {
     const r1 = new WeakRef(b1);
     const r2 = new WeakRef(b2);
 
-    this._bodies.push({ id1, id2, r1, r2, filter, cb });
+    this._pairsToWatch.push({ id1, id2, r1, r2, filter, cb });
   }
 
   static unregister(id: string) {
     const entriesToRemove: number[] = [];
 
     log(`Searching for entries with ${id}...`);
-    this._bodies.forEach(({ id1, id2 }, idx) => {
+    this._pairsToWatch.forEach(({ id1, id2 }, idx) => {
       if (id === id1 || id === id2) {
         log(`Unregistered pair ${id1}~${id2}.`);
         entriesToRemove.push(idx);
       }
     });
 
-    entriesToRemove.forEach((idx) => this._bodies.splice(idx, 1));
+    entriesToRemove.forEach((idx) => this._pairsToWatch.splice(idx, 1));
   }
 
   static update(dt: instant) {
-    this._bodies.forEach(({ r1, r2, filter, cb }) => {
+    this._pairsToWatch.forEach(({ r1, r2, filter, cb }) => {
       const b1 = r1.deref();
       const b2 = r2.deref();
 
@@ -95,11 +91,9 @@ export class CollisionManager {
 
       if (filter && !filter(b1, b2)) return;
 
-      const info = c1.checkContact(c2);
-
-      if (info.test) {
-        b1.addForce(this.collide(b1, b2, info.sep1));
-        b2.addForce(this.collide(b2, b1, info.sep2));
+      if (c1.checkContact(c2)) {
+        b1.addForce(this.collide(b1, b2, c1.center.sub(c2.center)));
+        b2.addForce(this.collide(b2, b1, c2.center.sub(c1.center)));
         cb && cb();
       }
     });
@@ -112,19 +106,24 @@ export class CollisionManager {
   ): ContactForce {
     const massFactor = (2 * against.mass) / (body.mass + against.mass);
 
-    // const magnitude =
-    //   (massFactor * body.velocity.sub(against.velocity).dot(info.sep)) /
-    //   (info.sep.l2() + c1.radius + c2.radius);
-
-    // const direction = body.velocity
-    //   .sub(info.sep.multiplyScalar(magnitude))
-    //   .normalize();
-
     return new ContactForce(sep.normalize(), massFactor * contactForceFactor);
   }
 }
 
-type ColliderType = "Circle" | "Box" | "Line";
+function segSeg(c1: SegmentCollider, c2: SegmentCollider) {
+  return Math2D.properInter(c1.a, c1.b, c2.a, c2.b) !== undefined;
+}
+
+function circleSegment(c1: CircleCollider, c2: SegmentCollider) {
+  return Math2D.segPointDistance(c2.a, c2.b, c1.center) <= c1.radius;
+}
+
+function circleCircle(c1: CircleCollider, c2: CircleCollider) {
+  const sep = c2.center.sub(c1.center);
+  return sep.abs() <= c1.radius + c2.radius;
+}
+
+type ColliderType = "Circle" | "Segment";
 
 interface ContactInfo {
   test: boolean;
@@ -133,8 +132,9 @@ interface ContactInfo {
 }
 
 export abstract class Collider {
+  public abstract center: Point;
   constructor(public type: ColliderType) {}
-  abstract checkContact(c2: Collider): ContactInfo; // return more info than just a boolean
+  abstract checkContact(c2: Collider): boolean;
 }
 
 export class CircleCollider extends Collider {
@@ -142,88 +142,39 @@ export class CircleCollider extends Collider {
     super("Circle");
   }
 
-  checkContact(that: CircleCollider) {
-    const sep = this.center.sub(that.center);
-    const distance = sep.abs();
-    return {
-      test: distance <= this.radius + that.radius,
-      sep1: sep,
-      sep2: sep.multiplyScalar(-1),
-    };
-  }
-}
-
-export class BoxCollider extends Collider {
-  public left: number;
-  public right: number;
-  public top: number;
-  public bottom: number;
-  public center: Point;
-
-  constructor(
-    public origin: Point,
-    public width: number,
-    public height: number,
-    public rotation: number = 0
-  ) {
-    super("Box");
-
-    this.left = origin.x;
-    this.right = origin.x + width;
-    this.top = origin.y;
-    this.bottom = origin.y + height;
-    this.center = new Point(this.left + width * 0.5, this.top + height * 0.5);
-  }
-
   checkContact(that: Collider) {
     switch (that.type) {
-      case "Circle": {
-        return false;
-      }
-      case "Box": {
-        return false;
-      }
-      case "Line": {
-        return false;
-      }
+      case "Circle":
+        return circleCircle(this, that as CircleCollider);
+      case "Segment":
+        return circleSegment(this, that as SegmentCollider);
     }
   }
 }
 
-export class LineCollider extends Collider {
-  public direction: Point;
-  constructor(public p1: Point, public p2: Point) {
-    super("Line");
+export class SegmentCollider extends Collider {
+  constructor(public a: Point, public b: Point) {
+    super("Segment");
+  }
 
-    this.direction = p1.sub(p2).normalize();
+  get center(): Point {
+    return Math2D.lerp2(this.a, this.b, 0.5);
+  }
+
+  get direction(): Point {
+    return this.a.sub(this.b);
   }
 
   get length(): number {
-    return this.p1.sub(this.p2).abs();
+    return this.direction.abs();
   }
 
   checkContact(that: Collider) {
     switch (that.type) {
-      case "Circle": {
-        const { center, radius } = that as CircleCollider;
-        const d1 = this.p1.sub(center).abs();
-        const d2 = this.p2.sub(center).abs();
-        const sum = d1 + d2;
-        return {
-          test:
-            sum + 2 * radius <= this.length || this.length <= sum - 2 * radius,
-
-          sep: center.sub(
-            this.direction.multiplyScalar(center.dot(this.direction))
-          ),
-        };
-      }
-      case "Box": {
-        return false;
-      }
-      case "Line": {
-        return false;
-      }
+      case "Circle":
+        return circleSegment(that as CircleCollider, this);
+      case "Segment":
+        return segSeg(this, that as SegmentCollider);
     }
   }
 }
