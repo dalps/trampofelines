@@ -7,13 +7,7 @@ export class MyCanvas extends HTMLCanvasElement {
   constructor(public name: string, public width = 480, public height = 480) {
     super();
 
-    const ctx = this.getContext("2d");
-
-    if (!ctx) {
-      throw new Error(`Context not available :(`);
-    }
-
-    this._ctx = ctx;
+    this.setSize(width, height);
   }
 
   setSize(w: number, h: number) {
@@ -22,7 +16,9 @@ export class MyCanvas extends HTMLCanvasElement {
   }
 
   get ctx(): CanvasRenderingContext2D {
-    return this._ctx ?? this.getContext("2d")!;
+    if (!this._ctx) this._ctx = this.getContext("2d")!;
+
+    return this._ctx;
   }
 
   get rect(): DOMRect {
@@ -42,9 +38,14 @@ export class MyCanvas extends HTMLCanvasElement {
   }
 }
 
-export type LayerName = "background" | "game" | "ui";
+customElements.define("my-canvas", MyCanvas, {
+  extends: "canvas",
+});
+
+export type LayerName = "background" | "game" | "ui" | string;
 
 export class Stage {
+  private static _layers: Map<LayerName, MyCanvas> = new Map();
   public static stage: HTMLElement;
   private static _activeLayer: MyCanvas;
 
@@ -52,8 +53,11 @@ export class Stage {
    *  Set the active layer.
    */
   public static setActiveLayer(layer: LayerName) {
-    this._activeLayer = this.layers.get(layer);
-    return this._activeLayer;
+    this._activeLayer = this._layers.get(layer);
+  }
+
+  public static getLayer(layer: LayerName): MyCanvas {
+    return this._layers.get(layer);
   }
 
   /**
@@ -84,16 +88,10 @@ export class Stage {
     return this.activeLayer.ctx;
   }
 
-  public static layers: Map<LayerName, MyCanvas> = new Map();
-
   static init(stage: HTMLElement) {
     this.stage = stage;
 
     console.log("Setting the stage...");
-
-    customElements.define("my-canvas", MyCanvas, {
-      extends: "canvas",
-    });
 
     ["background", "game", "ui"].forEach((name, i) => {
       const layer = document.createElement("canvas", {
@@ -101,18 +99,27 @@ export class Stage {
       });
       layer.id = name;
       layer.style.zIndex = `${i}`;
-      this.layers.set(name as LayerName, layer as MyCanvas);
+      this._layers.set(name, layer as MyCanvas);
       stage.appendChild(layer);
     });
 
     this.setActiveLayer("game");
-    this.setSizes();
-    // window.addEventListener("resize", this.setSizes.bind(this));
+    this.fitLayersToStage(["game", "ui", "background"]);
   }
 
-  static setSizes() {
-    this.layers.forEach((layer) => {
-      layer.setSize(this.stage.clientWidth, this.stage.clientHeight);
+  static newOffscreenLayer(name: string, width: number, height: number) {
+    const newLayer = document.createElement("canvas", { is: "my-canvas" });
+    newLayer.width = width;
+    newLayer.height = height;
+    this._layers.set(name, newLayer as MyCanvas);
+  }
+
+  static fitLayersToStage(layers: LayerName[]) {
+    layers.forEach((layer) => {
+      this.getLayer(layer).setSize(
+        this.stage.clientWidth,
+        this.stage.clientHeight
+      );
     });
   }
 }

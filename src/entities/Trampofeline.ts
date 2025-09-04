@@ -31,18 +31,18 @@ const MAX_STEEPNESS_TO_90 = 25;
 export default class Trampofelines {
   static init() {
     const { trampolines, balls, settings } = GAMESTATE;
-    const canvas = Stage.layers.get("ui");
+    const uiCanvas = Stage.getLayer("ui");
 
-    canvas.addEventListener("mousedown", handleMouseDown, false);
-    canvas.addEventListener("mousemove", handleMouseMove, false);
-    canvas.addEventListener("mouseup", handleMouseUp, false);
+    uiCanvas.addEventListener("mousedown", handleMouseDown, false);
+    uiCanvas.addEventListener("mousemove", handleMouseMove, false);
+    uiCanvas.addEventListener("mouseup", handleMouseUp, false);
 
-    canvas.addEventListener("touchstart", handleTouchStart, false);
-    canvas.addEventListener("touchmove", handleTouchMove, false);
-    canvas.addEventListener("touchend", handleTouchEnd, false);
+    uiCanvas.addEventListener("touchstart", handleTouchStart, false);
+    uiCanvas.addEventListener("touchmove", handleTouchMove, false);
+    uiCanvas.addEventListener("touchend", handleTouchEnd, false);
 
     function handleTouchStart(e: TouchEvent) {
-      p1 = canvas.resolveTouchPosition(e.touches[0]);
+      p1 = uiCanvas.resolveTouchPosition(e.touches[0]);
       mouseDown = true;
     }
 
@@ -56,7 +56,7 @@ export default class Trampofelines {
 
       drawing = true;
       distance = p1 && p2 ? p1.sub(p2).abs() : 0;
-      p2 = canvas.resolveTouchPosition(e.touches[0]);
+      p2 = uiCanvas.resolveTouchPosition(e.touches[0]);
     }
 
     function handleTouchEnd(e: TouchEvent) {
@@ -68,7 +68,7 @@ export default class Trampofelines {
     function handleMouseDown(e: MouseEvent) {
       e.preventDefault();
 
-      p1 = canvas.resolveMousePosition(e);
+      p1 = uiCanvas.resolveMousePosition(e);
       mouseDown = true;
     }
 
@@ -83,7 +83,7 @@ export default class Trampofelines {
 
       drawing = true;
       distance = p1 && p2 ? p1.sub(p2).abs() : 0;
-      p2 = canvas.resolveMousePosition(e);
+      p2 = uiCanvas.resolveMousePosition(e);
     }
 
     function handleMouseUp(e: MouseEvent) {

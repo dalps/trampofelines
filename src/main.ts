@@ -1,13 +1,12 @@
-import { Stage } from "./lib/Stage";
+import { BasketballCourt } from "./entities/Basket";
 import Trampofelines from "./entities/Trampofeline";
 import { Tube } from "./entities/Tube";
 import { settings, GAMESTATE as state } from "./GameState";
 import { CollisionManager } from "./lib/Collisions2D";
-import { Palette } from "./lib/Color";
-import { RippleManager } from "./lib/Ripple";
-import { Clock, type timestamp } from "./lib/TimeUtils";
 import { Point } from "./lib/MathUtils";
-import { Basket, BasketballCourt } from "./entities/Basket";
+import { RippleManager } from "./lib/Ripple";
+import { Stage } from "./lib/Stage";
+import { Clock, type timestamp } from "./lib/TimeUtils";
 
 const { balls, trampolines } = state;
 
@@ -15,14 +14,16 @@ function init() {
   Stage.init(document.getElementById("stage"));
 
   {
-    const { ctx, width: cw, height: ch } = Stage.setActiveLayer("background");
+    Stage.setActiveLayer("background");
+    const { ctx, cw, ch } = Stage;
     ctx.fillStyle = "#F5DEB3";
     ctx.fillRect(0, 0, cw, ch);
     BasketballCourt.draw();
   }
 
   {
-    const { ctx, width: cw, height: ch } = Stage.setActiveLayer("ui");
+    Stage.setActiveLayer("ui");
+    const { ctx, cw, ch } = Stage;
     ctx.clearRect(0, 0, cw, ch);
   }
 
@@ -38,20 +39,26 @@ function init() {
 }
 
 function clear() {
-  const { ctx, width: cw, height: ch } = Stage.layers.get("game");
+  Stage.setActiveLayer("game");
+  const { ctx, cw, ch } = Stage;
 
   ctx.clearRect(0, 0, cw, ch);
 }
 
 function draw(time: timestamp) {
-  const { width: cw, height: ch } = Stage.setActiveLayer("game");
+  time *= 0.01;
+  const dt = Clock.update(time);
+
+  Stage.setActiveLayer("game");
+  const { ctx, cw, ch } = Stage;
 
   clear();
 
-  Basket.draw(time);
-
-  time *= 0.01;
-  const dt = Clock.update(time);
+  ctx.drawImage(
+    Stage.getLayer("basket"),
+    200 + Math.cos(time * 0.1) * 50,
+    200 + Math.sin(time * 0.1) * 200
+  );
 
   // drawTitle(ctx, time);
 

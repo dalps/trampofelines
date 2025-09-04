@@ -1,8 +1,7 @@
 import { popsicle } from "../lib/CanvasUtils";
 import { Palette } from "../lib/Color";
 import { DEG2RAD, Point } from "../lib/MathUtils";
-import { MyCanvas, Stage } from "../lib/Stage";
-import { timestamp } from "../lib/TimeUtils";
+import { Stage } from "../lib/Stage";
 import { YarnBall } from "./YarnBall";
 
 export class BasketballCourt {
@@ -87,7 +86,6 @@ export class BasketballCourt {
     ctx.strokeStyle = "red";
     ctx.lineWidth = 4;
     ctx.stroke(hoop);
-    const poleHeight = 200;
 
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
@@ -122,40 +120,37 @@ M 20,42 24,62.4 20,67 23.7,72.2 20,77.4`);
   }
 }
 
-const pcanvas = document.createElement("canvas");
-const pcw = 16;
-const pch = 16;
-pcanvas.width = pcw;
-pcanvas.height = pch;
-const pctx = pcanvas.getContext("2d");
+Stage.newOffscreenLayer("pattern", 16, 16);
+Stage.newOffscreenLayer("basket", 200, 200);
 
 const basketColor2 = "#9d5d2cff";
 const basketColor1 = "#c07b3aff";
 
 export class Basket {
-  static drawPattern(time: timestamp) {
-    time *= 0.001;
-
-    pctx.clearRect(0, 0, pcw, pch);
-    pctx.fillStyle = basketColor1;
-
-    pctx.fillRect(0, 0, pcw, pch);
-    pctx.strokeStyle = basketColor2;
-    pctx.lineWidth = 2;
-    pctx.beginPath();
-    pctx.moveTo(0, 0);
-    pctx.lineTo(pcw, pch);
-    pctx.moveTo(pcw, 0);
-    pctx.lineTo(0, pch);
-    pctx.stroke();
-  }
-
-  static draw(time: timestamp) {
+  static drawPattern() {
+    Stage.setActiveLayer("pattern");
     const { ctx, cw, ch } = Stage;
 
-    ctx.save();
-    ctx.translate(500, 500);
+    ctx.clearRect(0, 0, cw, ch);
+    ctx.fillStyle = basketColor1;
 
+    ctx.fillRect(0, 0, cw, ch);
+    ctx.strokeStyle = basketColor2;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(cw, ch);
+    ctx.moveTo(cw, 0);
+    ctx.lineTo(0, ch);
+    ctx.stroke();
+  }
+
+  static drawBasket() {
+    Stage.setActiveLayer("basket");
+    const { ctx } = Stage;
+
+    ctx.save()
+    ctx.translate(100, 100);
     ctx.lineWidth = 2;
     ctx.lineJoin = "round";
     const basket = new Path2D(`m -69,-12.5
@@ -175,7 +170,7 @@ c -0,16.4 137.9,16.4 137.9,0`);
       C 31.3 -56.4 28.2 -0.9 28.2 -0.9
       Z`);
 
-    const pattern = ctx.createPattern(pcanvas, "repeat");
+    const pattern = ctx.createPattern(Stage.getLayer("pattern"), "repeat");
 
     ctx.lineWidth = 5;
     ctx.strokeStyle = basketColor2;
@@ -213,3 +208,4 @@ c -0,16.4 137.9,16.4 137.9,0`);
 }
 
 Basket.drawPattern();
+Basket.drawBasket();
