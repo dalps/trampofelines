@@ -1,7 +1,7 @@
 import { BasketballCourt } from "./entities/Basket";
 import Trampofelines from "./entities/Trampofeline";
 import { Tube } from "./entities/Tube";
-import { settings, GAMESTATE as state } from "./GameState";
+import { drawUI, settings, GAMESTATE as state } from "./GameState";
 import { star } from "./lib/CanvasUtils";
 import { CollisionManager } from "./lib/Collisions2D";
 import { DEG2RAD, Point } from "./lib/MathUtils";
@@ -26,9 +26,8 @@ function init() {
     Stage.setActiveLayer("ui");
     const { ctx, cw, ch } = Stage;
     ctx.clearRect(0, 0, cw, ch);
+    drawUI();
   }
-
-  Stage.setActiveLayer("game");
 
   Trampofelines.init();
 
@@ -67,7 +66,7 @@ function draw(time: timestamp) {
   ctx.lineWidth = 3;
   ctx.translate(200, 200);
   star(new Point(200, 200), { points: 5, outerRadius: 100, innerRadius: 50 });
-  ctx.fill()
+  ctx.fill();
   ctx.restore();
 
   // drawTitle(ctx, time);
@@ -97,8 +96,12 @@ function draw(time: timestamp) {
     const threadEndPos = b.thread.at(-1).position;
     if (threadEndPos.x < 0 || threadEndPos.x > cw || threadEndPos.y > ch) {
       ballsToRemove.push(i);
+      state.lives = Math.max(0, state.lives - 1);
+      drawUI();
       return;
     }
+
+    Stage.setActiveLayer("game");
 
     settings.play && b.update(dt);
 
