@@ -238,7 +238,7 @@ export class DynamicBody {
   }
 
   drawCollider() {
-    const ctx = Stage.ctx;
+    const { ctx } = Stage;
     if (!this.collider) return;
 
     ctx.lineWidth = 1;

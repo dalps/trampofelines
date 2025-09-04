@@ -1,5 +1,24 @@
-import { lerp, type Point } from "./MathUtils";
+import { lerp, Point } from "./MathUtils";
 import { Stage } from "./Stage";
+
+export function star(
+  pos: Point,
+  { innerRadius = 5, outerRadius = 10, points = 5 } = {}
+) {
+  const { ctx } = Stage;
+  const dphi = (Math.PI * 2) / (points * 2);
+
+  ctx.beginPath();
+  for (let i = 0, phi = 0; i < points * 2; i++, phi += dphi) {
+    const p = new Point(Math.cos(phi), Math.sin(phi)).multiplyScalar(
+      i % 2 === 0 ? outerRadius : innerRadius
+    );
+    ctx.lineTo(p.x, p.y);
+  }
+  ctx.closePath();
+
+  const p = new Path2D()
+}
 
 export function makeGradient(
   cp1: Point,
@@ -7,7 +26,7 @@ export function makeGradient(
   {
     color1 = "#00ff00",
     color2 = "#009c00",
-    shineColor = "#c4ffc4ff",
+    shineColor = "#c4ffc4",
     shinePos = 0.1,
     shineSize = 0.2,
     shineSmoothness = 0.5,
@@ -35,7 +54,7 @@ export function makeGradient(
 }
 
 export function popsicle(from: Point, to: Point, color = "black") {
-  const ctx = Stage.ctx;
+  const { ctx } = Stage;
 
   ctx.lineCap = "round";
   ctx.strokeStyle = color;
@@ -62,17 +81,17 @@ export function popsicle(from: Point, to: Point, color = "black") {
 }
 
 export function circle(p: Point, r: number) {
-  const ctx = Stage.ctx;
+  const { ctx } = Stage;
 
   ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
 }
 
-export function drawGrid(
+export function grid(
   canvas: HTMLCanvasElement,
 
   { sep = 20, lineWidth = 2, color = "#ccc", offsetX = 0, offsetY = 0 } = {}
 ) {
-  const ctx = Stage.ctx;
+  const { ctx } = Stage;
 
   ctx.lineWidth = lineWidth;
   ctx.strokeStyle = color;

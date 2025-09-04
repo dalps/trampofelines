@@ -56,7 +56,7 @@ export class Ripple {
   }
 
   draw() {
-    const ctx = Stage.ctx;
+    const { ctx } = Stage;
 
     ctx.fillStyle = `rgb(255,255,255,${this._transparency})`;
     ctx.beginPath();

@@ -2,6 +2,7 @@ import { BasketballCourt } from "./entities/Basket";
 import Trampofelines from "./entities/Trampofeline";
 import { Tube } from "./entities/Tube";
 import { settings, GAMESTATE as state } from "./GameState";
+import { star } from "./lib/CanvasUtils";
 import { CollisionManager } from "./lib/Collisions2D";
 import { DEG2RAD, Point } from "./lib/MathUtils";
 import { RippleManager } from "./lib/Ripple";
@@ -58,6 +59,15 @@ function draw(time: timestamp) {
   ctx.translate(cw * 0.5, ch * 0.5);
   ctx.rotate(Math.cos(time * 0.1) * 10 * DEG2RAD);
   ctx.drawImage(Stage.getLayer("basket"), -100, 0);
+  ctx.restore();
+
+  ctx.save();
+  ctx.strokeStyle = "yellow";
+  ctx.fillStyle = "#d7ff72ff";
+  ctx.lineWidth = 3;
+  ctx.translate(200, 200);
+  star(new Point(200, 200), { points: 5, outerRadius: 100, innerRadius: 50 });
+  ctx.fill()
   ctx.restore();
 
   // drawTitle(ctx, time);

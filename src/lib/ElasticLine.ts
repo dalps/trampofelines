@@ -83,7 +83,7 @@ export class ElasticShape {
     stroke = true,
     fill = true,
   } = {}) {
-    const ctx = Stage.ctx;
+    const { ctx } = Stage;
 
     ctx.fillStyle = fillColor;
     ctx.strokeStyle = strokeColor;
@@ -101,7 +101,7 @@ export class ElasticShape {
   }
 
   drawJoints(colors = ["yellow", "magenta", "cyan"]) {
-    const ctx = Stage.ctx;
+    const { ctx } = Stage;
 
     ctx.lineWidth = 2;
     ctx.strokeStyle = "black";

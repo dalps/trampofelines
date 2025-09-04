@@ -57,7 +57,7 @@ export class YarnBall extends DynamicBody {
   }
 
   draw() {
-    const ctx = Stage.ctx;
+    const { ctx } = Stage;
 
     Palette.setTransparency(1);
 

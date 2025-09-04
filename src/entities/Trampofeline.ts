@@ -162,7 +162,7 @@ export default class Trampofelines {
   }
 
   static draw(time: number) {
-    const ctx = Stage.ctx;
+    const { ctx } = Stage;
 
     if (p1 && p2 && distance >= 20) {
       ctx.lineWidth = 10;
@@ -206,7 +206,7 @@ export class Trampofeline extends ElasticLine {
   }
 
   draw(): void {
-    const ctx = Stage.ctx;
+    const { ctx } = Stage;
     Palette.setTransparency(this._transparency);
 
     ctx.lineWidth = 25;
@@ -259,7 +259,7 @@ export class Trampofeline extends ElasticLine {
 }
 
 export function drawCatFace() {
-  const ctx = Stage.ctx;
+  const { ctx } = Stage;
 
   // arms & paws
   ctx.strokeStyle = coatColor.toString();
@@ -368,7 +368,7 @@ export function drawCatFace() {
 }
 
 export function drawCatRear(time = 0) {
-  const ctx = Stage.ctx;
+  const { ctx } = Stage;
 
   // butt
   ctx.fillStyle = coatColor.toString();
