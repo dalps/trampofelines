@@ -239,5 +239,3 @@ function testLineIntersection() {
   p4 = new Point(307, 462);
   assertTruthy(check());
 }
-
-testLineIntersection();

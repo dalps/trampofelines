@@ -3,7 +3,7 @@ import Trampofelines from "./entities/Trampofeline";
 import { Tube } from "./entities/Tube";
 import { settings, GAMESTATE as state } from "./GameState";
 import { CollisionManager } from "./lib/Collisions2D";
-import { Point } from "./lib/MathUtils";
+import { DEG2RAD, Point } from "./lib/MathUtils";
 import { RippleManager } from "./lib/Ripple";
 import { Stage } from "./lib/Stage";
 import { Clock, type timestamp } from "./lib/TimeUtils";
@@ -54,11 +54,11 @@ function draw(time: timestamp) {
 
   clear();
 
-  ctx.drawImage(
-    Stage.getLayer("basket"),
-    200 + Math.cos(time * 0.1) * 50,
-    200 + Math.sin(time * 0.1) * 200
-  );
+  ctx.save();
+  ctx.translate(cw * 0.5, ch * 0.5);
+  ctx.rotate(Math.cos(time * 0.1) * 10 * DEG2RAD);
+  ctx.drawImage(Stage.getLayer("basket"), -100, 0);
+  ctx.restore();
 
   // drawTitle(ctx, time);
 
@@ -84,12 +84,8 @@ function draw(time: timestamp) {
   let ballsToRemove: number[] = [];
 
   balls.forEach((b, i) => {
-    if (
-      b.position.x < b.radius ||
-      b.position.x > cw + b.radius ||
-      // b.position.y < b.radius ||
-      b.position.y > ch + b.radius
-    ) {
+    const threadEndPos = b.thread.at(-1).position;
+    if (threadEndPos.x < 0 || threadEndPos.x > cw || threadEndPos.y > ch) {
       ballsToRemove.push(i);
       return;
     }

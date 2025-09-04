@@ -1,5 +1,38 @@
-import type { Point } from "./MathUtils";
+import { lerp, type Point } from "./MathUtils";
 import { Stage } from "./Stage";
+
+export function makeGradient(
+  cp1: Point,
+  cp2: Point,
+  {
+    color1 = "#00ff00",
+    color2 = "#009c00",
+    shineColor = "#c4ffc4ff",
+    shinePos = 0.1,
+    shineSize = 0.2,
+    shineSmoothness = 0.5,
+  } = {}
+) {
+  const { ctx } = Stage;
+  const g = ctx.createLinearGradient(cp1.x, cp1.y, cp2.x, cp2.y);
+
+  g.addColorStop(0, color1);
+  if (shineSize > 0) {
+    g.addColorStop(shinePos, color1);
+    g.addColorStop(
+      shinePos + lerp(0, shineSize * 0.5, shineSmoothness),
+      shineColor
+    );
+    g.addColorStop(
+      shinePos + shineSize - lerp(0, shineSize * 0.5, shineSmoothness),
+      shineColor
+    );
+    g.addColorStop(shinePos + shineSize, color1);
+  }
+  g.addColorStop(1, color2);
+
+  return g;
+}
 
 export function popsicle(from: Point, to: Point, color = "black") {
   const ctx = Stage.ctx;

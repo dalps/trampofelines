@@ -122,4 +122,10 @@ export class Stage {
       );
     });
   }
+
+  static debugOffscreenLayer(name: string) {
+    const canvas = Stage.getLayer(name);
+    Stage.stage.appendChild(canvas);
+    canvas.style.border = "1px solid blue";
+  }
 }

@@ -1,19 +1,26 @@
 import { GAMESTATE as St } from "../GameState";
-import { Stage } from "../lib/Stage";
+import { MyCanvas, Stage } from "../lib/Stage";
 import { CollisionManager } from "../lib/Collisions2D";
 import { HSLColor, Palette } from "../lib/Color";
 import { Ripple } from "../lib/Ripple";
 import { Clock, timestamp } from "../lib/TimeUtils";
 import { lerp, Point } from "../lib/MathUtils";
 import { YarnBall } from "./YarnBall";
+import { makeGradient } from "../lib/CanvasUtils";
 
 export class Tube {
   public position: Point;
   public size: Point;
+  private canvas: MyCanvas;
 
   constructor(position: Point, size = new Point(100, 100)) {
     this.position = position;
     this.size = size;
+    this.canvas = Stage.getLayer("tube");
+
+    Stage.newOffscreenLayer("tube", size.x * 1.5, size.y);
+    Tube.drawTube(this.size.x, this.size.y);
+
     Clock.every(10, () => {
       if (St.balls.length < 25) this.spawnYarnBall();
     });
@@ -66,162 +73,143 @@ export class Tube {
   update(dt: timestamp) {}
 
   draw() {
-    const ctx = Stage.ctx;
+    const { ctx } = Stage;
 
-    let {
-      position: { x, y },
-      size: { x: sx, y: sy },
-    } = this;
+    ctx.save();
+    ctx.drawImage(Stage.getLayer("tube"), this.position.x, this.position.y);
+    ctx.restore();
+  }
+
+  static drawTube(sx: number, sy: number) {
+    Stage.setActiveLayer("tube");
+    const { ctx } = Stage;
+
     const body = new Path2D();
     const head = new Path2D();
     const lid = new Path2D();
     const hole = new Path2D();
 
-    body.rect(x, y, sx, sy);
-
     const tubeEllispe = (start, size, roundness = 20) => {};
 
     const cpx = 20;
-    const o = 10; // overhang for head
-    const headLength = Math.max(sx * 0.1, 20);
-    head.moveTo(x + sx + headLength, y - o);
-    head.lineTo(x + sx, y - o);
+    const overhang = 10;
+    const thickness = Math.max(sx * 0.1, 20);
+
+    body.rect(0, overhang, sx, sy - overhang * 2);
+
+    let x0 = sx + thickness;
+    let x1 = sx;
+    head.moveTo(x0, 0);
+    head.lineTo(x1, 0);
     head.bezierCurveTo(
       // cp1
-      x + sx - cpx,
-      y - o,
+      sx - cpx,
+      -overhang,
       // cp2
-      x + sx - cpx,
-      y + sy + o,
+      sx - cpx,
+      sy + overhang,
       // end
-      x + sx,
-      y + sy + o
+      sx,
+      sy
     );
-    head.lineTo(x + sx + headLength, y + sy + o);
+    head.lineTo(sx + thickness, sy);
     head.closePath();
 
-    let x2 = x + sx + headLength;
-    lid.moveTo(x2, y - o);
+    lid.moveTo(x0, 0);
     lid.bezierCurveTo(
       // cp1
-      x2 - cpx,
-      y - o,
+      x0 - cpx,
+      -overhang,
       // cp2
-      x2 - cpx,
-      y + sy + o,
+      x0 - cpx,
+      sy + overhang,
       // end
-      x2,
-      y + sy + o
+      x0,
+      sy
     );
     lid.bezierCurveTo(
       // cp1
-      x2 + cpx,
-      y + sy + o,
+      x0 + cpx,
+      sy + overhang,
       // cp2
-      x2 + cpx,
-      y - o,
+      x0 + cpx,
+      -overhang,
       // end
-      x2,
-      y - o
+      x0,
+      0
     );
 
     // head.ellipse(x + sx, y + sy * 0.5, 20, sy * 0.6, 0, 0, Math.PI * 2);
 
-    hole.ellipse(x2 + 2, y + sy * 0.5, 8, sy * 0.4, 0, 0, Math.PI * 2);
+    hole.ellipse(x0 + 2, sy * 0.5, 8, sy * 0.4, 0, 0, Math.PI * 2);
 
-    const [highlightL, highlightR] = [x + sx, x2].map((x2) => {
+    const [highlightL, highlightR] = [sx, x0].map((x2) => {
       const p = new Path2D();
-      p.moveTo(x2, y - o);
+      p.moveTo(x2, 0);
       p.bezierCurveTo(
         // cp1
         x2 - cpx,
-        y - o,
+        -overhang,
         // cp2
         x2 - cpx,
-        y + sy + o,
+        sy + overhang,
         // end
         x2,
-        y + sy + o
+        sy
       );
 
       return p;
     });
 
-    const makeGradient = (
-      cp1: Point,
-      cp2: Point,
-      {
-        color1 = "#00ff00",
-        color2 = "#009c00",
-        shineColor = "#fff",
-        shinePos = 0.1,
-        shineSize = 0.2,
-      } = {}
-    ) => {
-      const g = ctx.createLinearGradient(cp1.x, cp1.y, cp2.x, cp2.y);
-
-      g.addColorStop(0, color1);
-      if (shineSize > 0) {
-        g.addColorStop(shinePos, color1);
-        g.addColorStop(shinePos + shineSize * 0.5, shineColor);
-        g.addColorStop(shinePos + shineSize, color1);
-      }
-      g.addColorStop(1, color2);
-
-      return g;
-    };
-    // ctx.stroke(hole);
-
-    ctx.fillStyle = makeGradient(this.position, this.position.addY(sy));
+    ctx.fillStyle = makeGradient(new Point(0, 0), new Point(0, sy), {
+      shineSize: 0.2,
+    });
+    ctx.fillRect;
     ctx.strokeStyle = "#2cbb2c";
     ctx.fill(body);
+
     // ctx.stroke(body);
     ctx.fillStyle = makeGradient(
-      this.position.addY(-o),
-      this.position.addY(sy + o),
-      { shinePos: 0.05 }
+      new Point(0, -overhang),
+      new Point(0, sy + overhang),
+      {
+        shinePos: 0.05,
+      }
     );
     ctx.fill(head);
     // ctx.stroke(head);
     ctx.fillStyle = makeGradient(
-      this.position.addY(-o),
-      this.position.addY(sy + o),
-      { shineSize: 0 }
+      new Point(0, -overhang),
+      new Point(0, sy + overhang),
+      {
+        shineSize: 0,
+      }
     );
     ctx.fill(lid);
     // ctx.stroke(lid);
-    ctx.fillStyle = makeGradient(
-      new Point(x2 - 10, this.position.y),
-      new Point(x2 + 10, this.position.y),
-      { color1: "black", color2: "#298529ff", shineSize: 0 }
-    );
+
+    ctx.fillStyle = makeGradient(new Point(0, 0), new Point(0, sy), {
+      color1: "black",
+      color2: "#298529ff",
+      shineSize: 0,
+    });
     ctx.fill(hole);
     // ctx.stroke(hole);
 
     ctx.lineWidth = 3;
-    ctx.strokeStyle = ctx.fillStyle = makeGradient(
-      this.position.addY(-o * 3),
-      this.position.addY(sy + o * 3),
-      {
-        color1: "rgba(255, 255, 255, 0)",
-        color2: "rgba(255, 2, 2, 0)",
-        shineColor: "#ffffff7f",
-        shineSize: 0.55,
-        shinePos: 0,
-      }
-    );
-    ctx.stroke(highlightL);
-    ctx.strokeStyle = ctx.fillStyle = makeGradient(
-      this.position.addY(-o * 3),
-      this.position.addY(sy + o * 3),
-      {
-        color1: "rgba(255, 255, 255, 0)",
-        color2: "rgba(255, 2, 2, 0)",
-        shineColor: "#ffffffbf",
-        shineSize: 0.55,
-        shinePos: 0,
-      }
-    );
-    ctx.stroke(highlightR);
+    [highlightL, highlightR].forEach((path) => {
+      ctx.strokeStyle = ctx.fillStyle = makeGradient(
+        new Point(0, -overhang * 3),
+        new Point(0, sy + overhang * 3),
+        {
+          color1: "rgba(255, 255, 255, 0)",
+          color2: "rgba(255, 2, 2, 0)",
+          shineSize: 0.55,
+          shinePos: 0,
+          shineSmoothness: 1,
+        }
+      );
+      ctx.stroke(path);
+    });
   }
 }
