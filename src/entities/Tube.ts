@@ -21,7 +21,7 @@ export class Tube {
     Stage.newOffscreenLayer("tube", size.x * 1.5, size.y);
     Tube.drawTube(this.size.x, this.size.y);
 
-    Clock.every(10, () => {
+    Clock.every(20, () => {
       if (St.balls.length < 25) this.spawnYarnBall();
     });
   }

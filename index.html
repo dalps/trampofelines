@@ -37,10 +37,49 @@
         overflow: hidden;
         position: relative;
       }
+
+      button {
+        --w: 200px;
+        display: block;
+        position: absolute;
+        z-index: 4;
+        width: var(--w);
+        left: calc(50% - var(--w) * 0.5);
+        bottom: 20%;
+        padding-block: 0.5em;
+        color: white;
+        outline: none;
+        background: #fd5050;
+        border: none;
+        border-radius: 5px;
+        font-size: 1.5em;
+        font-weight: bold;
+        text-transform: uppercase;
+        font-family: Roboto, Arial, sans-serif;
+        cursor: pointer;
+        animation: a1 1s ease-in-out alternate infinite;
+      }
+
+      @keyframes a1 {
+        from {
+          transform: scale(1);
+        }
+
+        50% {
+          transform: scale(1.2);
+        }
+
+        to {
+          transform: scale(1);
+        }
+      }
     </style>
   </head>
   <body>
-    <div id="stage"></div>
+    <div id="stage">
+      <button id="play-btn" style="display: none">Play!</button>
+      <button id="restart-btn" style="display: none">Restart</button>
+    </div>
     <script type="module" src="./main.js"></script>
   </body>
 </html>

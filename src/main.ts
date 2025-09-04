@@ -1,7 +1,13 @@
-import { BasketballCourt } from "./entities/Basket";
+import { Basket, BasketballCourt } from "./entities/Basket";
 import Trampofelines from "./entities/Trampofeline";
 import { Tube } from "./entities/Tube";
-import { drawUI, settings, GAMESTATE as state } from "./GameState";
+import {
+  drawLives,
+  gameOver,
+  settings,
+  State,
+  GAMESTATE as state,
+} from "./GameState";
 import { star } from "./lib/CanvasUtils";
 import { CollisionManager } from "./lib/Collisions2D";
 import { DEG2RAD, Point } from "./lib/MathUtils";
@@ -26,11 +32,12 @@ function init() {
     Stage.setActiveLayer("ui");
     const { ctx, cw, ch } = Stage;
     ctx.clearRect(0, 0, cw, ch);
-    drawUI();
+    drawLives();
   }
 
   Trampofelines.init();
 
+  state.basket = new Basket(new Point(650, 250));
   state.tubes.push(new Tube(new Point(0, 100)));
 
   clear();
@@ -55,12 +62,6 @@ function draw(time: timestamp) {
   clear();
 
   ctx.save();
-  ctx.translate(cw * 0.5, ch * 0.5);
-  ctx.rotate(Math.cos(time * 0.1) * 10 * DEG2RAD);
-  ctx.drawImage(Stage.getLayer("basket"), -100, 0);
-  ctx.restore();
-
-  ctx.save();
   ctx.strokeStyle = "yellow";
   ctx.fillStyle = "#d7ff72ff";
   ctx.lineWidth = 3;
@@ -72,7 +73,7 @@ function draw(time: timestamp) {
   // drawTitle(ctx, time);
 
   state.tubes.forEach((tube) => tube.draw());
-  state.enemies.forEach((e) => e.draw());
+  state.basket.update(time);
 
   settings.play && CollisionManager.update(dt);
 
@@ -92,12 +93,16 @@ function draw(time: timestamp) {
 
   let ballsToRemove: number[] = [];
 
+  state.basket.update(time);
+
   balls.forEach((b, i) => {
     const threadEndPos = b.thread.at(-1).position;
     if (threadEndPos.x < 0 || threadEndPos.x > cw || threadEndPos.y > ch) {
       ballsToRemove.push(i);
       state.lives = Math.max(0, state.lives - 1);
-      drawUI();
+
+      state.state === State.Playing && drawLives();
+      state.lives <= 0 && gameOver();
       return;
     }
 
