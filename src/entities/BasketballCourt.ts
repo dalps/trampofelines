@@ -1,3 +1,4 @@
+import { star } from "../lib/CanvasUtils";
 import { Palette } from "../lib/Color";
 import { Point, DEG2RAD } from "../lib/MathUtils";
 import { Stage } from "../lib/Stage";
@@ -33,8 +34,38 @@ export class BasketballCourt {
     ctx.ellipse(cw * 0.2, ch + 10, 200, 150, -20 * DEG2RAD, 0, Math.PI * 2);
     ctx.stroke();
 
+    ctx.strokeStyle = "yellow";
+    ctx.fillStyle = "#d7ff72ff";
+    ctx.lineWidth = 3;
+
+    star(new Point(200, 200), { points: 5, outerRadius: 30, innerRadius: 10 });
+    ctx.fill();
+
+    star(new Point(cw * 0.8, ch * 0.1), {
+      points: 4,
+      outerRadius: 30,
+      innerRadius: 10,
+    });
+    ctx.fill();
+
+    star(new Point(600, 300), {
+      points: 5,
+      outerRadius: 50,
+      innerRadius: 20,
+      angle: 30 * DEG2RAD,
+    });
+    ctx.fill();
+
+    star(new Point(cw * 0.5, 100), {
+      points: 5,
+      outerRadius: 20,
+      innerRadius: 10,
+      angle: -30 * DEG2RAD,
+    });
+    ctx.fill();
+
     ctx.save();
-    ctx.translate(cw * 0.8, 100);
+    ctx.translate(cw * 0.8, 300);
     ctx.scale(scale, scale);
 
     // pole

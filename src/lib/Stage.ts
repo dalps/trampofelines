@@ -1,3 +1,4 @@
+import { BasketballCourt } from "../entities/BasketballCourt";
 import { restart } from "../GameState";
 import { Point } from "./MathUtils";
 
@@ -98,7 +99,8 @@ export class Stage {
     restartBtn.addEventListener("click", restart);
     playBtn.addEventListener("click", restart);
 
-    ["background", "game", "ui"].forEach((name, i) => {
+    const liveLayers = ["background", "game", "ui"];
+    liveLayers.forEach((name, i) => {
       const layer = document.createElement("canvas", {
         is: "my-canvas",
       });
@@ -109,7 +111,13 @@ export class Stage {
     });
 
     this.setActiveLayer("game");
-    this.fitLayersToStage(["game", "ui", "background"]);
+
+    this.fitLayersToStage(liveLayers);
+
+    window.addEventListener("resize", () => {
+      this.fitLayersToStage(["game", "ui", "background"]);
+      BasketballCourt.draw();
+    });
   }
 
   static newOffscreenLayer(name: string, width: number, height: number) {

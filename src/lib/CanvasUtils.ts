@@ -3,19 +3,20 @@ import { Stage } from "./Stage";
 
 export function star(
   pos: Point,
-  { innerRadius = 5, outerRadius = 10, points = 5 } = {}
+  { innerRadius = 5, outerRadius = 10, points = 5, angle = 0 } = {}
 ) {
   const { ctx } = Stage;
   const dphi = (Math.PI * 2) / (points * 2);
 
   ctx.beginPath();
   for (let i = 0, phi = 0; i < points * 2; i++, phi += dphi) {
-    const p = new Point(Math.cos(phi), Math.sin(phi)).multiplyScalar(
+    let p = new Point(Math.cos(phi), Math.sin(phi)).multiplyScalar(
       i % 2 === 0 ? outerRadius : innerRadius
     );
+    p = p.rotate(angle);
+    p = p.add(pos);
     ctx.lineTo(p.x, p.y);
   }
-  ctx.closePath();
 
   const p = new Path2D();
 }
@@ -80,7 +81,7 @@ export function popsicle(from: Point, to: Point, color = "black") {
 export function circle(p: Point, r: number) {
   const { ctx } = Stage;
 
-  ctx.beginPath()
+  ctx.beginPath();
   ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
 }
 

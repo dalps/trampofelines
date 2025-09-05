@@ -1,4 +1,4 @@
-import { drawLives, GAMESTATE } from "../GameState";
+import { drawLives, GAMESTATE, State as GameState } from "../GameState";
 import { makeGradient } from "../lib/CanvasUtils";
 import { CollisionManager, downwardFilter } from "../lib/Collisions2D";
 import { HSLColor, Palette } from "../lib/Color";
@@ -86,6 +86,8 @@ export class Tube {
     CollisionManager.register(GAMESTATE.basket, ball, {
       filter: downwardFilter,
       cb: () => {
+        if (GAMESTATE.state !== GameState.Playing) return;
+
         GAMESTATE.score += 1;
         CollisionManager.unregisterBody(ball);
         ball.state = State.Dead;
