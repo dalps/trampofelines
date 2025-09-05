@@ -78,7 +78,7 @@ export class CollisionManager {
     entriesToRemove.forEach((idx) => this._pairsToWatch.splice(idx, 1));
   }
 
-  static update(dt: instant) {
+  static update() {
     this._pairsToWatch.forEach(({ r1, r2, filter, cb }) => {
       const b1 = r1.deref();
       const b2 = r2.deref();

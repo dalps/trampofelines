@@ -4,6 +4,7 @@ import { Point } from "../lib/MathUtils";
 import Math2D, { DEG2RAD } from "../lib/MathUtils";
 import { DynamicBody, Gravity } from "../lib/Physics2D";
 import { Stage } from "../lib/Stage";
+import { Clock } from "../lib/TimeUtils";
 
 export class YarnBall extends DynamicBody {
   public thread: DynamicBody[];
@@ -38,8 +39,9 @@ export class YarnBall extends DynamicBody {
     this.thread = points.map((p) => new DynamicBody(p));
   }
 
-  update(dt: number): void {
-    super.update(dt);
+  update(): void {
+    const { dt } = Clock;
+    super.update();
 
     this.threadLength += dt * 0.01;
     this.thread[0].position = this.position

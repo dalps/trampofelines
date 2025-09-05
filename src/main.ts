@@ -77,12 +77,12 @@ function draw(time: timestamp) {
   state.tubes.forEach((tube) => tube.draw());
   state.basket.update();
 
-  settings.play && CollisionManager.update(dt);
+  settings.play && CollisionManager.update();
 
   Trampofelines.draw(time);
 
   trampolines.forEach((l) => {
-    settings.play && l.update(dt);
+    settings.play && l.update();
 
     l.draw();
     settings.showJoints && l.drawJoints();
@@ -110,7 +110,7 @@ function draw(time: timestamp) {
 
     Stage.setActiveLayer("game");
 
-    settings.play && b.update(dt);
+    settings.play && b.update();
 
     b.draw();
     settings.showForces && b.drawForces();
@@ -122,7 +122,7 @@ function draw(time: timestamp) {
     // unregister the body
   });
 
-  RippleManager.updateAndDraw(dt * 0.1);
+  RippleManager.updateAndDraw();
 
   requestAnimationFrame(draw);
 }

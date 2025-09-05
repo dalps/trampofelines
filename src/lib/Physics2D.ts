@@ -1,7 +1,7 @@
 import { popsicle } from "./CanvasUtils";
 import type { Collider } from "./Collisions2D";
 import { damp, Point } from "./MathUtils";
-import { instant } from "./TimeUtils";
+import { Clock, instant } from "./TimeUtils";
 
 /**
  * A static force that can be applied to a dynamic body
@@ -20,7 +20,7 @@ export class Force {
     this._direction = v;
   }
 
-  get magnitude(): numbepr {
+  get magnitude(): number {
     return this._magnitude;
   }
 
@@ -93,11 +93,11 @@ export class ContactForce extends Force {
     super(d, m);
   }
 
-  update(dt: instant) {
+  update() {
     this._magnitude =
       this._magnitude <= ContactForce.EPSILON
         ? 0
-        : damp(this._magnitude, 0, this.lambda, dt);
+        : damp(this._magnitude, 0, this.lambda, Clock.dt);
   }
 }
 
@@ -186,11 +186,13 @@ export class DynamicBody {
     this._fixed = !this._fixed;
   }
 
-  update(dt: number) {
+  update() {
+    const { dt } = Clock;
+
     if (this._fixed) return;
 
     this._forces.forEach(
-      (f) => (f as ContactForce).update && (f as ContactForce).update(dt)
+      (f) => (f as ContactForce).update && (f as ContactForce).update()
     );
 
     const o = this.orientation + this.angularVelocity * dt;

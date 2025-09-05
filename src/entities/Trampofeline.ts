@@ -6,7 +6,7 @@ import { ElasticLine } from "../lib/ElasticLine";
 import Math2D, { damp, lerp, Point, RAD2DEG } from "../lib/MathUtils";
 import { Gravity, State } from "../lib/Physics2D";
 import { Stage } from "../lib/Stage";
-import type { instant, timestamp } from "../lib/TimeUtils";
+import { Clock, type instant, type timestamp } from "../lib/TimeUtils";
 
 let p1: Point | undefined;
 let p2: Point | undefined;
@@ -186,7 +186,6 @@ export default class Trampofelines {
 }
 
 export class Trampofeline extends ElasticLine {
-  private _time: timestamp = 0;
   private _transparency = 1;
   private _killed = false;
 
@@ -199,13 +198,13 @@ export class Trampofeline extends ElasticLine {
     });
   }
 
-  update(dt: instant): void {
-    super.update(dt);
-    this._killed && (this._transparency = damp(this._transparency, 0, 0.5, dt));
-    this._time += dt;
+  update() {
+    super.update();
+    this._killed &&
+      (this._transparency = damp(this._transparency, 0, 0.5, Clock.dt));
   }
 
-  draw(): void {
+  draw() {
     const { ctx } = Stage;
     Palette.setTransparency(this._transparency);
 
@@ -246,7 +245,7 @@ export class Trampofeline extends ElasticLine {
       ctx.save();
       ctx.translate(lastJoint.x, lastJoint.y);
       ctx.rotate(angle);
-      drawCatRear(this._time);
+      drawCatRear();
       ctx.restore();
     }
 

@@ -1,7 +1,7 @@
 import { Stage } from "./Stage";
 import { circle } from "./CanvasUtils";
-import { instant } from "./Physics2D";
 import { damp, type Point } from "./MathUtils";
+import { Clock } from "./TimeUtils";
 
 const EPSILON = 0.001;
 
@@ -24,14 +24,14 @@ export class RippleManager {
     }
   }
 
-  static update(dt: instant) {
+  static update() {
     for (let ref of this._ripples.values()) {
-      ref.deref()?.update(dt);
+      ref.deref()?.update();
     }
   }
 
-  static updateAndDraw(dt: instant) {
-    this.update(dt);
+  static updateAndDraw() {
+    this.update();
     this.draw();
   }
 }
@@ -65,13 +65,13 @@ export class Ripple {
     ctx.fill();
   }
 
-  update(dt: number) {
-    this._radius = damp(this._radius, this.finalRadius, this.speed, dt);
+  update() {
+    this._radius = damp(this._radius, this.finalRadius, this.speed, Clock.dt);
     this._transparency = damp(
       this._transparency,
       this.finalTransparency,
       this.speed,
-      dt
+      Clock.dt
     );
 
     if (
