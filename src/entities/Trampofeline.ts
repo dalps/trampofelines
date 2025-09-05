@@ -1,12 +1,17 @@
 import { GAMESTATE } from "../GameState";
 import { circle } from "../lib/CanvasUtils";
-import { CircleCollider, CollisionManager } from "../lib/Collisions2D";
+import {
+  CircleCollider,
+  CollisionManager,
+  downwardFilter,
+} from "../lib/Collisions2D";
 import { Palette } from "../lib/Color";
 import { ElasticLine } from "../lib/ElasticLine";
 import Math2D, { damp, lerp, Point, RAD2DEG } from "../lib/MathUtils";
 import { Gravity, State } from "../lib/Physics2D";
+import { Ripple } from "../lib/Ripple";
 import { Stage } from "../lib/Stage";
-import { Clock, type instant, type timestamp } from "../lib/TimeUtils";
+import { Clock } from "../lib/TimeUtils";
 
 let p1: Point | undefined;
 let p2: Point | undefined;
@@ -28,21 +33,27 @@ const MAX_CATS = 3;
 const MIN_LENGTH = 100;
 const MAX_STEEPNESS_TO_90 = 25;
 
-export default class Trampofelines {
+export default class TrampofelineManager {
+  private static entities: Map<string, Trampofeline> = new Map();
+
+  public static get trampolines() {
+    return Array.from(this.entities.values());
+  }
+
   static init() {
-    const { trampolines, balls, settings } = GAMESTATE;
-    const uiCanvas = Stage.getLayer("ui");
+    const { balls, settings } = GAMESTATE;
+    const ui = Stage.getLayer("ui");
 
-    uiCanvas.addEventListener("mousedown", handleMouseDown, false);
-    uiCanvas.addEventListener("mousemove", handleMouseMove, false);
-    uiCanvas.addEventListener("mouseup", handleMouseUp, false);
+    ui.addEventListener("mousedown", handleMouseDown, false);
+    ui.addEventListener("mousemove", handleMouseMove, false);
+    ui.addEventListener("mouseup", handleMouseUp, false);
 
-    uiCanvas.addEventListener("touchstart", handleTouchStart, false);
-    uiCanvas.addEventListener("touchmove", handleTouchMove, false);
-    uiCanvas.addEventListener("touchend", handleTouchEnd, false);
+    ui.addEventListener("touchstart", handleTouchStart, false);
+    ui.addEventListener("touchmove", handleTouchMove, false);
+    ui.addEventListener("touchend", handleTouchEnd, false);
 
     function handleTouchStart(e: TouchEvent) {
-      p1 = uiCanvas.resolveTouchPosition(e.touches[0]);
+      p1 = ui.resolveTouchPosition(e.touches[0]);
       mouseDown = true;
     }
 
@@ -56,7 +67,7 @@ export default class Trampofelines {
 
       drawing = true;
       distance = p1 && p2 ? p1.sub(p2).abs() : 0;
-      p2 = uiCanvas.resolveTouchPosition(e.touches[0]);
+      p2 = ui.resolveTouchPosition(e.touches[0]);
     }
 
     function handleTouchEnd(e: TouchEvent) {
@@ -68,7 +79,7 @@ export default class Trampofelines {
     function handleMouseDown(e: MouseEvent) {
       e.preventDefault();
 
-      p1 = uiCanvas.resolveMousePosition(e);
+      p1 = ui.resolveMousePosition(e);
       mouseDown = true;
     }
 
@@ -83,7 +94,7 @@ export default class Trampofelines {
 
       drawing = true;
       distance = p1 && p2 ? p1.sub(p2).abs() : 0;
-      p2 = uiCanvas.resolveMousePosition(e);
+      p2 = ui.resolveMousePosition(e);
     }
 
     function handleMouseUp(e: MouseEvent) {
@@ -102,46 +113,61 @@ export default class Trampofelines {
         return;
       }
 
-      if (!Trampofelines.testPlacement()) {
-        p1 = p2 = undefined;
-        return;
-      }
-
-      const cat = new Trampofeline(p2, p1, 10, {
-        damping: 2,
-        mass: 2,
-        jointsAttraction: 220,
-        jointsRepulsion: 50,
-      });
-
-      trampolines.push(cat);
-
-      cat.joints.forEach((j) => {
-        settings.gravity && j.addForce(Gravity);
-        j.attachCollider(
-          new CircleCollider(j.position, GAMESTATE.settings.colliderRadius)
-        );
-
-        balls.forEach((b) =>
-          CollisionManager.register(j, b, {
-            filter: (b1, b2) => {
-              // only react if ball is in descending motion AND strictly above the joint
-              const isDescending = b2.velocity.y >= 0;
-              const aboveJoint = b2.position.y < b1.position.y;
-              return isDescending && aboveJoint;
-            },
-          })
-        );
-      });
+      if (TrampofelineManager.testPlacement()) TrampofelineManager.makeCat();
 
       p1 = p2 = undefined;
     }
   }
 
+  static makeCat() {
+    if (!p1 || !p2 || p1.equals(p2)) return;
+
+    console.log("hello?");
+
+    const cat = new Trampofeline(p2, p1, 10, {
+      damping: 2,
+      mass: 2,
+      jointsAttraction: 220,
+      jointsRepulsion: 50,
+    });
+
+    cat.id = crypto.randomUUID();
+    this.entities.set(cat.id, cat);
+
+    cat.joints.forEach((j) => {
+      GAMESTATE.settings.gravity && j.addForce(Gravity);
+
+      j.attachCollider(
+        new CircleCollider(j.position, GAMESTATE.settings.colliderRadius)
+      );
+
+      GAMESTATE.balls.forEach((b) =>
+        CollisionManager.register(j, b, {
+          filter: downwardFilter,
+          cb: () => {
+            new Ripple(j.position, 15, 30, 0.3, 0);
+            TrampofelineManager.killCat(cat);
+          },
+        })
+      );
+    });
+  }
+
+  static killCat(cat: Trampofeline) {
+    cat.joints.forEach((j) => {
+      j.state = State.Dead;
+      CollisionManager.unregisterBody(j);
+    });
+    cat.kill();
+    setTimeout(() => this.entities.delete(cat.id), 500);
+  }
+
   static testPlacement(): boolean {
     const longEnough = distance >= MIN_LENGTH;
-    const belowLimit = GAMESTATE.trampolines.length < MAX_CATS;
-    const intersections = GAMESTATE.trampolines.filter(({ joints }) => {
+    const belowLimit = TrampofelineManager.entities.size < MAX_CATS;
+    const intersections = Array.from(
+      TrampofelineManager.entities.values()
+    ).filter(({ joints }) => {
       p3 = joints.at(0).position;
       p4 = joints.at(-1).position;
       inter = Math2D.properInter(p1, p2, p3, p4);
@@ -155,23 +181,24 @@ export default class Trampofelines {
     return longEnough && belowLimit && noIntersections && goodAngle;
   }
 
-  static draw(time: number) {
+  static drawGuides(time: number) {
     const { ctx } = Stage;
 
-    if (p1 && p2 && distance >= 20) {
-      ctx.lineWidth = 10;
-      ctx.setLineDash([5, 15]);
-      ctx.strokeStyle = `rgba(${
-        this.testPlacement() ? `0,0,0` : `255,0,0`
-      },${lerp(0.6, 0.8, Math.sin(time))})`;
-      ctx.lineCap = "round";
-      ctx.beginPath();
-      ctx.moveTo(p1.x, p1.y);
-      ctx.lineTo(p2.x, p2.y);
-      ctx.stroke();
+    if (!p1 || !p2) return;
 
-      ctx.setLineDash([]);
-    }
+    ctx.lineWidth = 10;
+    ctx.lineDashOffset = -time * 5;
+    ctx.setLineDash([5, 15]);
+    ctx.strokeStyle = `rgba(${
+      this.testPlacement() ? `0,0,0` : `255,0,0`
+    },${lerp(0.6, 0.8, Math.sin(time))})`;
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.moveTo(p1.x, p1.y);
+    ctx.lineTo(p2.x, p2.y);
+    ctx.stroke();
+
+    ctx.setLineDash([]);
   }
 
   static isDrawing() {
@@ -181,21 +208,17 @@ export default class Trampofelines {
 
 export class Trampofeline extends ElasticLine {
   private _transparency = 1;
+  public id: string;
   private _killed = false;
-
-  kill() {
-    // this._killed = true;
-    console.log(`Killing trampoline...`);
-    this.joints.forEach((j) => {
-      j.state = State.Dead;
-      CollisionManager.unregisterBody(j.collisionID!);
-    });
-  }
 
   update() {
     super.update();
     this._killed &&
       (this._transparency = damp(this._transparency, 0, 0.5, Clock.dt));
+  }
+
+  kill() {
+    this._killed = true;
   }
 
   draw() {
@@ -279,13 +302,36 @@ export function drawCatFace() {
   });
 
   // face
+  const innerEarX = 10;
+  const earY = -20;
+  const earHeight = 10;
+
+  ctx.lineWidth = 2;
   ctx.fillStyle = coatColor.toString();
+  ctx.strokeStyle = detailColor.toString();
   ctx.beginPath();
   ctx.moveTo(20, -20);
   // ctx.quadraticCurveTo(0, 50, -20, -20);
   ctx.bezierCurveTo(40, 30, -40, 30, -20, -20);
-  ctx.closePath();
+  
+  // ears
+  [innerEarX, -innerEarX].forEach((x, i) => {
+    ctx.moveTo(x, earY);
+    ctx.lineTo(x + (i === 1 ? -1 : 1) * 5, earY - earHeight);
+    ctx.lineTo(x + (i === 1 ? -1 : 1) * 10, earY);
+  });
+  ctx.stroke();
   ctx.fill();
+  
+  // stripes
+  ctx.beginPath();
+  ctx.moveTo(0, -20);
+  ctx.lineTo(0,-15);
+  ctx.moveTo(-3, -20);
+  ctx.lineTo(-3,-17);
+  ctx.moveTo(3, -20);
+  ctx.lineTo(3,-17);
+  ctx.stroke()
 
   // eyes
   const eyeY = -10;
@@ -293,17 +339,15 @@ export function drawCatFace() {
   const innerEye = 2;
 
   ctx.fillStyle = `${white}`;
-  ctx.beginPath();
   circle(new Point(10, eyeY), outerEye);
+  ctx.fill();
   circle(new Point(-10, eyeY), outerEye);
-  ctx.closePath();
   ctx.fill();
 
   ctx.fillStyle = `${black}`;
-  ctx.beginPath();
   circle(new Point(10, eyeY), innerEye);
+  ctx.fill();
   circle(new Point(-10, eyeY), innerEye);
-  ctx.closePath();
   ctx.fill();
 
   // whiskers
@@ -322,22 +366,6 @@ export function drawCatFace() {
     });
   });
   ctx.stroke();
-
-  // ears
-  ctx.fillStyle = coatColor.toString();
-  ctx.strokeStyle = detailColor.toString();
-  const innerEarX = 10;
-  const earY = -18;
-  const earHeight = 10;
-
-  ctx.beginPath();
-  [innerEarX, -innerEarX].forEach((x, i) => {
-    ctx.moveTo(x, earY);
-    ctx.lineTo(x + (i === 1 ? -1 : 1) * 5, earY - earHeight);
-    ctx.lineTo(x + (i === 1 ? -1 : 1) * 10, earY);
-    ctx.stroke();
-    ctx.fill();
-  });
 
   // snout
   ctx.fillStyle = `${pink}`;
@@ -360,7 +388,8 @@ export function drawCatFace() {
   ctx.stroke();
 }
 
-export function drawCatRear(time = 0) {
+export function drawCatRear() {
+  const { time } = Clock;
   const { ctx } = Stage;
 
   // butt
@@ -395,13 +424,13 @@ export function drawCatRear(time = 0) {
     ctx.translate(x, 40);
 
     ctx.fillStyle = detailColor.toString();
-    ctx.beginPath();
+
     circle(new Point(0, -3), 3);
-    ctx.closePath();
+    ctx.fill();
     circle(new Point(4, 2), 2);
-    ctx.closePath();
+    ctx.fill();
     circle(new Point(0, 4), 2);
-    ctx.closePath();
+    ctx.fill();
     circle(new Point(-4, 2), 2);
     ctx.fill();
 

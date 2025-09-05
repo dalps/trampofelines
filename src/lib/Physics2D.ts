@@ -149,6 +149,7 @@ export class DynamicBody {
   }
 
   addForce(force: Force) {
+    console.log(`${this.collisionID}: ${this._forces.length}`)
     !this._fixed && this._forces.push(force);
   }
 

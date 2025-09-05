@@ -1,5 +1,5 @@
 import { Basket } from "./entities/Basket";
-import { Trampofeline } from "./entities/Trampofeline";
+import TrampofelineManager, { Trampofeline } from "./entities/Trampofeline";
 import type { Tube } from "./entities/Tube";
 import { YarnBall } from "./entities/YarnBall";
 import { Palette } from "./lib/Color";
@@ -8,7 +8,7 @@ import { restartBtn, Stage } from "./lib/Stage";
 
 export const settings = {
   showJoints: false,
-  showForces: true,
+  showForces: false,
   play: true,
   colliderRadius: 20,
   lineMass: 2,
@@ -21,7 +21,6 @@ export const settings = {
 export interface GameState {
   state: State;
   balls: YarnBall[];
-  trampolines: Trampofeline[];
   tubes: Tube[];
   basket?: Basket;
   lives: number;
@@ -50,7 +49,7 @@ export function restart() {
     case State.GameOver:
       GAMESTATE.lives = TOTAL_LIVES;
       GAMESTATE.balls.splice(0);
-      GAMESTATE.trampolines.splice(0);
+      TrampofelineManager.entities.clear();
       restartBtn.style.display = "none";
       drawLives();
       GAMESTATE.state = State.Playing;

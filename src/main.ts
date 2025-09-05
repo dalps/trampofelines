@@ -1,6 +1,6 @@
 import { Basket } from "./entities/Basket";
 import { BasketballCourt } from "./entities/BasketballCourt";
-import Trampofelines from "./entities/Trampofeline";
+import TrampofelineManager from "./entities/Trampofeline";
 import { Tube } from "./entities/Tube";
 import {
   drawLives,
@@ -36,7 +36,7 @@ function init() {
     drawLives();
   }
 
-  Trampofelines.init();
+  TrampofelineManager.init();
 
   state.basket = new Basket(new Point(650, 250));
   state.tubes.push(new Tube(new Point(0, 100)));
@@ -79,9 +79,7 @@ function draw(time: timestamp) {
 
   settings.play && CollisionManager.update();
 
-  Trampofelines.draw(time);
-
-  trampolines.forEach((l) => {
+  TrampofelineManager.trampolines.forEach((l) => {
     settings.play && l.update();
 
     l.draw();
@@ -92,6 +90,8 @@ function draw(time: timestamp) {
       settings.showForces && j.drawCollider();
     });
   });
+
+  TrampofelineManager.drawGuides(time);
 
   let ballsToRemove: number[] = [];
 
@@ -118,8 +118,8 @@ function draw(time: timestamp) {
   });
 
   ballsToRemove.forEach((idx) => {
+    CollisionManager.unregisterBody(balls[idx]);
     balls.splice(idx, 1);
-    // unregister the body
   });
 
   RippleManager.updateAndDraw();

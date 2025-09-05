@@ -4,9 +4,9 @@ import { ContactForce, State, type DynamicBody } from "./Physics2D";
 import { Stage } from "./Stage";
 import { instant } from "./TimeUtils";
 
-const contactForceFactor = 20;
+const contactForceFactor = 300;
 const debugColor = "yellowgreen";
-const DEBUG = true;
+const DEBUG = false;
 
 function log(msg: string) {
   DEBUG && console.log(msg);
@@ -25,16 +25,9 @@ export class CollisionManager {
   private static _id = 0;
   private static _pairsToWatch: CollisionPair[] = [];
 
-  static getID(b: DynamicBody) {
-    if (b.state !== State.Alive) {
-      log(`Refusing to assign an id to dead body ${b.name}`);
-      return undefined;
-    }
-
-    if (!b.collisionID) {
-      b.collisionID = `${b.name}${this._id++}`;
-    }
-
+  static getId(b: DynamicBody) {
+    if (!b.collider || b.state !== State.Alive) return undefined;
+    if (!b.collisionID) b.collisionID = `${b.name}${this._id++}`;
     return b.collisionID;
   }
 
@@ -49,17 +42,10 @@ export class CollisionManager {
       cb?: Function;
     } = {}
   ): void {
-    if (!b1.collider || !b2.collider) {
-      throw new Error("Cannot register a body without an attached collider.");
-    }
+    const id1 = this.getId(b1);
+    const id2 = this.getId(b2);
 
-    const id1 = this.getID(b1);
-    const id2 = this.getID(b2);
-
-    if (!id1 || !id2) {
-      log(`Couldn't schedule collisions for ${b1.name} or ${b2.name}.`);
-      return;
-    }
+    if (!id1 || !id2) return;
 
     const r1 = new WeakRef(b1);
     const r2 = new WeakRef(b2);
@@ -71,12 +57,18 @@ export class CollisionManager {
     const entriesToRemove: number[] = [];
 
     log(`Searching for entries containing ${b.collisionID}...`);
+
     this._pairsToWatch.forEach(({ id1, id2 }, idx) => {
       if (b.collisionID === id1 || b.collisionID === id2) {
-        log(`Unregistered pair (${id1}, ${id2}).`);
         entriesToRemove.push(idx);
       }
     });
+
+    log(
+      `Found ${entriesToRemove.map(
+        (v) => `(${this._pairsToWatch[v].id1},${this._pairsToWatch[v].id2})`
+      )}`
+    );
 
     entriesToRemove.forEach((idx) => this._pairsToWatch.splice(idx, 1));
   }
@@ -85,31 +77,30 @@ export class CollisionManager {
     this._pairsToWatch.forEach(({ r1, r2, filter, cb }) => {
       const b1 = r1.deref();
       const b2 = r2.deref();
+      const c1 = b1.collider;
+      const c2 = b2.collider;
 
-      if (!b1 || !b2) {
-        // log(`A registered body was dropped.\nb1: ${b1?.name} b2: ${b2?.name}`);
+      if (
+        !b1 ||
+        !b2 ||
+        !c1 ||
+        !c2 ||
+        b1.state !== State.Alive ||
+        b2.state !== State.Alive ||
+        (filter && !filter(b1, b2)) ||
+        !c1.checkContact(c2)
+      )
         return;
-      }
 
-      const c1 = b1.collider!;
-      const c2 = b2.collider!;
-
-      if (filter && !filter(b1, b2)) return;
-
-      if (c1.checkContact(c2)) {
-        b1.addForce(this.collide(b1, b2, c1.center.sub(c2.center)));
-        b2.addForce(this.collide(b2, b1, c2.center.sub(c1.center)));
-        cb && cb();
-      }
+      b1.addForce(this.collide(b1, b2));
+      b2.addForce(this.collide(b2, b1));
+      cb && cb();
     });
   }
 
-  static collide(
-    body: DynamicBody,
-    against: DynamicBody,
-    sep: Point
-  ): ContactForce {
+  static collide(body: DynamicBody, against: DynamicBody): ContactForce {
     const massFactor = (2 * against.mass) / (body.mass + against.mass);
+    const sep = body.collider.center.sub(against.collider.center);
 
     return new ContactForce(sep.normalize(), massFactor * contactForceFactor);
   }
@@ -130,16 +121,10 @@ function circleCircle(c1: CircleCollider, c2: CircleCollider) {
 
 type ColliderType = "Circle" | "Segment";
 
-interface ContactInfo {
-  test: boolean;
-  sep1: Point;
-  sep2: Point;
-}
-
 export abstract class Collider {
   public abstract center: Point;
   constructor(public type: ColliderType) {}
-  abstract draw();
+  abstract draw(): void;
   abstract checkContact(c2: Collider): boolean;
 }
 
@@ -197,4 +182,14 @@ export class SegmentCollider extends Collider {
     popsicle(this.a, this.b, debugColor);
     popsicle(this.b, this.a, debugColor);
   }
+}
+
+/**
+ * Rejects collisions when the first body is not in descending motion
+ * and strictly above the second body
+ */
+export function downwardFilter(b1: DynamicBody, b2: DynamicBody) {
+  const isDescending = b2.velocity.y >= 0;
+  const aboveJoint = b2.position.y < b1.position.y;
+  return isDescending && aboveJoint;
 }

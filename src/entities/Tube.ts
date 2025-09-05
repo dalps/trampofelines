@@ -1,12 +1,13 @@
 import { GAMESTATE, GAMESTATE as St } from "../GameState";
 import { MyCanvas, Stage } from "../lib/Stage";
-import { CollisionManager } from "../lib/Collisions2D";
+import { CollisionManager, downwardFilter } from "../lib/Collisions2D";
 import { HSLColor, Palette } from "../lib/Color";
 import { Ripple } from "../lib/Ripple";
 import { Clock, timestamp } from "../lib/TimeUtils";
 import { lerp, Point } from "../lib/MathUtils";
 import { YarnBall } from "./YarnBall";
 import { makeGradient } from "../lib/CanvasUtils";
+import TrampofelineManager from "./Trampofeline";
 
 export class Tube {
   public position: Point;
@@ -64,17 +65,20 @@ export class Tube {
 
     St.balls.push(ball);
 
-    St.trampolines.forEach((l) =>
-      l.joints.forEach((j) =>
+    TrampofelineManager.trampolines.forEach((cat) =>
+      cat.joints.forEach((j) =>
         CollisionManager.register(j, ball, {
+          filter: downwardFilter,
           cb: () => {
             new Ripple(j.position, 15, 30, 0.3, 0);
+            TrampofelineManager.killCat(cat);
           },
         })
       )
     );
 
     CollisionManager.register(GAMESTATE.basket, ball, {
+      filter: downwardFilter,
       cb: () => {
         GAMESTATE.score += 1;
         CollisionManager.unregisterBody(ball);
