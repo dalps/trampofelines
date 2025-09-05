@@ -12,6 +12,8 @@ import { Gravity, State } from "../lib/Physics2D";
 import { Ripple } from "../lib/Ripple";
 import { Stage } from "../lib/Stage";
 import { Clock } from "../lib/TimeUtils";
+import { zzfxP } from "../zzfx";
+import sfx from "../sfx";
 
 let p1: Point | undefined;
 let p2: Point | undefined;
@@ -146,6 +148,7 @@ export default class TrampofelineManager {
           filter: downwardFilter,
           cb: () => {
             new Ripple(j.position, 15, 30, 0.3, 0);
+            zzfxP(sfx.bounce);
             TrampofelineManager.killCat(cat);
           },
         })
@@ -313,7 +316,7 @@ export function drawCatFace() {
   ctx.moveTo(20, -20);
   // ctx.quadraticCurveTo(0, 50, -20, -20);
   ctx.bezierCurveTo(40, 30, -40, 30, -20, -20);
-  
+
   // ears
   [innerEarX, -innerEarX].forEach((x, i) => {
     ctx.moveTo(x, earY);
@@ -322,16 +325,16 @@ export function drawCatFace() {
   });
   ctx.stroke();
   ctx.fill();
-  
+
   // stripes
   ctx.beginPath();
   ctx.moveTo(0, -20);
-  ctx.lineTo(0,-15);
+  ctx.lineTo(0, -15);
   ctx.moveTo(-3, -20);
-  ctx.lineTo(-3,-17);
+  ctx.lineTo(-3, -17);
   ctx.moveTo(3, -20);
-  ctx.lineTo(3,-17);
-  ctx.stroke()
+  ctx.lineTo(3, -17);
+  ctx.stroke();
 
   // eyes
   const eyeY = -10;

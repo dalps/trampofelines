@@ -1,14 +1,16 @@
 import { drawLives, GAMESTATE } from "../GameState";
-import { MyCanvas, Stage } from "../lib/Stage";
+import { makeGradient } from "../lib/CanvasUtils";
 import { CollisionManager, downwardFilter } from "../lib/Collisions2D";
 import { HSLColor, Palette } from "../lib/Color";
-import { Ripple } from "../lib/Ripple";
-import { Clock, timestamp } from "../lib/TimeUtils";
 import { lerp, Point } from "../lib/MathUtils";
-import { YarnBall } from "./YarnBall";
-import { makeGradient } from "../lib/CanvasUtils";
-import TrampofelineManager from "./Trampofeline";
 import { State } from "../lib/Physics2D";
+import { Ripple } from "../lib/Ripple";
+import { MyCanvas, Stage } from "../lib/Stage";
+import { Clock } from "../lib/TimeUtils";
+import { zzfxP } from "../zzfx";
+import TrampofelineManager from "./Trampofeline";
+import { YarnBall } from "./YarnBall";
+import sfx from "../sfx";
 
 export class Tube {
   public position: Point;
@@ -24,7 +26,10 @@ export class Tube {
     Tube.drawTube(this.size.x, this.size.y);
 
     Clock.every(20, () => {
-      if (GAMESTATE.balls.size < 3) this.spawnYarnBall();
+      if (GAMESTATE.balls.size < 3) {
+        zzfxP(sfx.spawn);
+        this.spawnYarnBall();
+      }
     });
   }
 
@@ -71,6 +76,7 @@ export class Tube {
           filter: downwardFilter,
           cb: () => {
             new Ripple(j.position, 15, 30, 0.3, 0);
+            zzfxP(sfx.bounce);
             TrampofelineManager.killCat(cat);
           },
         })
@@ -84,6 +90,7 @@ export class Tube {
         CollisionManager.unregisterBody(ball);
         ball.state = State.Dead;
         drawLives();
+        zzfxP(sfx.score);
         Stage.setActiveLayer("game");
         GAMESTATE.balls.delete(ball.id);
         new Ripple(ball.position.clone(), 15, 30, 0.3, 0);

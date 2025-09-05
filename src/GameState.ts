@@ -5,6 +5,8 @@ import { YarnBall } from "./entities/YarnBall";
 import { Palette } from "./lib/Color";
 import { Point } from "./lib/MathUtils";
 import { restartBtn, Stage } from "./lib/Stage";
+import sfx from "./sfx";
+import { zzfxP } from "./zzfx";
 
 export const settings = {
   showJoints: false,
@@ -38,6 +40,7 @@ export function gameOver() {
   switch (GAMESTATE.state) {
     case State.Playing:
       drawGameoverUI();
+      zzfxP(sfx.gameover);
       restartBtn.style.display = "block";
       GAMESTATE.state = State.GameOver;
   }
@@ -106,7 +109,7 @@ export function drawLives() {
   ctx.fillText(score, cw * 0.5, 100);
 }
 
-export const FONT = "Roboto,sans-serif";
+export const FONT = "Roboto,tsans-serif";
 
 export function drawGameoverUI() {
   Stage.setActiveLayer("ui");
