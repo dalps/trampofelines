@@ -6,7 +6,7 @@ import { instant } from "./TimeUtils";
 
 const contactForceFactor = 20;
 const debugColor = "yellowgreen";
-const DEBUG = false;
+const DEBUG = true;
 
 function log(msg: string) {
   DEBUG && console.log(msg);
@@ -32,9 +32,7 @@ export class CollisionManager {
     }
 
     if (!b.collisionID) {
-      const id = `${b.name}_${this._id++}`;
-      log(`${b.name} doesn't have an id yet. Creating new one... ${id}`);
-      return (b.collisionID = id);
+      b.collisionID = `${b.name}${this._id++}`;
     }
 
     return b.collisionID;
@@ -43,15 +41,20 @@ export class CollisionManager {
   static register(
     b1: DynamicBody,
     b2: DynamicBody,
-    filter?: (b1: DynamicBody, b2: DynamicBody) => boolean,
-    cb?: Function
+    {
+      filter,
+      cb,
+    }: {
+      filter?: (b1: DynamicBody, b2: DynamicBody) => boolean;
+      cb?: Function;
+    } = {}
   ): void {
     if (!b1.collider || !b2.collider) {
       throw new Error("Cannot register a body without an attached collider.");
     }
 
-    let id1 = this.getID(b1);
-    let id2 = this.getID(b2);
+    const id1 = this.getID(b1);
+    const id2 = this.getID(b2);
 
     if (!id1 || !id2) {
       log(`Couldn't schedule collisions for ${b1.name} or ${b2.name}.`);
@@ -64,13 +67,13 @@ export class CollisionManager {
     this._pairsToWatch.push({ id1, id2, r1, r2, filter, cb });
   }
 
-  static unregisterBody(id: string) {
+  static unregisterBody(b: DynamicBody) {
     const entriesToRemove: number[] = [];
 
-    log(`Searching for entries containing ${id}...`);
+    log(`Searching for entries containing ${b.collisionID}...`);
     this._pairsToWatch.forEach(({ id1, id2 }, idx) => {
-      if (id === id1 || id === id2) {
-        log(`Unregistered pair ${id1}~${id2}.`);
+      if (b.collisionID === id1 || b.collisionID === id2) {
+        log(`Unregistered pair (${id1}, ${id2}).`);
         entriesToRemove.push(idx);
       }
     });
@@ -84,7 +87,7 @@ export class CollisionManager {
       const b2 = r2.deref();
 
       if (!b1 || !b2) {
-        log(`A registered body was dropped.\nb1: ${b1?.name} b2: ${b2?.name}`);
+        // log(`A registered body was dropped.\nb1: ${b1?.name} b2: ${b2?.name}`);
         return;
       }
 

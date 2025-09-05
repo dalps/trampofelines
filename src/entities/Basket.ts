@@ -16,6 +16,7 @@ const basketColor1 = "#c07b3aff";
 export class Basket extends DynamicBody {
   constructor(center: Point) {
     super(center);
+    this.name = "Basket"
     this.collider = new SegmentCollider(center.addX(-75), center.addX(75));
   }
 
@@ -35,9 +36,6 @@ export class Basket extends DynamicBody {
     ctx.rotate(this.orientation);
     ctx.drawImage(Stage.getLayer("basket"), -100, -90);
     ctx.restore();
-    
-    circle(this.position, 5);
-    ctx.stroke();
   }
 
   static drawPattern() {

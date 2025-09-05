@@ -83,7 +83,6 @@ export function popsicle(from: Point, to: Point, color = "black") {
 export function circle(p: Point, r: number) {
   const { ctx } = Stage;
 
-  ctx.beginPath();
   ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
 }
 

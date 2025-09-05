@@ -54,6 +54,7 @@ export class Tube {
       St.settings.ballRadius,
       color
     );
+    ball.name = "YarnBall";
 
     const nRipples = 5;
     for (let i = 0; i < nRipples; i++) {
@@ -64,15 +65,25 @@ export class Tube {
     St.balls.push(ball);
 
     St.trampolines.forEach((l) =>
-      l.joints.forEach((j) => CollisionManager.register(j, ball))
+      l.joints.forEach((j) =>
+        CollisionManager.register(j, ball, {
+          cb: () => {
+            new Ripple(j.position, 15, 30, 0.3, 0);
+          },
+        })
+      )
     );
 
-    CollisionManager.register(GAMESTATE.basket, ball);
+    CollisionManager.register(GAMESTATE.basket, ball, {
+      cb: () => {
+        GAMESTATE.score += 1;
+        CollisionManager.unregisterBody(ball);
+        new Ripple(ball.position.clone(), 15, 30, 0.3, 0);
+      },
+    });
 
     return ball;
   }
-
-  update(dt: timestamp) {}
 
   draw() {
     const { ctx } = Stage;

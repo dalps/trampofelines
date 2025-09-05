@@ -66,12 +66,13 @@ export class Ripple {
   }
 
   update() {
-    this._radius = damp(this._radius, this.finalRadius, this.speed, Clock.dt);
+    const dt = Clock.dt * 0.1;
+    this._radius = damp(this._radius, this.finalRadius, this.speed, dt);
     this._transparency = damp(
       this._transparency,
       this.finalTransparency,
       this.speed,
-      Clock.dt
+      dt
     );
 
     if (

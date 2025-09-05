@@ -123,20 +123,14 @@ export default class Trampofelines {
         );
 
         balls.forEach((b) =>
-          CollisionManager.register(
-            j,
-            b,
-            (b1, b2) => {
+          CollisionManager.register(j, b, {
+            filter: (b1, b2) => {
               // only react if ball is in descending motion AND strictly above the joint
               const isDescending = b2.velocity.y >= 0;
               const aboveJoint = b2.position.y < b1.position.y;
               return isDescending && aboveJoint;
             },
-            () => {
-              console.log("hello?");
-              // cat.kill();
-            }
-          )
+          })
         );
       });
 

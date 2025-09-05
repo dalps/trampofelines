@@ -12,7 +12,7 @@ class Joint extends DynamicBody {
     public attraction = 100,
     public repulsion = 50
   ) {
-    super(position, { name: "joint", mass, friction: damping });
+    super(position, { name: "Joint", mass, friction: damping });
   }
 
   addNeighbor(t: Joint) {
