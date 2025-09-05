@@ -195,7 +195,7 @@ export class Trampofeline extends ElasticLine {
     console.log(`Killing trampoline...`);
     this.joints.forEach((j) => {
       j.state = State.Dead;
-      CollisionManager.unregister(j.collisionID!);
+      CollisionManager.unregisterBody(j.collisionID!);
     });
   }
 

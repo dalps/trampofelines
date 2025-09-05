@@ -1,4 +1,4 @@
-import { GAMESTATE as St } from "../GameState";
+import { GAMESTATE, GAMESTATE as St } from "../GameState";
 import { MyCanvas, Stage } from "../lib/Stage";
 import { CollisionManager } from "../lib/Collisions2D";
 import { HSLColor, Palette } from "../lib/Color";
@@ -66,6 +66,8 @@ export class Tube {
     St.trampolines.forEach((l) =>
       l.joints.forEach((j) => CollisionManager.register(j, ball))
     );
+
+    CollisionManager.register(GAMESTATE.basket, ball);
 
     return ball;
   }

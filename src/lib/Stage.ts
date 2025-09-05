@@ -1,4 +1,8 @@
+import { restart } from "../GameState";
 import { Point } from "./MathUtils";
+
+export const restartBtn = document.getElementById("restart-btn");
+export const playBtn = document.getElementById("play-btn");
 
 export class MyCanvas extends HTMLCanvasElement {
   private _ctx: CanvasRenderingContext2D;
@@ -91,7 +95,8 @@ export class Stage {
   static init(stage: HTMLElement) {
     this.stage = stage;
 
-    console.log("Setting the stage...");
+    restartBtn.addEventListener("click", restart);
+    playBtn.addEventListener("click", restart);
 
     ["background", "game", "ui"].forEach((name, i) => {
       const layer = document.createElement("canvas", {

@@ -45,6 +45,11 @@ export class Point {
     return c.add(this.sub(c).rotate(phi));
   }
 
+  rotateAboutI(c: Point, phi: number) {
+    const rotated = c.add(this.sub(c).rotate(phi));
+    this.set(rotated.x, rotated.y);
+  }
+
   normalize(): Point {
     const l2 = this.abs();
     this.x /= l2;

@@ -17,6 +17,10 @@ export class Clock {
     return this._now - this._then;
   }
 
+  static get time() {
+    return this._now;
+  }
+
   static update(time: timestamp): instant {
     this._then = this._now;
     this._now = time;

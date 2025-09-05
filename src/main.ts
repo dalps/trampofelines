@@ -1,4 +1,5 @@
-import { Basket, BasketballCourt } from "./entities/Basket";
+import { Basket } from "./entities/Basket";
+import { BasketballCourt } from "./entities/BasketballCourt";
 import Trampofelines from "./entities/Trampofeline";
 import { Tube } from "./entities/Tube";
 import {
@@ -54,7 +55,8 @@ function clear() {
 
 function draw(time: timestamp) {
   time *= 0.01;
-  const dt = Clock.update(time);
+  Clock.update(time);
+  const { dt } = Clock;
 
   Stage.setActiveLayer("game");
   const { ctx, cw, ch } = Stage;
@@ -73,7 +75,7 @@ function draw(time: timestamp) {
   // drawTitle(ctx, time);
 
   state.tubes.forEach((tube) => tube.draw());
-  state.basket.update(time);
+  state.basket.update();
 
   settings.play && CollisionManager.update(dt);
 
@@ -93,7 +95,7 @@ function draw(time: timestamp) {
 
   let ballsToRemove: number[] = [];
 
-  state.basket.update(time);
+  settings.showForces && state.basket.drawCollider();
 
   balls.forEach((b, i) => {
     const threadEndPos = b.thread.at(-1).position;

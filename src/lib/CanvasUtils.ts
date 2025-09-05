@@ -17,7 +17,7 @@ export function star(
   }
   ctx.closePath();
 
-  const p = new Path2D()
+  const p = new Path2D();
 }
 
 export function makeGradient(
@@ -83,6 +83,7 @@ export function popsicle(from: Point, to: Point, color = "black") {
 export function circle(p: Point, r: number) {
   const { ctx } = Stage;
 
+  ctx.beginPath();
   ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
 }
 

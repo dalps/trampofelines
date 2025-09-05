@@ -1,9 +1,11 @@
-import { ContactForce, State, type DynamicBody } from "./Physics2D";
+import { circle, popsicle } from "./CanvasUtils";
 import Math2D, { Point } from "./MathUtils";
+import { ContactForce, State, type DynamicBody } from "./Physics2D";
+import { Stage } from "./Stage";
 import { instant } from "./TimeUtils";
 
 const contactForceFactor = 20;
-
+const debugColor = "yellowgreen";
 const DEBUG = false;
 
 function log(msg: string) {
@@ -62,10 +64,10 @@ export class CollisionManager {
     this._pairsToWatch.push({ id1, id2, r1, r2, filter, cb });
   }
 
-  static unregister(id: string) {
+  static unregisterBody(id: string) {
     const entriesToRemove: number[] = [];
 
-    log(`Searching for entries with ${id}...`);
+    log(`Searching for entries containing ${id}...`);
     this._pairsToWatch.forEach(({ id1, id2 }, idx) => {
       if (id === id1 || id === id2) {
         log(`Unregistered pair ${id1}~${id2}.`);
@@ -134,6 +136,7 @@ interface ContactInfo {
 export abstract class Collider {
   public abstract center: Point;
   constructor(public type: ColliderType) {}
+  abstract draw();
   abstract checkContact(c2: Collider): boolean;
 }
 
@@ -149,6 +152,15 @@ export class CircleCollider extends Collider {
       case "Segment":
         return circleSegment(this, that as SegmentCollider);
     }
+  }
+
+  draw() {
+    const { ctx } = Stage;
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = debugColor;
+
+    circle(this.center, this.radius);
+    ctx.stroke();
   }
 }
 
@@ -176,5 +188,10 @@ export class SegmentCollider extends Collider {
       case "Segment":
         return segSeg(this, that as SegmentCollider);
     }
+  }
+
+  draw() {
+    popsicle(this.a, this.b, debugColor);
+    popsicle(this.b, this.a, debugColor);
   }
 }

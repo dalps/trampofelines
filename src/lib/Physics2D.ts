@@ -1,7 +1,6 @@
-import { circle, popsicle } from "./CanvasUtils";
-import type { CircleCollider, Collider } from "./Collisions2D";
+import { popsicle } from "./CanvasUtils";
+import type { Collider } from "./Collisions2D";
 import { damp, Point } from "./MathUtils";
-import { Stage } from "./Stage";
 import { instant } from "./TimeUtils";
 
 /**
@@ -21,7 +20,7 @@ export class Force {
     this._direction = v;
   }
 
-  get magnitude(): number {
+  get magnitude(): numbepr {
     return this._magnitude;
   }
 
@@ -238,19 +237,7 @@ export class DynamicBody {
   }
 
   drawCollider() {
-    const { ctx } = Stage;
-    if (!this.collider) return;
-
-    ctx.lineWidth = 1;
-    ctx.strokeStyle = "yellowgreen";
-
-    ctx.beginPath();
-    circle(
-      (this.collider as CircleCollider).center,
-      (this.collider as CircleCollider).radius
-    );
-    ctx.closePath();
-    ctx.stroke();
+    this.collider?.draw();
   }
 
   toString() {

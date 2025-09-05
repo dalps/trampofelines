@@ -8,7 +8,7 @@ import { restartBtn, Stage } from "./lib/Stage";
 
 export const settings = {
   showJoints: false,
-  showForces: false,
+  showForces: true,
   play: true,
   colliderRadius: 20,
   lineMass: 2,
@@ -40,7 +40,6 @@ export function gameOver() {
     case State.Playing:
       drawGameoverUI();
       restartBtn.style.display = "block";
-      console.log(`${GAMESTATE.state} --> ${State.GameOver}`);
       GAMESTATE.state = State.GameOver;
   }
 }

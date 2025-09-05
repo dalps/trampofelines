@@ -2,7 +2,8 @@ import { Point } from "./lib/MathUtils";
 import { Stage } from "./lib/Stage";
 
 export function toranporin() {
-  const ctx = Stage.setActiveLayer("background").ctx;
+  Stage.setActiveLayer("background");
+  const { ctx } = Stage;
 
   const text = "猫のトランポリン";
   const textSize = 48;
@@ -19,7 +20,8 @@ export function toranporin() {
 }
 
 export function drawTitle() {
-  const ctx = Stage.setActiveLayer("background").ctx;
+  Stage.setActiveLayer("background");
+  const { ctx } = Stage;
 
   const path = new Path2D();
   const textPath = new Path2D(
