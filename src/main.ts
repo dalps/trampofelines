@@ -16,7 +16,7 @@ import { RippleManager } from "./lib/Ripple";
 import { Stage } from "./lib/Stage";
 import { Clock, type timestamp } from "./lib/TimeUtils";
 
-const { balls, trampolines } = state;
+const { balls } = state;
 
 function init() {
   Stage.init(document.getElementById("stage"));
@@ -100,7 +100,8 @@ function draw(time: timestamp) {
   balls.forEach((b, i) => {
     const threadEndPos = b.thread.at(-1).position;
     if (threadEndPos.x < 0 || threadEndPos.x > cw || threadEndPos.y > ch) {
-      ballsToRemove.push(i);
+      CollisionManager.unregisterBody(b);
+      state.balls.delete(b.id);
       state.lives = Math.max(0, state.lives - 1);
 
       state.state === State.Playing && drawLives();
@@ -115,11 +116,6 @@ function draw(time: timestamp) {
     b.draw();
     settings.showForces && b.drawForces();
     settings.showForces && b.drawCollider();
-  });
-
-  ballsToRemove.forEach((idx) => {
-    CollisionManager.unregisterBody(balls[idx]);
-    balls.splice(idx, 1);
   });
 
   RippleManager.updateAndDraw();

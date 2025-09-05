@@ -15,8 +15,8 @@ function log(msg: string) {
 interface CollisionPair {
   id1: string;
   id2: string;
-  r1: WeakRef<DynamicBody>;
-  r2: WeakRef<DynamicBody>;
+  ref1: WeakRef<DynamicBody>;
+  ref2: WeakRef<DynamicBody>;
   filter?: (b1: DynamicBody, b2: DynamicBody) => boolean;
   cb?: Function;
 }
@@ -47,10 +47,14 @@ export class CollisionManager {
 
     if (!id1 || !id2) return;
 
-    const r1 = new WeakRef(b1);
-    const r2 = new WeakRef(b2);
-
-    this._pairsToWatch.push({ id1, id2, r1, r2, filter, cb });
+    this._pairsToWatch.push({
+      id1,
+      id2,
+      ref1: new WeakRef(b1),
+      ref2: new WeakRef(b2),
+      filter,
+      cb,
+    });
   }
 
   static unregisterBody(b: DynamicBody) {
@@ -74,7 +78,7 @@ export class CollisionManager {
   }
 
   static update() {
-    this._pairsToWatch.forEach(({ r1, r2, filter, cb }) => {
+    this._pairsToWatch.forEach(({ ref1: r1, ref2: r2, filter, cb }) => {
       const b1 = r1.deref();
       const b2 = r2.deref();
       const c1 = b1.collider;

@@ -1,4 +1,4 @@
-import { GAMESTATE, GAMESTATE as St } from "../GameState";
+import { drawLives, GAMESTATE } from "../GameState";
 import { MyCanvas, Stage } from "../lib/Stage";
 import { CollisionManager, downwardFilter } from "../lib/Collisions2D";
 import { HSLColor, Palette } from "../lib/Color";
@@ -8,6 +8,7 @@ import { lerp, Point } from "../lib/MathUtils";
 import { YarnBall } from "./YarnBall";
 import { makeGradient } from "../lib/CanvasUtils";
 import TrampofelineManager from "./Trampofeline";
+import { State } from "../lib/Physics2D";
 
 export class Tube {
   public position: Point;
@@ -23,14 +24,13 @@ export class Tube {
     Tube.drawTube(this.size.x, this.size.y);
 
     Clock.every(20, () => {
-      if (St.balls.length < 25) this.spawnYarnBall();
+      if (GAMESTATE.balls.size < 3) this.spawnYarnBall();
     });
   }
 
   spawnYarnBall() {
     let {
-      position: { x, y },
-      size: { x: sx, y: sy },
+      size: { x: sx },
     } = this;
 
     const headLength = Math.max(sx * 0.1, 20);
@@ -50,9 +50,9 @@ export class Tube {
 
     const ball = new YarnBall(
       startPos,
-      St.settings.ballVelocity,
-      St.settings.ballMass,
-      St.settings.ballRadius,
+      GAMESTATE.settings.ballVelocity,
+      GAMESTATE.settings.ballMass,
+      GAMESTATE.settings.ballRadius,
       color
     );
     ball.name = "YarnBall";
@@ -63,7 +63,7 @@ export class Tube {
       new Ripple(Point.random(p1, p2), startRadius, startRadius + 10);
     }
 
-    St.balls.push(ball);
+    GAMESTATE.balls.set(ball.id, ball);
 
     TrampofelineManager.trampolines.forEach((cat) =>
       cat.joints.forEach((j) =>
@@ -82,6 +82,10 @@ export class Tube {
       cb: () => {
         GAMESTATE.score += 1;
         CollisionManager.unregisterBody(ball);
+        ball.state = State.Dead;
+        drawLives();
+        Stage.setActiveLayer("game");
+        GAMESTATE.balls.delete(ball.id);
         new Ripple(ball.position.clone(), 15, 30, 0.3, 0);
       },
     });
@@ -105,8 +109,6 @@ export class Tube {
     const head = new Path2D();
     const lid = new Path2D();
     const hole = new Path2D();
-
-    const tubeEllispe = (start, size, roundness = 20) => {};
 
     const cpx = 20;
     const overhang = 10;

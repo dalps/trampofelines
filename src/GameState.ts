@@ -20,7 +20,7 @@ export const settings = {
 
 export interface GameState {
   state: State;
-  balls: YarnBall[];
+  balls: Map<string, YarnBall>;
   tubes: Tube[];
   basket?: Basket;
   lives: number;
@@ -48,7 +48,7 @@ export function restart() {
     case State.Title:
     case State.GameOver:
       GAMESTATE.lives = TOTAL_LIVES;
-      GAMESTATE.balls.splice(0);
+      GAMESTATE.balls.clear();
       TrampofelineManager.entities.clear();
       restartBtn.style.display = "none";
       drawLives();
@@ -59,8 +59,7 @@ export function restart() {
 const TOTAL_LIVES = 3;
 export const GAMESTATE: GameState = {
   state: State.Playing,
-  balls: [],
-  trampolines: [],
+  balls: new Map(),
   tubes: [],
   lives: TOTAL_LIVES,
   score: 0,
@@ -98,7 +97,16 @@ export function drawLives() {
 
     pos.incrX(sectionSize);
   }
+
+  // Print the score
+  const score = `Rescued: ${GAMESTATE.score}`;
+  ctx.font = `24px ${FONT}`;
+  ctx.fillStyle = "black";
+  ctx.textAlign = "center";
+  ctx.fillText(score, cw * 0.5, 100);
 }
+
+export const FONT = "Roboto,sans-serif";
 
 export function drawGameoverUI() {
   Stage.setActiveLayer("ui");
@@ -117,7 +125,7 @@ export function drawGameoverUI() {
   ctx.lineWidth = 3;
   ctx.strokeStyle = "#5a7bffff";
   ctx.textAlign = "center";
-  ctx.font = "48px sans-serif";
+  ctx.font = `48px ${FONT}`;
 
   ctx.save();
   ctx.translate(cw * 0.5 - 250, ch * 0.5 - 100);
@@ -126,10 +134,10 @@ export function drawGameoverUI() {
   ctx.fill(gameOver);
   ctx.restore();
 
-  ctx.font = "28px sans-serif";
+  ctx.font = `28px ${FONT}`;
   ctx.fillText(gameOver2, cw * 0.5, ch * 0.5 + 48);
 
   ctx.fillStyle = "#fff";
-  ctx.font = "36px sans-serif";
+  ctx.font = `36px ${FONT}`;
   ctx.fillText(score, cw * 0.5, ch * 0.5 + 100);
 }

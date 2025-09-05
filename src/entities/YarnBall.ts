@@ -7,6 +7,7 @@ import { Stage } from "../lib/Stage";
 import { Clock } from "../lib/TimeUtils";
 
 export class YarnBall extends DynamicBody {
+  public id: string;
   public thread: DynamicBody[];
   public threadLength: number = 100;
   public radius: number = 10;
@@ -20,6 +21,8 @@ export class YarnBall extends DynamicBody {
     color: Color
   ) {
     super(startPos, { friction: 0.1, angularVelocity: 0.5 });
+
+    this.id = crypto.randomUUID();
 
     this.mass = mass;
     this.color = color;
