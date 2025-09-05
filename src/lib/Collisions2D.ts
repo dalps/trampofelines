@@ -4,7 +4,6 @@ import { ContactForce, State, type DynamicBody } from "./Physics2D";
 import { Stage } from "./Stage";
 import { instant } from "./TimeUtils";
 
-const contactForceFactor = 300;
 const debugColor = "yellowgreen";
 const DEBUG = false;
 
@@ -12,13 +11,18 @@ function log(msg: string) {
   DEBUG && console.log(msg);
 }
 
-interface CollisionPair {
+interface CollisionOptions {
+  sensor?: boolean;
+  contactForceFactor?: number;
+  filter?: (b1: DynamicBody, b2: DynamicBody) => boolean;
+  cb?: Function;
+}
+
+interface CollisionPair extends CollisionOptions {
   id1: string;
   id2: string;
   ref1: WeakRef<DynamicBody>;
   ref2: WeakRef<DynamicBody>;
-  filter?: (b1: DynamicBody, b2: DynamicBody) => boolean;
-  cb?: Function;
 }
 
 export class CollisionManager {
@@ -34,13 +38,7 @@ export class CollisionManager {
   static register(
     b1: DynamicBody,
     b2: DynamicBody,
-    {
-      filter,
-      cb,
-    }: {
-      filter?: (b1: DynamicBody, b2: DynamicBody) => boolean;
-      cb?: Function;
-    } = {}
+    options: CollisionOptions = {}
   ): void {
     const id1 = this.getId(b1);
     const id2 = this.getId(b2);
@@ -52,8 +50,7 @@ export class CollisionManager {
       id2,
       ref1: new WeakRef(b1),
       ref2: new WeakRef(b2),
-      filter,
-      cb,
+      ...options,
     });
   }
 
@@ -78,35 +75,48 @@ export class CollisionManager {
   }
 
   static update() {
-    this._pairsToWatch.forEach(({ ref1: r1, ref2: r2, filter, cb }) => {
-      const b1 = r1.deref();
-      const b2 = r2.deref();
-      const c1 = b1.collider;
-      const c2 = b2.collider;
+    this._pairsToWatch.forEach(
+      ({
+        ref1: r1,
+        ref2: r2,
+        filter,
+        cb,
+        sensor = false,
+        contactForceFactor = 300,
+      }) => {
+        const b1 = r1.deref();
+        const b2 = r2.deref();
+        const c1 = b1.collider;
+        const c2 = b2.collider;
 
-      if (
-        !b1 ||
-        !b2 ||
-        !c1 ||
-        !c2 ||
-        b1.state !== State.Alive ||
-        b2.state !== State.Alive ||
-        (filter && !filter(b1, b2)) ||
-        !c1.checkContact(c2)
-      )
-        return;
+        if (
+          !b1 ||
+          !b2 ||
+          !c1 ||
+          !c2 ||
+          b1.state !== State.Alive ||
+          b2.state !== State.Alive ||
+          (filter && !filter(b1, b2)) ||
+          !c1.checkContact(c2)
+        )
+          return;
 
-      b1.addForce(this.collide(b1, b2));
-      b2.addForce(this.collide(b2, b1));
-      cb && cb();
-    });
+        !sensor && b1.addForce(this.collide(b1, b2, contactForceFactor));
+        !sensor && b2.addForce(this.collide(b2, b1, contactForceFactor));
+        cb && cb();
+      }
+    );
   }
 
-  static collide(body: DynamicBody, against: DynamicBody): ContactForce {
+  static collide(
+    body: DynamicBody,
+    against: DynamicBody,
+    factor = 1
+  ): ContactForce {
     const massFactor = (2 * against.mass) / (body.mass + against.mass);
     const sep = body.collider.center.sub(against.collider.center);
 
-    return new ContactForce(sep.normalize(), massFactor * contactForceFactor);
+    return new ContactForce(sep.normalize(), massFactor * factor);
   }
 }
 

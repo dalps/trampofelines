@@ -84,6 +84,7 @@ export class Tube {
     );
 
     CollisionManager.register(GAMESTATE.basket, ball, {
+      sensor: true,
       filter: downwardFilter,
       cb: () => {
         if (GAMESTATE.state !== GameState.Playing) return;
