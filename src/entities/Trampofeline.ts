@@ -43,7 +43,8 @@ export default class TrampofelineManager {
   }
 
   static init() {
-    const { balls, settings } = GAMESTATE;
+    Stage.setActiveLayer("game");
+
     const ui = Stage.getLayer("ui");
 
     ui.addEventListener("mousedown", handleMouseDown, false);
@@ -278,6 +279,7 @@ export class Trampofeline extends ElasticLine {
 }
 
 export function drawCatFace() {
+  console.log("drawing cat...");
   const { ctx } = Stage;
 
   // arms & paws

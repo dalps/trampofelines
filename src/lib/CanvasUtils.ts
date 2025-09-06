@@ -3,22 +3,30 @@ import { Stage } from "./Stage";
 
 export function star(
   pos: Point,
-  { innerRadius = 5, outerRadius = 10, points = 5, angle = 0 } = {}
+  {
+    innerRadius = 5,
+    outerRadius = 10,
+    points = 5,
+    angle = 0,
+    cb = undefined,
+  } = {}
 ) {
   const { ctx } = Stage;
   const dphi = (Math.PI * 2) / (points * 2);
 
-  ctx.beginPath();
+  if (!cb) {
+    !cb && ctx.beginPath();
+    cb = (p: Point) => Stage.ctx.lineTo(p.x, p.y);
+  }
+
   for (let i = 0, phi = 0; i < points * 2; i++, phi += dphi) {
     let p = new Point(Math.cos(phi), Math.sin(phi)).multiplyScalar(
       i % 2 === 0 ? outerRadius : innerRadius
     );
     p = p.rotate(angle);
     p = p.add(pos);
-    ctx.lineTo(p.x, p.y);
+    cb(p, i);
   }
-
-  const p = new Path2D();
 }
 
 export function makeGradient(

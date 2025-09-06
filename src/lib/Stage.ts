@@ -1,4 +1,5 @@
 import { BasketballCourt } from "../entities/BasketballCourt";
+import { drawCatFace, drawCatRear } from "../entities/Trampofeline";
 import { drawGameoverUI, GAMESTATE, restart, State, title } from "../GameState";
 import { drawTitle } from "../type";
 import { Point } from "./MathUtils";
@@ -118,6 +119,16 @@ export class Stage {
 
     this.setActiveLayer("game");
 
+    Stage.newOffscreenLayer("catFace", 50, 100);
+    Stage.setActiveLayer("catFace");
+    Stage.ctx.translate(25, 50);
+    drawCatFace();
+    
+    Stage.newOffscreenLayer("catRear", 50, 100);
+    Stage.setActiveLayer("catRear");
+    Stage.ctx.translate(25, 50);
+    drawCatRear();
+
     this.fitLayersToStage(liveLayers);
 
     window.addEventListener("resize", () =>
@@ -159,5 +170,6 @@ export class Stage {
     const canvas = Stage.getLayer(name);
     Stage.stage.appendChild(canvas);
     canvas.style.border = "1px solid blue";
+    canvas.style.zIndex = "9999";
   }
 }

@@ -16,6 +16,7 @@ import { RippleManager } from "./lib/Ripple";
 import { Stage } from "./lib/Stage";
 import { Clock, type timestamp } from "./lib/TimeUtils";
 import sfx from "./sfx";
+import { drawTitle } from "./type";
 import { zzfxP } from "./zzfx";
 
 const { balls } = state;
@@ -24,9 +25,10 @@ function init() {
   Stage.init(document.getElementById("stage"));
   const { ctx, cw, ch } = Stage;
 
+  TrampofelineManager.init();
+
   title();
 
-  TrampofelineManager.init();
   state.basket = new Basket(new Point(cw * 0.5, ch * 0.5));
   state.tubes.push(new Tube(new Point(0, 100)));
   state.tubes.push(new Tube(new Point(0, 500)));
@@ -50,9 +52,7 @@ function draw(time: timestamp) {
   switch (GAMESTATE.state) {
     case State.Title:
       Stage.setActiveLayer("background");
-      // clear();
-      // toranporin();
-      // drawTitle();
+      drawTitle();
       break;
     case State.GameOver:
     case State.Playing:
