@@ -2,18 +2,13 @@ default:
     parallel -j 2 just ::: serve watch
 
 serve:
-    cp index.html dist
     live-server dist
 
-serve-esbuild:
-    cp index.html dist
-    esbuild --minify --bundle src/main.ts --outdir=dist --watch --serve --servedir=dist
-
 watch:
-    esbuild --bundle src/main.ts --outdir=dist --format=esm --watch=forever --sourcemap
+    esbuild --bundle --loader:.html=copy --outdir=dist --format=esm --watch=forever --sourcemap src/main.ts index.html
 
 build:
-    esbuild --minify --bundle src/main.ts --outdir=dist --format=esm
+    esbuild --minify --bundle --loader:.html=copy --outdir=dist --format=esm src/main.ts index.html
 
 zip: build
     advzip pack.zip -a dist/index.html dist/main.js
