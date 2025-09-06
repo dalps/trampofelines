@@ -136,7 +136,12 @@ export function drawLives() {
 
   // const colors = ["fuchsia", "chartreuse", "coral"]
   for (let i = 0; i < GAMESTATE.lives; i++) {
-    YarnBall.drawYarnball(pos, radius, Palette.colors.fuchsia);
+    YarnBall.drawYarnball(pos, {
+      radius,
+      color: Palette.colors.fuchsia,
+      lineWidth: 2,
+      decoration: true,
+    });
 
     pos.incrX(sectionSize);
   }

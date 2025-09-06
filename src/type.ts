@@ -86,20 +86,12 @@ export function drawTitle() {
   ctx.fill();
 
   const c = new Point(cw * 0.5, ch * 0.4);
-  YarnBall.drawYarnball(c, 120, blue0);
-  ctx.fill();
-
-  ctx.strokeStyle = blue0;
-  ctx.lineCap = "butt";
-  ctx.lineWidth = 15;
-  ctx.beginPath();
-  const p = new Path2D(`m 0,0
-c -20,20 -50,-30 -90,5 -44,30 -70,5 -70,5`);
-  const p1 = c.addY(110);
-  ctx.save();
-  ctx.translate(p1.x, p1.y);
-  ctx.stroke(p);
-  ctx.restore();
+  YarnBall.drawYarnball(c, {
+    radius: 150,
+    color: blue0.clone(),
+    lineWidth: 15,
+    rotation: time * 2,
+  });
 
   const path = new Path2D();
   const trampo = new Path2D(

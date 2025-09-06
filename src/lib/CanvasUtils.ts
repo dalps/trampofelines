@@ -1,4 +1,4 @@
-import { lerp, Point } from "./MathUtils";
+import { DEG2RAD, lerp, Point } from "./MathUtils";
 import { Stage } from "./Stage";
 
 export function star(
@@ -116,5 +116,39 @@ export function grid(
     ctx.moveTo(0, y);
     ctx.lineTo(canvas.width, y);
     ctx.stroke();
+  }
+}
+
+export function drawSector(
+  position: Point,
+  radius: number,
+  {
+    subs = 10,
+    n = 90 / subs,
+    slices = 3,
+    theta = 360 / slices,
+    col1 = "white",
+    col2 = "black",
+  } = {}
+) {
+  const { ctx } = Stage;
+  for (let i = 0; i < n; i++) {
+    const dStart = theta + subs * i;
+    const dEnd = theta + 180 - subs * i;
+
+    ctx.beginPath();
+    ctx.arc(
+      position.x,
+      position.y,
+      radius,
+      dStart * DEG2RAD,
+      dEnd * DEG2RAD,
+      false
+    );
+    ctx.closePath();
+    ctx.closePath();
+
+    ctx.fillStyle = i % 2 === 0 ? col1 : col2;
+    ctx.fill();
   }
 }
