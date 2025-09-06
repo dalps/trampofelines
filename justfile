@@ -10,8 +10,8 @@ watch:
 build:
     esbuild --minify --bundle --loader:.html=copy --outdir=dist --format=esm index.html src/main.ts
 
-zip: build
-    advzip pack.zip -a dist/index.html dist/main.js
+zip: clean build
+    advzip pack.zip -a dist/*
     stat pack.zip
 
 clean:
