@@ -112,7 +112,7 @@ export class YarnBall extends DynamicBody {
     const bg = new Path2D();
     const mat = new DOMMatrix()
       .translate(position.x, position.y)
-      .rotate(rotation, rotation, rotation)
+      .rotate(0, 0, rotation)
       .scale(radius / originalRadius, radius / originalRadius);
 
     arc.arc(0, 0, 47.5, 0, Math.PI * 2);

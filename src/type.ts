@@ -1,7 +1,7 @@
 import { YarnBall } from "./entities/YarnBall";
 import { circle, star } from "./lib/CanvasUtils";
 import { Color, HSLColor, Palette } from "./lib/Color";
-import Math2D, { DEG2RAD, Point } from "./lib/MathUtils";
+import Math2D, { DEG2RAD, distribute, Point } from "./lib/MathUtils";
 import { Stage } from "./lib/Stage";
 import { Clock, timestamp } from "./lib/TimeUtils";
 
@@ -27,12 +27,7 @@ export function drawTitle() {
   Stage.setActiveLayer("ui");
   const { ctx, cw, ch } = Stage;
   const { time } = Clock;
-
-  const white = "#fff";
-  const blue0 = new HSLColor(210, 100, 35); // "hsla(210, 100%, 35%, 1.00)";
-  const blue1 = "#0066cc";
-  const blue2 = "#0080ff";
-  const blue3 = "#4da6ff";
+  const { white, blue0, blue1, blue2, blue3 } = Palette.colors;
 
   ctx.fillStyle = blue1;
   ctx.fillRect(0, 0, cw, ch);
@@ -51,27 +46,45 @@ export function drawTitle() {
   ctx.lineTo(cw, ch);
   ctx.fill();
 
-  ctx.save();
-  ctx.rotate(Math.atan2(-h, w));
-  ctx.drawImage(
-    Stage.getLayer("catFace"),
-    -100 + ((time * 10) % (Math.hypot(w, h) + 50)),
-    h * 0.5
-  );
-  ctx.restore();
+  let c1 = new Point(0, ch);
+  let c2 = new Point(cw, 0);
 
-  const c1 = new Point(cw * 0.5 - 150, ch * 0.35);
-  const c2 = new Point(cw * 0.5 + 150, ch * 0.45);
+  ctx.fillStyle = blue0;
+  ctx.strokeStyle = blue0;
+
+  [c1, c2].forEach((c, i) =>
+    star(c, {
+      outerRadius: 200,
+      innerRadius: 400,
+      angle: 0.01 * time,
+      cb: (p, j) => {
+        const even = j % 2 === 0;
+        star(p, {
+          points: even ? 5 : 4,
+          innerRadius: even ? 20 : 10,
+          outerRadius: even ? 40 : 20,
+          angle: (even ? 1 : -1) * 0.05 * time,
+        });
+        ctx.closePath();
+        even && ctx.fill();
+        !even && ctx.stroke();
+      },
+    })
+  );
+
+  c1 = new Point(cw * 0.5 - 150, ch * 0.35);
+  c2 = new Point(cw * 0.5 + 150, ch * 0.45);
 
   ctx.fillStyle = blue3;
   ctx.strokeStyle = white;
+
   [c1, c2].forEach((c, i) =>
     star(c, {
       outerRadius: 100,
       innerRadius: 100,
-      angle: 0.05 * time,
+      angle: (i % 2 === 0 ? -1 : 1) * 0.05 * time,
       cb: (p, j) => {
-        star(p, { angle: 0.3 * time });
+        star(p, { angle: (i % 2 === 0 ? -1 : 1) * 0.3 * time });
         ctx.closePath();
         j % 2 === 0 && ctx.fill();
         j % 2 === 1 && ctx.stroke();
@@ -79,7 +92,7 @@ export function drawTitle() {
     })
   );
 
-  ctx.fillStyle = blue0.toString();
+  ctx.fillStyle = blue0;
   circle(c1, 80);
   ctx.fill();
   circle(c2, 80);
@@ -123,4 +136,31 @@ export function drawTitle() {
 
   ctx.fill(path);
   ctx.stroke(path);
+
+  const catSize = 50;
+  const subs = Math.ceil(Math.hypot(w, h) / catSize) + 5;
+  const l = catSize * subs;
+  const min = -l;
+  const max = l;
+  const angle = Math.atan2(-h, w);
+  ctx.save();
+  ctx.scale(1.2, 1.2);
+  ctx.rotate(angle);
+  distribute(min, max, subs, (n) => {
+    const x = min + ((n + time * 3) % (max - min));
+    const y = h * 0.4;
+    ctx.drawImage(Stage.getLayer("catFace"), x + 25, y);
+  });
+  ctx.restore();
+
+  ctx.save();
+  ctx.translate(cw, ch);
+  ctx.scale(1.2, 1.2);
+  ctx.rotate(Math.PI + angle);
+  distribute(min, max, subs, (n) => {
+    const x = min + ((n + time * 3) % (max - min));
+    const y = h * 0.4;
+    ctx.drawImage(Stage.getLayer("catFace"), x + 25, y);
+  });
+  ctx.restore();
 }

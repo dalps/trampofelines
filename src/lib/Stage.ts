@@ -2,6 +2,7 @@ import { BasketballCourt } from "../entities/BasketballCourt";
 import { drawCatFace, drawCatRear } from "../entities/Trampofeline";
 import { drawGameoverUI, GAMESTATE, restart, State, title } from "../GameState";
 import { drawTitle } from "../type";
+import { Palette } from "./Color";
 import { Point } from "./MathUtils";
 
 export const restartBtn = document.getElementById("restart-btn");
@@ -119,11 +120,19 @@ export class Stage {
 
     this.setActiveLayer("game");
 
+    const { white, blue0, blue1, blue2, blue3 } = Palette.colors;
     Stage.newOffscreenLayer("catFace", 50, 100);
     Stage.setActiveLayer("catFace");
     Stage.ctx.translate(25, 50);
-    drawCatFace();
-    
+    drawCatFace({
+      coatColor: blue1,
+      detailColor: blue0,
+      white: blue3,
+      black: blue0,
+      pink: blue3,
+      drawPaws: false,
+    });
+
     Stage.newOffscreenLayer("catRear", 50, 100);
     Stage.setActiveLayer("catRear");
     Stage.ctx.translate(25, 50);

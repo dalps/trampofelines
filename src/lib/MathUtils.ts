@@ -5,6 +5,18 @@ export function lerp(min: number, max: number, t: number) {
   return min * (1 - t) + max * t;
 }
 
+export function distribute(
+  min: number,
+  max: number,
+  subs: number,
+  cb: (n: number, i: number) => void
+) {
+  for (let i = 0; i < subs; i++) {
+    const n = lerp(min, max, i / subs);
+    cb(n, i);
+  }
+}
+
 export function damp(
   current: number,
   target: number,

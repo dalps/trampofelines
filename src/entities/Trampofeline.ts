@@ -278,33 +278,42 @@ export class Trampofeline extends ElasticLine {
   }
 }
 
-export function drawCatFace() {
-  console.log("drawing cat...");
+export function drawCatFace({
+  coatColor = Palette.colors.nightBlue,
+  detailColor = Palette.colors.blueGray,
+  pink = Palette.colors.pink,
+  white = Palette.colors.white,
+  black = Palette.colors.black,
+  drawPaws = true,
+} = {}) {
   const { ctx } = Stage;
 
-  // arms & paws
-  ctx.strokeStyle = coatColor.toString();
-  ctx.lineWidth = 10;
-  const pawDistance = 10;
-  [pawDistance, -pawDistance].forEach((x) => {
-    ctx.beginPath();
-    ctx.moveTo(x, 0);
-    ctx.lineTo(x, 40);
-    ctx.stroke();
+  if (drawPaws) {
+    // arms & paws
+    ctx.strokeStyle = coatColor;
+    ctx.lineCap = "round";
+    ctx.lineWidth = 10;
+    const pawDistance = 10;
+    [pawDistance, -pawDistance].forEach((x) => {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, 40);
+      ctx.stroke();
 
-    ctx.save();
-    ctx.strokeStyle = detailColor.toString();
-    ctx.lineWidth = 2;
-    ctx.translate(x, 40);
+      ctx.save();
+      ctx.strokeStyle = detailColor;
+      ctx.lineWidth = 2;
+      ctx.translate(x, 40);
 
-    ctx.beginPath();
-    ctx.moveTo(2, 4);
-    ctx.lineTo(2, 0);
-    ctx.moveTo(-2, 4);
-    ctx.lineTo(-2, 0);
-    ctx.stroke();
-    ctx.restore();
-  });
+      ctx.beginPath();
+      ctx.moveTo(2, 4);
+      ctx.lineTo(2, 0);
+      ctx.moveTo(-2, 4);
+      ctx.lineTo(-2, 0);
+      ctx.stroke();
+      ctx.restore();
+    });
+  }
 
   // face
   const innerEarX = 10;
@@ -312,8 +321,8 @@ export function drawCatFace() {
   const earHeight = 10;
 
   ctx.lineWidth = 2;
-  ctx.fillStyle = coatColor.toString();
-  ctx.strokeStyle = detailColor.toString();
+  ctx.fillStyle = coatColor;
+  ctx.strokeStyle = detailColor;
   ctx.beginPath();
   ctx.moveTo(20, -20);
   // ctx.quadraticCurveTo(0, 50, -20, -20);
@@ -343,20 +352,20 @@ export function drawCatFace() {
   const outerEye = 5;
   const innerEye = 2;
 
-  ctx.fillStyle = `${white}`;
+  ctx.fillStyle = white;
   circle(new Point(10, eyeY), outerEye);
   ctx.fill();
   circle(new Point(-10, eyeY), outerEye);
   ctx.fill();
 
-  ctx.fillStyle = `${black}`;
+  ctx.fillStyle = black;
   circle(new Point(10, eyeY), innerEye);
   ctx.fill();
   circle(new Point(-10, eyeY), innerEye);
   ctx.fill();
 
   // whiskers
-  ctx.strokeStyle = `${white}`;
+  ctx.strokeStyle = white;
   ctx.lineWidth = 2;
   ctx.beginPath();
   const start = 5;
@@ -373,8 +382,8 @@ export function drawCatFace() {
   ctx.stroke();
 
   // snout
-  ctx.fillStyle = `${pink}`;
-  ctx.strokeStyle = `${black}`;
+  ctx.fillStyle = pink;
+  ctx.strokeStyle = black;
   ctx.beginPath();
   circle(new Point(0, 0), 4);
   ctx.closePath();
@@ -382,7 +391,7 @@ export function drawCatFace() {
   ctx.stroke();
 
   // mouth
-  ctx.strokeStyle = detailColor.toString();
+  ctx.strokeStyle = detailColor;
   ctx.beginPath();
   const mouthY = 5;
   const mouthAngle = 5;
