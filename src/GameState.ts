@@ -1,11 +1,20 @@
 import { Basket } from "./entities/Basket";
+import { BasketballCourt } from "./entities/BasketballCourt";
 import TrampofelineManager, { Trampofeline } from "./entities/Trampofeline";
 import type { Tube } from "./entities/Tube";
 import { YarnBall } from "./entities/YarnBall";
 import { Palette } from "./lib/Color";
 import { Point } from "./lib/MathUtils";
-import { restartBtn, Stage } from "./lib/Stage";
+import {
+  gameoverElements,
+  playBtn,
+  playInfiniteBtn,
+  restartBtn,
+  Stage,
+  titleElements,
+} from "./lib/Stage";
 import sfx from "./sfx";
+import { drawTitle } from "./type";
 import { zzfxP } from "./zzfx";
 
 export const settings = {
@@ -18,6 +27,7 @@ export const settings = {
   ballRadius: 20,
   ballVelocity: new Point(50, -10),
   gravity: true,
+  volume: true,
 };
 
 export interface GameState {
@@ -41,7 +51,9 @@ export function gameOver() {
     case State.Playing:
       drawGameoverUI();
       zzfxP(sfx.gameover);
-      restartBtn.style.display = "block";
+      gameoverElements.style.display = "block";
+      titleElements.style.display = "none";
+
       GAMESTATE.state = State.GameOver;
   }
 }
@@ -53,15 +65,43 @@ export function restart() {
       GAMESTATE.lives = TOTAL_LIVES;
       GAMESTATE.balls.clear();
       TrampofelineManager.entities.clear();
-      restartBtn.style.display = "none";
+      gameoverElements.style.display = "none";
+      titleElements.style.display = "none";
+
+      BasketballCourt.draw();
       drawLives();
+
       GAMESTATE.state = State.Playing;
+  }
+}
+
+export function title() {
+  switch (GAMESTATE.state) {
+    case State.GameOver:
+    case State.Title:
+      GAMESTATE.lives = TOTAL_LIVES;
+      GAMESTATE.balls.clear();
+      TrampofelineManager.entities.clear();
+      gameoverElements.style.display = "none";
+      titleElements.style.display = "block";
+
+      drawTitle();
+
+      GAMESTATE.state = State.Title;
+    // No transition
+  }
+}
+
+export function quit() {
+  switch (GAMESTATE.state) {
+    case State.GameOver:
+      title();
   }
 }
 
 const TOTAL_LIVES = 3;
 export const GAMESTATE: GameState = {
-  state: State.Playing,
+  state: State.Title,
   balls: new Map(),
   tubes: [],
   lives: TOTAL_LIVES,

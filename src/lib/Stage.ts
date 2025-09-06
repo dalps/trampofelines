@@ -1,9 +1,14 @@
 import { BasketballCourt } from "../entities/BasketballCourt";
-import { restart } from "../GameState";
+import { drawGameoverUI, GAMESTATE, restart, State, title } from "../GameState";
+import { drawTitle } from "../type";
 import { Point } from "./MathUtils";
 
 export const restartBtn = document.getElementById("restart-btn");
 export const playBtn = document.getElementById("play-btn");
+export const quitBtn = document.getElementById("quit-btn");
+export const playInfiniteBtn = document.getElementById("play-infinite-btn");
+export const titleElements = document.getElementById("title");
+export const gameoverElements = document.getElementById("gameover");
 
 export class MyCanvas extends HTMLCanvasElement {
   private _ctx: CanvasRenderingContext2D;
@@ -97,7 +102,8 @@ export class Stage {
     this.stage = stage;
 
     restartBtn.addEventListener("click", restart);
-    playBtn.addEventListener("click", restart);
+    playInfiniteBtn.addEventListener("click", restart);
+    quitBtn.addEventListener("click", title);
 
     const liveLayers = ["background", "game", "ui"];
     liveLayers.forEach((name, i) => {
@@ -114,10 +120,9 @@ export class Stage {
 
     this.fitLayersToStage(liveLayers);
 
-    window.addEventListener("resize", () => {
-      this.fitLayersToStage(["game", "ui", "background"]);
-      BasketballCourt.draw();
-    });
+    window.addEventListener("resize", () =>
+      this.fitLayersToStage(["game", "ui", "background"])
+    );
   }
 
   static newOffscreenLayer(name: string, width: number, height: number) {
@@ -134,6 +139,20 @@ export class Stage {
         this.stage.clientHeight
       );
     });
+
+    // Redraw backgrounds
+    switch (GAMESTATE.state) {
+      case State.Title:
+        drawTitle();
+        break;
+      case State.Playing:
+        BasketballCourt.draw();
+        break;
+      case State.GameOver:
+        BasketballCourt.draw();
+        drawGameoverUI();
+        break;
+    }
   }
 
   static debugOffscreenLayer(name: string) {
