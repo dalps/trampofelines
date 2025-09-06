@@ -5,13 +5,17 @@ serve:
     live-server dist
 
 watch:
-    esbuild --bundle --loader:.html=copy --outdir=dist --format=esm --watch=forever --sourcemap src/main.ts index.html
+    esbuild --bundle --loader:.html=copy --outdir=dist --format=esm --watch=forever --sourcemap index.html src/main.ts
 
 build:
-    esbuild --minify --bundle --loader:.html=copy --outdir=dist --format=esm src/main.ts index.html
+    esbuild --minify --bundle --loader:.html=copy --outdir=dist --format=esm index.html src/main.ts
 
 zip: build
     advzip pack.zip -a dist/index.html dist/main.js
+    stat pack.zip
+
+clean:
+    rm -rf ./dist ./pack.zip
 
 linecount:
     find src/ -name '*.ts' | xargs wc -lc
