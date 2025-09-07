@@ -8,7 +8,7 @@ import {
   State,
   title,
 } from "./GameState";
-import { drawTitle } from "../backdrops/type";
+import { drawTitle } from "../backdrops/Title";
 import { Palette } from "./Color";
 import { Point } from "../utils/MathUtils";
 

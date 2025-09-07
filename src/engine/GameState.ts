@@ -1,4 +1,4 @@
-import { drawTitle } from "../backdrops/type";
+import { drawTitle } from "../backdrops/Title";
 import sfx from "../engine/sfx";
 import { Basket } from "../entities/Basket";
 import TrampofelineManager from "../entities/Trampofeline";

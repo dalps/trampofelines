@@ -1,4 +1,4 @@
-import { drawTitle } from "./backdrops/type";
+import { drawTitle } from "./backdrops/Title";
 import { CollisionManager } from "./engine/Collisions2D";
 import {
   drawLives,

@@ -1,25 +1,24 @@
+import { Palette } from "../engine/Color";
+import { Stage } from "../engine/Stage";
 import { YarnBall } from "../entities/YarnBall";
 import { circle, star } from "../utils/CanvasUtils";
-import { Color, HSLColor, Palette } from "../engine/Color";
-import Math2D, { DEG2RAD, distribute, Point } from "../utils/MathUtils";
-import { Stage } from "../engine/Stage";
-import { Clock, timestamp } from "../utils/TimeUtils";
+import { distribute, Point } from "../utils/MathUtils";
+import { Clock } from "../utils/TimeUtils";
 
-export function toranporin() {
-  Stage.setActiveLayer("background");
+export function toranporin(position: Point, { color = Palette.colors.blue0 }) {
+  Stage.setActiveLayer("ui");
   const { ctx } = Stage;
 
   const text = "猫のトランポリン";
   const textSize = 48;
+
   ctx.font = `${textSize}px sans-serif`;
   ctx.textBaseline = "ideographic";
-  ["purple", "red"].forEach((color, i) => {
-    ctx.fillStyle = color;
-    ctx.fillText(text, (i + 1) * 2, textSize + (i + 1) * 2);
-  });
-  ctx.fillStyle = "#222";
-  ctx.fillText(text, 0, 48);
-  // ctx.strokeStyle = "blue";
+
+  ctx.fillStyle = color;
+  ctx.fillText(text, position.x, position.y + 48);
+
+  // ctx.strokeStyle = Palette.colors.blue1;
   // ctx.strokeText(text, 0, 48);
 }
 
@@ -143,9 +142,14 @@ export function drawTitle() {
   const min = -l;
   const max = l;
   const angle = Math.atan2(-h, w);
+
   ctx.save();
   ctx.scale(1.2, 1.2);
   ctx.rotate(angle);
+  toranporin(new Point(min + ((time * 10) % (max - min)), h * 0.5), {
+    color: blue1,
+  });
+
   distribute(min, max, subs, (n) => {
     const x = min + ((n + time * 3) % (max - min));
     const y = h * 0.4;
@@ -157,6 +161,9 @@ export function drawTitle() {
   ctx.translate(cw, ch);
   ctx.scale(1.2, 1.2);
   ctx.rotate(Math.PI + angle);
+  toranporin(new Point(min + ((time * 10) % (max - min)), h * 0.5), {
+    color: blue1,
+  });
   distribute(min, max, subs, (n) => {
     const x = min + ((n + time * 3) % (max - min));
     const y = h * 0.4;

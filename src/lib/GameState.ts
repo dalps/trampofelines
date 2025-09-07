@@ -1,4 +1,4 @@
-import { drawTitle } from "../backdrops/type";
+import { drawTitle } from "../backdrops/Title";
 import { Basket } from "../entities/Basket";
 import TrampofelineManager from "../entities/Trampofeline";
 import type { Tube } from "../entities/Tube";
@@ -7,11 +7,7 @@ import { star } from "./CanvasUtils";
 import { Palette } from "./Color";
 import { Point } from "./MathUtils";
 import sfx from "./sfx";
-import {
-  gameoverElements,
-  Stage,
-  titleElements
-} from "./Stage";
+import { gameoverElements, Stage, titleElements } from "./Stage";
 import { zzfxP } from "./zzfx";
 
 export const settings = {
