@@ -47,6 +47,7 @@ export function gameOver() {
       zzfxP(sfx.gameover);
       gameoverElements.style.display = "block";
       titleElements.style.display = "none";
+      TrampofelineManager.disableUI();
 
       GAMESTATE.state = State.GameOver;
   }
@@ -58,9 +59,11 @@ export function restart() {
     case State.GameOver:
       GAMESTATE.lives = TOTAL_LIVES;
       GAMESTATE.balls.clear();
+      TrampofelineManager.enableUI();
       TrampofelineManager.entities.clear();
       gameoverElements.style.display = "none";
       titleElements.style.display = "none";
+      Stage.stage.appendChild(Stage.getLayer("ui"));
 
       Stage.setActiveLayer("background");
       BasketballCourt.draw();
@@ -78,8 +81,11 @@ export function title() {
       GAMESTATE.lives = TOTAL_LIVES;
       GAMESTATE.balls.clear();
       TrampofelineManager.entities.clear();
+      TrampofelineManager.disableUI();
       gameoverElements.style.display = "none";
       titleElements.style.display = "block";
+
+      Stage.clearLayer("game-info");
 
       drawTitle();
 
@@ -106,10 +112,9 @@ export const GAMESTATE: GameState = {
 };
 
 export function drawLives() {
-  Stage.setActiveLayer("ui");
-  const { ctx, cw, ch } = Stage;
-
-  ctx.clearRect(0, 0, cw, ch);
+  Stage.setActiveLayer("game-info");
+  Stage.clearLayer("game-info");
+  const { ctx, cw } = Stage;
 
   const sectionSize = 55;
   const radius = 20;
@@ -165,7 +170,7 @@ export function drawLives() {
 export const FONT = "Roboto,tsans-serif";
 
 export function drawGameoverUI() {
-  Stage.setActiveLayer("ui");
+  Stage.setActiveLayer("game-info");
   const { ctx, cw, ch } = Stage;
 
   ctx.fillStyle = "#0000007f";

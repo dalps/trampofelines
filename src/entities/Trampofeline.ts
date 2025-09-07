@@ -24,14 +24,9 @@ let mouseDown = false;
 let distance = 0;
 let drawing = false;
 let valid = true;
+let soundInterval: number;
 
-const {
-  nightBlue: coatColor,
-  blueGray: detailColor,
-  white,
-  black,
-  pink,
-} = Palette.colors;
+const { nightBlue: coatColor, blueGray: detailColor } = Palette.colors;
 const MAX_CATS = 3;
 const MIN_LENGTH = 100;
 const MAX_STEEPNESS_TO_90 = 25;
@@ -41,6 +36,20 @@ export default class TrampofelineManager {
 
   public static get trampolines() {
     return Array.from(this.entities.values());
+  }
+
+  static enableUI() {
+    Stage.stage.appendChild(Stage.getLayer("ui"));
+  }
+
+  static disableUI() {
+    p1 = p2 = undefined;
+    soundInterval && clearInterval(soundInterval);
+
+    const ui = Stage.getLayer("ui");
+    if (ui.parentElement) {
+      Stage.stage.removeChild(ui);
+    }
   }
 
   static init() {
@@ -87,6 +96,8 @@ export default class TrampofelineManager {
 
       Stage.setActiveLayer("game");
 
+      soundInterval = setInterval(() => zzfxP(sfx.drawing), 50);
+
       mouseDown = true;
     }
 
@@ -97,6 +108,7 @@ export default class TrampofelineManager {
         mouseDown = false;
         drawing = false;
         p1 = p2 = undefined;
+        clearInterval(soundInterval);
         return;
       }
 
@@ -113,6 +125,7 @@ export default class TrampofelineManager {
 
     function endStroke() {
       mouseDown = false;
+      clearInterval(soundInterval);
 
       if (!p1 || !p2 || distance < 100) {
         distance < 20 && p1;
@@ -122,6 +135,9 @@ export default class TrampofelineManager {
       }
 
       valid && TrampofelineManager.makeCat();
+      console.log(valid);
+      // valid && zzfxP(sfx.meow);
+      !valid && zzfxP(sfx.badPlacement);
 
       p1 = p2 = undefined;
     }
@@ -192,6 +208,9 @@ export default class TrampofelineManager {
   }
 
   static drawGuides(time: number) {
+    Stage.setActiveLayer("ui");
+    Stage.clearLayer("ui");
+
     const { ctx } = Stage;
 
     if (!p1 || !p2) return;
@@ -281,6 +300,8 @@ export class Trampofeline extends ElasticLine {
     //   popsicle(p3, p4, "blue");
     //   popsicle(inter, inter, "yellow");
     // }
+
+    Palette.setTransparency(1);
   }
 }
 

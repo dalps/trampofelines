@@ -19,6 +19,8 @@ export const playInfiniteBtn = document.getElementById("play-infinite-btn");
 export const titleElements = document.getElementById("title");
 export const gameoverElements = document.getElementById("gameover");
 
+const CANVASES = ["background", "game", "game-info", "ui"];
+
 export class MyCanvas extends HTMLCanvasElement {
   private _ctx: CanvasRenderingContext2D;
   private _rect: DOMRect;
@@ -80,6 +82,15 @@ export class Stage {
   }
 
   /**
+   * Clear the specified layer without affecting the active layer.
+   */
+  public static clearLayer(layer: LayerName) {
+    const { ctx, width, height } = Stage.getLayer(layer);
+
+    ctx.clearRect(0, 0, width, height);
+  }
+
+  /**
    *  The active layer.
    */
   public static get activeLayer(): MyCanvas {
@@ -114,8 +125,7 @@ export class Stage {
     playInfiniteBtn.addEventListener("click", restart);
     quitBtn.addEventListener("click", title);
 
-    const liveLayers = ["background", "game", "ui"];
-    liveLayers.forEach((name, i) => {
+    CANVASES.forEach((name, i) => {
       const layer = document.createElement("canvas", {
         is: "my-canvas",
       });
@@ -145,11 +155,9 @@ export class Stage {
     Stage.ctx.translate(25, 50);
     drawCatRear();
 
-    this.fitLayersToStage(liveLayers);
+    this.fitLayersToStage();
 
-    window.addEventListener("resize", () =>
-      this.fitLayersToStage(["game", "ui", "background"])
-    );
+    window.addEventListener("resize", this.fitLayersToStage.bind(this));
   }
 
   static newOffscreenLayer(name: string, width: number, height: number) {
@@ -159,8 +167,9 @@ export class Stage {
     this._layers.set(name, newLayer as MyCanvas);
   }
 
-  static fitLayersToStage(layers: LayerName[]) {
-    layers.forEach((layer) => {
+  // I should probably stop resizing: it results in the game breaking, more code, wanky experience
+  static fitLayersToStage() {
+    CANVASES.forEach((layer) => {
       this.getLayer(layer).setSize(
         this.stage.clientWidth,
         this.stage.clientHeight

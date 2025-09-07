@@ -29,11 +29,6 @@ function init() {
   requestAnimationFrame(draw);
 }
 
-function clear() {
-  const { ctx, cw, ch } = Stage;
-  ctx.clearRect(0, 0, cw, ch);
-}
-
 /**
  * The game loop
  */
@@ -50,9 +45,9 @@ function draw(time: timestamp) {
     case State.GameOver:
     case State.Playing:
       Stage.setActiveLayer("game");
-      const { cw, ch } = Stage;
+      Stage.clearLayer("game");
 
-      clear();
+      const { cw, ch } = Stage;
 
       GAMESTATE.tubes.forEach((tube) => tube.draw());
       GAMESTATE.basket?.update();

@@ -42,9 +42,7 @@ export class Basket extends DynamicBody {
     Stage.setActiveLayer("pattern");
     const { ctx, cw, ch } = Stage;
 
-    ctx.clearRect(0, 0, cw, ch);
     ctx.fillStyle = basketColor1;
-
     ctx.fillRect(0, 0, cw, ch);
     ctx.strokeStyle = basketColor2;
     ctx.lineWidth = 2;

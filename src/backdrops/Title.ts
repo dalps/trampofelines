@@ -6,7 +6,7 @@ import { distribute, Point } from "../utils/MathUtils";
 import { Clock } from "../utils/TimeUtils";
 
 export function toranporin(position: Point, { color = Palette.colors.blue0 }) {
-  Stage.setActiveLayer("ui");
+  Stage.setActiveLayer("game");
   const { ctx } = Stage;
 
   const text = "猫のトランポリン";
@@ -23,7 +23,7 @@ export function toranporin(position: Point, { color = Palette.colors.blue0 }) {
 }
 
 export function drawTitle() {
-  Stage.setActiveLayer("ui");
+  Stage.setActiveLayer("game");
   const { ctx, cw, ch } = Stage;
   const { time } = Clock;
   const { white, blue0, blue1, blue2, blue3 } = Palette.colors;
