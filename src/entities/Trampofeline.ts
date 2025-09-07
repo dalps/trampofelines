@@ -23,6 +23,7 @@ let inter: Point | undefined;
 let mouseDown = false;
 let distance = 0;
 let drawing = false;
+let valid = true;
 
 const {
   nightBlue: coatColor,
@@ -83,13 +84,17 @@ export default class TrampofelineManager {
       e.preventDefault();
 
       p1 = ui.resolveMousePosition(e);
+
+      Stage.setActiveLayer("game");
+
       mouseDown = true;
     }
 
     function handleMouseMove(e: MouseEvent) {
       e.preventDefault();
 
-      if (!mouseDown) {
+      if (!mouseDown || e.buttons === 0) {
+        mouseDown = false;
         drawing = false;
         p1 = p2 = undefined;
         return;
@@ -116,7 +121,7 @@ export default class TrampofelineManager {
         return;
       }
 
-      if (TrampofelineManager.testPlacement()) TrampofelineManager.makeCat();
+      valid && TrampofelineManager.makeCat();
 
       p1 = p2 = undefined;
     }
@@ -167,22 +172,23 @@ export default class TrampofelineManager {
   }
 
   static testPlacement(): boolean {
-    const longEnough = distance >= MIN_LENGTH;
-    const belowLimit = TrampofelineManager.entities.size < MAX_CATS;
-    const intersections = Array.from(
-      TrampofelineManager.entities.values()
-    ).filter(({ joints }) => {
-      p3 = joints.at(0).position;
-      p4 = joints.at(-1).position;
-      inter = Math2D.properInter(p1, p2, p3, p4);
-      return inter;
-    });
-    const noIntersections = intersections.length === 0;
-    const sep = p2.sub(p1);
-    const angle = Math.abs(Math.atan2(sep.y, sep.x)) * RAD2DEG;
-    const goodAngle =
-      angle <= 90 - MAX_STEEPNESS_TO_90 || angle >= 90 + MAX_STEEPNESS_TO_90;
-    return longEnough && belowLimit && noIntersections && goodAngle;
+    let sep: Point;
+    let angle: number;
+    valid =
+      (distance >= MIN_LENGTH &&
+        TrampofelineManager.entities.size < MAX_CATS &&
+        Array.from(TrampofelineManager.entities.values()).filter(
+          ({ joints }) => {
+            p3 = joints.at(0).position;
+            p4 = joints.at(-1).position;
+            inter = Math2D.properInter(p1, p2, p3, p4);
+            return inter;
+          }
+        ).length === 0 &&
+        (angle = Math.abs(Math.atan2((sep = p2.sub(p1)).y, sep.x)) * RAD2DEG) <=
+          90 - MAX_STEEPNESS_TO_90) ||
+      angle >= 90 + MAX_STEEPNESS_TO_90;
+    return valid;
   }
 
   static drawGuides(time: number) {
