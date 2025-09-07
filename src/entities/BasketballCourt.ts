@@ -1,10 +1,63 @@
-import { star } from "../lib/CanvasUtils";
+import { drawLives, GAMESTATE } from "../GameState";
+import {
+  CollisionManager,
+  downwardFilter,
+  SegmentCollider,
+} from "../lib/Collisions2D";
 import { Palette } from "../lib/Color";
-import { Point, DEG2RAD } from "../lib/MathUtils";
+import { DEG2RAD, Point } from "../lib/MathUtils";
+import { DynamicBody } from "../lib/Physics2D";
 import { Stage } from "../lib/Stage";
+import sfx from "../sfx";
+import { zzfxP } from "../zzfx";
+import { Tube } from "./Tube";
+import { YarnBall } from "./YarnBall";
 
 export class BasketballCourt {
-  constructor(public position: Point) {}
+  static backBoard: DynamicBody;
+  static hoop: DynamicBody;
+
+  static init(position: Point) {
+    const { cw, ch } = Stage;
+    this.backBoard = new DynamicBody(position);
+    this.hoop = new DynamicBody(position);
+    const boardCollider = new SegmentCollider(
+      new Point(cw * 0.9, ch * 0.5),
+      new Point(cw * 0.9, ch * 0.5 + 100)
+    );
+    const hoopHeight = ch * 0.5 + 50;
+    const hoopSensor = new SegmentCollider(
+      new Point(cw * 0.9, hoopHeight),
+      new Point(cw * 0.9 - 50, hoopHeight)
+    );
+
+    this.hoop.toggleFixed();
+    this.backBoard.toggleFixed();
+
+    this.hoop.attachCollider(hoopSensor);
+    this.backBoard.attachCollider(boardCollider);
+
+    GAMESTATE.tubes.push(
+      new Tube(new Point(0, 100), {
+        cb: BasketballCourt.registerBall.bind(this),
+      })
+    );
+
+    GAMESTATE.balls.forEach(BasketballCourt.registerBall);
+  }
+
+  static registerBall(b: YarnBall) {
+    CollisionManager.register(b, this.backBoard);
+    CollisionManager.register(b, this.hoop, {
+      sensor: true,
+      filter: downwardFilter,
+      cb: () => {
+        GAMESTATE.score += 1;
+        drawLives();
+        zzfxP(sfx.score);
+      },
+    });
+  }
 
   static draw() {
     Stage.setActiveLayer("background");
@@ -37,32 +90,6 @@ export class BasketballCourt {
     ctx.strokeStyle = "yellow";
     ctx.fillStyle = "#d7ff72ff";
     ctx.lineWidth = 3;
-
-    star(new Point(200, 200), { points: 5, outerRadius: 30, innerRadius: 10 });
-    ctx.fill();
-
-    star(new Point(cw * 0.8, ch * 0.1), {
-      points: 4,
-      outerRadius: 30,
-      innerRadius: 10,
-    });
-    ctx.fill();
-
-    star(new Point(600, 300), {
-      points: 5,
-      outerRadius: 50,
-      innerRadius: 20,
-      angle: 30 * DEG2RAD,
-    });
-    ctx.fill();
-
-    star(new Point(cw * 0.5, 100), {
-      points: 5,
-      outerRadius: 20,
-      innerRadius: 10,
-      angle: -30 * DEG2RAD,
-    });
-    ctx.fill();
 
     ctx.save();
     ctx.translate(cw * 0.8, 300);

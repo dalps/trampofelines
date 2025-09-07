@@ -17,7 +17,10 @@ export class Tube {
   public size: Point;
   private canvas: MyCanvas;
 
-  constructor(position: Point, size = new Point(100, 100)) {
+  constructor(
+    position: Point,
+    { size = new Point(100, 100), cb = (b: YarnBall) => {} } = {}
+  ) {
     this.position = position;
     this.size = size;
     this.canvas = Stage.getLayer("tube");
@@ -28,7 +31,8 @@ export class Tube {
     Clock.every(20, () => {
       if (GAMESTATE.balls.size < 3) {
         zzfxP(sfx.spawn);
-        this.spawnYarnBall();
+        const ball = this.spawnYarnBall();
+        cb(ball);
       }
     });
   }
@@ -83,22 +87,23 @@ export class Tube {
       )
     );
 
-    CollisionManager.register(GAMESTATE.basket, ball, {
-      sensor: true,
-      filter: downwardFilter,
-      cb: () => {
-        if (GAMESTATE.state !== GameState.Playing) return;
+    GAMESTATE.basket &&
+      CollisionManager.register(GAMESTATE.basket, ball, {
+        sensor: true,
+        filter: downwardFilter,
+        cb: () => {
+          if (GAMESTATE.state !== GameState.Playing) return;
 
-        GAMESTATE.score += 1;
-        CollisionManager.unregisterBody(ball);
-        ball.state = State.Dead;
-        drawLives();
-        zzfxP(sfx.score);
-        Stage.setActiveLayer("game");
-        GAMESTATE.balls.delete(ball.id);
-        new Ripple(ball.position.clone(), 15, 30, 0.3, 0);
-      },
-    });
+          GAMESTATE.score += 1;
+          CollisionManager.unregisterBody(ball);
+          ball.state = State.Dead;
+          drawLives();
+          zzfxP(sfx.score);
+          Stage.setActiveLayer("game");
+          GAMESTATE.balls.delete(ball.id);
+          new Ripple(ball.position.clone(), 15, 30, 0.3, 0);
+        },
+      });
 
     return ball;
   }

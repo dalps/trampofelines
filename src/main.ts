@@ -1,4 +1,5 @@
 import { Basket } from "./entities/Basket";
+import { BasketballCourt } from "./entities/BasketballCourt";
 import TrampofelineManager from "./entities/Trampofeline";
 import { Tube } from "./entities/Tube";
 import {
@@ -7,7 +8,6 @@ import {
   GAMESTATE,
   settings,
   State,
-  GAMESTATE as state,
   title,
 } from "./GameState";
 import { CollisionManager } from "./lib/Collisions2D";
@@ -19,19 +19,16 @@ import sfx from "./sfx";
 import { drawTitle } from "./type";
 import { zzfxP } from "./zzfx";
 
-const { balls } = state;
+const { balls } = GAMESTATE;
 
 function init() {
   Stage.init(document.getElementById("stage"));
-  const { ctx, cw, ch } = Stage;
 
+  BasketballCourt.init(new Point(Stage.cw * 0.5, Stage.ch * 0.5));
   TrampofelineManager.init();
 
-  title();
-
-  state.basket = new Basket(new Point(cw * 0.5, ch * 0.5));
-  state.tubes.push(new Tube(new Point(0, 100)));
-  state.tubes.push(new Tube(new Point(0, 500)));
+  // title();
+  GAMESTATE.state = State.Playing;
 
   requestAnimationFrame(draw);
 }
@@ -61,8 +58,8 @@ function draw(time: timestamp) {
 
       clear();
 
-      state.tubes.forEach((tube) => tube.draw());
-      state.basket.update();
+      GAMESTATE.tubes.forEach((tube) => tube.draw());
+      GAMESTATE.basket?.update();
 
       settings.play && CollisionManager.update();
 
@@ -80,18 +77,18 @@ function draw(time: timestamp) {
 
       TrampofelineManager.drawGuides(time);
 
-      settings.showForces && state.basket.drawCollider();
+      settings.showForces && GAMESTATE.basket?.drawCollider();
 
       balls.forEach((b, i) => {
         const threadEndPos = b.thread.at(-1).position;
         if (threadEndPos.x < 0 || threadEndPos.x > cw || threadEndPos.y > ch) {
           CollisionManager.unregisterBody(b);
-          state.state === State.Playing && zzfxP(sfx.drop);
-          state.balls.delete(b.id);
-          state.lives = Math.max(0, state.lives - 1);
+          GAMESTATE.state === State.Playing && zzfxP(sfx.drop);
+          GAMESTATE.balls.delete(b.id);
+          GAMESTATE.lives = Math.max(0, GAMESTATE.lives - 1);
 
-          state.state === State.Playing && drawLives();
-          state.lives <= 0 && gameOver();
+          GAMESTATE.state === State.Playing && drawLives();
+          GAMESTATE.lives <= 0 && gameOver();
           return;
         }
 
@@ -103,6 +100,9 @@ function draw(time: timestamp) {
         settings.showForces && b.drawForces();
         settings.showForces && b.drawCollider();
       });
+
+      settings.showForces && BasketballCourt.backBoard.collider.draw();
+      settings.showForces && BasketballCourt.hoop.collider.draw();
 
       RippleManager.updateAndDraw();
 

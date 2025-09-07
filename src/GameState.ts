@@ -3,6 +3,7 @@ import { BasketballCourt } from "./entities/BasketballCourt";
 import TrampofelineManager, { Trampofeline } from "./entities/Trampofeline";
 import type { Tube } from "./entities/Tube";
 import { YarnBall } from "./entities/YarnBall";
+import { star } from "./lib/CanvasUtils";
 import { Palette } from "./lib/Color";
 import { Point } from "./lib/MathUtils";
 import {
@@ -19,7 +20,7 @@ import { zzfxP } from "./zzfx";
 
 export const settings = {
   showJoints: false,
-  showForces: false,
+  showForces: true,
   play: true,
   colliderRadius: 20,
   lineMass: 2,
@@ -115,20 +116,32 @@ export function drawLives() {
 
   ctx.clearRect(0, 0, cw, ch);
 
-  const sectionSize = 50;
+  const sectionSize = 55;
   const radius = 20;
-  const pos = new Point(cw * 0.5 - 1.5 * sectionSize, sectionSize * 0.75);
+  const pos = new Point(cw * 0.5 - 1.5 * sectionSize, 20);
+  const center = new Point(sectionSize * 0.5, sectionSize * 0.5);
 
-  ctx.strokeStyle = "red";
+  ctx.lineJoin = "round";
   ctx.lineCap = "round";
-  ctx.lineWidth = 4;
   for (let i = 0; i < TOTAL_LIVES - GAMESTATE.lives; i++) {
-    ctx.beginPath();
-    const diag = sectionSize * 0.2;
-    ctx.moveTo(pos.x - diag, pos.y - diag);
-    ctx.lineTo(pos.x + diag, pos.y + diag);
-    ctx.moveTo(pos.x - diag, pos.y + diag);
-    ctx.lineTo(pos.x + diag, pos.y - diag);
+    ctx.strokeStyle = "white";
+    ctx.lineWidth = 8;
+    star(pos.add(center), {
+      points: 4,
+      innerRadius: 0,
+      outerRadius: 18,
+      angle: Math.PI / 4,
+    });
+    ctx.stroke();
+
+    ctx.strokeStyle = "red";
+    ctx.lineWidth = 4;
+    star(pos.add(center), {
+      points: 4,
+      innerRadius: 0,
+      outerRadius: 18,
+      angle: Math.PI / 4,
+    });
     ctx.stroke();
 
     pos.incrX(sectionSize);
@@ -136,7 +149,7 @@ export function drawLives() {
 
   // const colors = ["fuchsia", "chartreuse", "coral"]
   for (let i = 0; i < GAMESTATE.lives; i++) {
-    YarnBall.drawYarnball(pos, {
+    YarnBall.drawYarnball(pos.add(center), {
       radius,
       color: Palette.colors.fuchsia,
       lineWidth: 2,
@@ -150,8 +163,8 @@ export function drawLives() {
   const score = `Rescued: ${GAMESTATE.score}`;
   ctx.font = `24px ${FONT}`;
   ctx.fillStyle = "black";
-  ctx.textAlign = "center";
-  ctx.fillText(score, cw * 0.5, 100);
+  ctx.textAlign = "right";
+  ctx.fillText(score, cw - 20, 48);
 }
 
 export const FONT = "Roboto,tsans-serif";
@@ -176,16 +189,16 @@ export function drawGameoverUI() {
   ctx.font = `48px ${FONT}`;
 
   ctx.save();
-  ctx.translate(cw * 0.5 - 250, ch * 0.5 - 100);
+  ctx.translate(cw * 0.5 - 250, ch * 0.5 - 200);
   ctx.scale(5, 5);
   ctx.stroke(gameOver);
   ctx.fill(gameOver);
   ctx.restore();
 
   ctx.font = `28px ${FONT}`;
-  ctx.fillText(gameOver2, cw * 0.5, ch * 0.5 + 48);
+  ctx.fillText(gameOver2, cw * 0.5, ch * 0.5 - 50);
 
   ctx.fillStyle = "#fff";
   ctx.font = `36px ${FONT}`;
-  ctx.fillText(score, cw * 0.5, ch * 0.5 + 100);
+  ctx.fillText(score, cw * 0.5, ch * 0.5);
 }

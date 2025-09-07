@@ -86,8 +86,8 @@ export class CollisionManager {
       }) => {
         const b1 = r1.deref();
         const b2 = r2.deref();
-        const c1 = b1.collider;
-        const c2 = b2.collider;
+        const c1 = b1?.collider;
+        const c2 = b2?.collider;
 
         if (
           !b1 ||
