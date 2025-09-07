@@ -39,7 +39,7 @@ function draw(time: timestamp) {
 
   switch (GAMESTATE.state) {
     case State.Title:
-      Stage.setActiveLayer("background");
+      Stage.setActiveLayer("bg");
       drawTitle();
       break;
     case State.GameOver:

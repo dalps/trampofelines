@@ -19,7 +19,7 @@ export const playInfiniteBtn = document.getElementById("play-infinite-btn");
 export const titleElements = document.getElementById("title");
 export const gameoverElements = document.getElementById("gameover");
 
-const CANVASES = ["background", "game", "game-info", "ui"];
+const CANVASES = ["bg-static", "bg", "game", "game-info", "ui"];
 
 export class MyCanvas extends HTMLCanvasElement {
   private _ctx: CanvasRenderingContext2D;
@@ -63,7 +63,7 @@ customElements.define("my-canvas", MyCanvas, {
   extends: "canvas",
 });
 
-export type LayerName = "background" | "game" | "ui" | string;
+export type LayerName = "bg" | "game" | "ui" | string;
 
 export class Stage {
   private static _layers: Map<LayerName, MyCanvas> = new Map();

@@ -65,7 +65,7 @@ export function restart() {
       titleElements.style.display = "none";
       Stage.stage.appendChild(Stage.getLayer("ui"));
 
-      Stage.setActiveLayer("background");
+      Stage.setActiveLayer("bg");
       BasketballCourt.draw();
 
       drawLives();

@@ -50,6 +50,8 @@ export function drawTitle() {
 
   ctx.fillStyle = blue0;
   ctx.strokeStyle = blue0;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
 
   [c1, c2].forEach((c, i) =>
     star(c, {

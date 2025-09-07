@@ -59,7 +59,7 @@ export class BasketballCourt {
   }
 
   static draw() {
-    Stage.setActiveLayer("background");
+    Stage.setActiveLayer("bg");
     const { ctx, cw, ch } = Stage;
     const scale = 2;
 
