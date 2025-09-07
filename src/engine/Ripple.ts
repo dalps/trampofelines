@@ -1,7 +1,7 @@
 import { Stage } from "./Stage";
-import { circle } from "./CanvasUtils";
-import { damp, type Point } from "./MathUtils";
-import { Clock } from "./TimeUtils";
+import { circle } from "../utils/CanvasUtils";
+import { damp, type Point } from "../utils/MathUtils";
+import { Clock } from "../utils/TimeUtils";
 
 const EPSILON = 0.001;
 

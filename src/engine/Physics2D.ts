@@ -1,7 +1,7 @@
-import { popsicle } from "./CanvasUtils";
+import { popsicle } from "../utils/CanvasUtils";
 import type { Collider } from "./Collisions2D";
-import { damp, Point } from "./MathUtils";
-import { Clock, instant } from "./TimeUtils";
+import { damp, Point } from "../utils/MathUtils";
+import { Clock, instant } from "../utils/TimeUtils";
 
 /**
  * A static force that can be applied to a dynamic body

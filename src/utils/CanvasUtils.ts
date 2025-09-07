@@ -1,5 +1,5 @@
-import { DEG2RAD, lerp, Point } from "./MathUtils";
-import { Stage } from "./Stage";
+import { DEG2RAD, lerp, Point } from "../utils/MathUtils";
+import { Stage } from "../engine/Stage";
 
 export function star(
   pos: Point,

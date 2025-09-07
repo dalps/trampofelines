@@ -1,26 +1,19 @@
-import { Basket } from "./entities/Basket";
-import { BasketballCourt } from "./entities/BasketballCourt";
-import TrampofelineManager, { Trampofeline } from "./entities/Trampofeline";
-import type { Tube } from "./entities/Tube";
-import { YarnBall } from "./entities/YarnBall";
-import { star } from "./lib/CanvasUtils";
-import { Palette } from "./lib/Color";
-import { Point } from "./lib/MathUtils";
-import {
-  gameoverElements,
-  playBtn,
-  playInfiniteBtn,
-  restartBtn,
-  Stage,
-  titleElements,
-} from "./lib/Stage";
-import sfx from "./sfx";
-import { drawTitle } from "./type";
+import { drawTitle } from "../backdrops/type";
+import sfx from "../engine/sfx";
+import { Basket } from "../entities/Basket";
+import TrampofelineManager from "../entities/Trampofeline";
+import type { Tube } from "../entities/Tube";
+import { YarnBall } from "../entities/YarnBall";
+import { BasketballCourt } from "../levels/BasketballCourt";
+import { star } from "../utils/CanvasUtils";
+import { Point } from "../utils/MathUtils";
+import { Palette } from "./Color";
+import { gameoverElements, Stage, titleElements } from "./Stage";
 import { zzfxP } from "./zzfx";
 
 export const settings = {
   showJoints: false,
-  showForces: true,
+  showForces: false,
   play: true,
   colliderRadius: 20,
   lineMass: 2,
@@ -69,7 +62,9 @@ export function restart() {
       gameoverElements.style.display = "none";
       titleElements.style.display = "none";
 
+      Stage.setActiveLayer("background");
       BasketballCourt.draw();
+
       drawLives();
 
       GAMESTATE.state = State.Playing;

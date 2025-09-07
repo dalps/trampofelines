@@ -1,9 +1,9 @@
-import { YarnBall } from "./entities/YarnBall";
-import { circle, star } from "./lib/CanvasUtils";
-import { Color, HSLColor, Palette } from "./lib/Color";
-import Math2D, { DEG2RAD, distribute, Point } from "./lib/MathUtils";
-import { Stage } from "./lib/Stage";
-import { Clock, timestamp } from "./lib/TimeUtils";
+import { YarnBall } from "../entities/YarnBall";
+import { circle, star } from "../utils/CanvasUtils";
+import { Color, HSLColor, Palette } from "../engine/Color";
+import Math2D, { DEG2RAD, distribute, Point } from "../utils/MathUtils";
+import { Stage } from "../engine/Stage";
+import { Clock, timestamp } from "../utils/TimeUtils";
 
 export function toranporin() {
   Stage.setActiveLayer("background");

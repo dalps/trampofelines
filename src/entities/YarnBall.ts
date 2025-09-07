@@ -1,9 +1,9 @@
-import { CircleCollider } from "../lib/Collisions2D";
-import { Palette, type Color } from "../lib/Color";
-import Math2D, { Point } from "../lib/MathUtils";
-import { DynamicBody, Gravity } from "../lib/Physics2D";
-import { Stage } from "../lib/Stage";
-import { Clock } from "../lib/TimeUtils";
+import { CircleCollider } from "../engine/Collisions2D";
+import { Palette, type Color } from "../engine/Color";
+import Math2D, { Point } from "../utils/MathUtils";
+import { DynamicBody, Gravity } from "../engine/Physics2D";
+import { Stage } from "../engine/Stage";
+import { Clock } from "../utils/TimeUtils";
 
 export class YarnBall extends DynamicBody {
   public id: string;

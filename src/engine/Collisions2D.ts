@@ -1,8 +1,8 @@
-import { circle, popsicle } from "./CanvasUtils";
-import Math2D, { Point } from "./MathUtils";
+import { circle, popsicle } from "../utils/CanvasUtils";
+import Math2D, { Point } from "../utils/MathUtils";
 import { ContactForce, State, type DynamicBody } from "./Physics2D";
 import { Stage } from "./Stage";
-import { instant } from "./TimeUtils";
+import { instant } from "../utils/TimeUtils";
 
 const debugColor = "yellowgreen";
 const DEBUG = false;

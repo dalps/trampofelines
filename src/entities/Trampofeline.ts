@@ -1,19 +1,19 @@
-import { GAMESTATE } from "../GameState";
-import { circle } from "../lib/CanvasUtils";
+import { GAMESTATE } from "../engine/GameState";
+import { circle } from "../utils/CanvasUtils";
 import {
   CircleCollider,
   CollisionManager,
   downwardFilter,
-} from "../lib/Collisions2D";
-import { Palette } from "../lib/Color";
-import { ElasticLine } from "../lib/ElasticLine";
-import Math2D, { damp, lerp, Point, RAD2DEG } from "../lib/MathUtils";
-import { Gravity, State } from "../lib/Physics2D";
-import { Ripple } from "../lib/Ripple";
-import { Stage } from "../lib/Stage";
-import { Clock } from "../lib/TimeUtils";
-import { zzfxP } from "../zzfx";
-import sfx from "../sfx";
+} from "../engine/Collisions2D";
+import { Palette } from "../engine/Color";
+import { ElasticLine } from "../engine/ElasticLine";
+import Math2D, { damp, lerp, Point, RAD2DEG } from "../utils/MathUtils";
+import { Gravity, State } from "../engine/Physics2D";
+import { Ripple } from "../engine/Ripple";
+import { Stage } from "../engine/Stage";
+import { Clock } from "../utils/TimeUtils";
+import { zzfxP } from "../engine/zzfx";
+import sfx from "../engine/sfx";
 
 let p1: Point | undefined;
 let p2: Point | undefined;

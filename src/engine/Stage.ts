@@ -1,9 +1,16 @@
-import { BasketballCourt } from "../entities/BasketballCourt";
+import { BasketballCourt } from "../levels/BasketballCourt";
 import { drawCatFace, drawCatRear } from "../entities/Trampofeline";
-import { drawGameoverUI, GAMESTATE, restart, State, title } from "../GameState";
-import { drawTitle } from "../type";
+import {
+  drawGameoverUI,
+  drawLives as drawPlayingUI,
+  GAMESTATE,
+  restart,
+  State,
+  title,
+} from "./GameState";
+import { drawTitle } from "../backdrops/type";
 import { Palette } from "./Color";
-import { Point } from "./MathUtils";
+import { Point } from "../utils/MathUtils";
 
 export const restartBtn = document.getElementById("restart-btn");
 export const playBtn = document.getElementById("play-btn");
@@ -167,6 +174,7 @@ export class Stage {
         break;
       case State.Playing:
         BasketballCourt.draw();
+        drawPlayingUI();
         break;
       case State.GameOver:
         BasketballCourt.draw();

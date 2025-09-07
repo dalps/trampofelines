@@ -6,5 +6,5 @@
     "noEmit": true
   },
 
-  "files": ["src/main.ts", "./src/entities/BasketballCourt.ts"]
+  "files": ["src/main.ts", "src/levels/BasketballCourt.ts"]
 }

@@ -1,10 +1,10 @@
-import { circle, popsicle } from "../lib/CanvasUtils";
-import { SegmentCollider } from "../lib/Collisions2D";
-import { Palette } from "../lib/Color";
-import { DEG2RAD, Point } from "../lib/MathUtils";
-import { DynamicBody } from "../lib/Physics2D";
-import { Stage } from "../lib/Stage";
-import { Clock, instant, timestamp } from "../lib/TimeUtils";
+import { circle, popsicle } from "../utils/CanvasUtils";
+import { SegmentCollider } from "../engine/Collisions2D";
+import { Palette } from "../engine/Color";
+import { DEG2RAD, Point } from "../utils/MathUtils";
+import { DynamicBody } from "../engine/Physics2D";
+import { Stage } from "../engine/Stage";
+import { Clock, instant, timestamp } from "../utils/TimeUtils";
 import { YarnBall } from "./YarnBall";
 
 Stage.newOffscreenLayer("pattern", 16, 16);

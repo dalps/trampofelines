@@ -1,7 +1,5 @@
-import { Basket } from "./entities/Basket";
-import { BasketballCourt } from "./entities/BasketballCourt";
-import TrampofelineManager from "./entities/Trampofeline";
-import { Tube } from "./entities/Tube";
+import { drawTitle } from "./backdrops/type";
+import { CollisionManager } from "./engine/Collisions2D";
 import {
   drawLives,
   gameOver,
@@ -9,16 +7,15 @@ import {
   settings,
   State,
   title,
-} from "./GameState";
-import { CollisionManager } from "./lib/Collisions2D";
-import { Point } from "./lib/MathUtils";
-import { RippleManager } from "./lib/Ripple";
-import { Stage } from "./lib/Stage";
-import { Clock, type timestamp } from "./lib/TimeUtils";
-import sfx from "./sfx";
-import { drawTitle } from "./type";
-import { zzfxP } from "./zzfx";
-
+} from "./engine/GameState";
+import { RippleManager } from "./engine/Ripple";
+import sfx from "./engine/sfx";
+import { Stage } from "./engine/Stage";
+import { zzfxP } from "./engine/zzfx";
+import TrampofelineManager from "./entities/Trampofeline";
+import { BasketballCourt } from "./levels/BasketballCourt";
+import { Point } from "./utils/MathUtils";
+import { Clock, type timestamp } from "./utils/TimeUtils";
 const { balls } = GAMESTATE;
 
 function init() {
@@ -27,8 +24,7 @@ function init() {
   BasketballCourt.init(new Point(Stage.cw * 0.5, Stage.ch * 0.5));
   TrampofelineManager.init();
 
-  // title();
-  GAMESTATE.state = State.Playing;
+  title();
 
   requestAnimationFrame(draw);
 }
@@ -101,8 +97,8 @@ function draw(time: timestamp) {
         settings.showForces && b.drawCollider();
       });
 
-      settings.showForces && BasketballCourt.backBoard.collider.draw();
-      settings.showForces && BasketballCourt.hoop.collider.draw();
+      // settings.showForces && BasketballCourt.backBoard.collider.draw();
+      // settings.showForces && BasketballCourt.hoop.collider.draw();
 
       RippleManager.updateAndDraw();
 

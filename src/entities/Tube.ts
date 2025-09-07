@@ -1,16 +1,15 @@
-import { drawLives, GAMESTATE, State as GameState } from "../GameState";
-import { makeGradient } from "../lib/CanvasUtils";
-import { CollisionManager, downwardFilter } from "../lib/Collisions2D";
-import { HSLColor, Palette } from "../lib/Color";
-import { lerp, Point } from "../lib/MathUtils";
-import { State } from "../lib/Physics2D";
-import { Ripple } from "../lib/Ripple";
-import { MyCanvas, Stage } from "../lib/Stage";
-import { Clock } from "../lib/TimeUtils";
-import { zzfxP } from "../zzfx";
+import { drawLives, GAMESTATE, State as GameState } from "../engine/GameState";
+import { makeGradient } from "../utils/CanvasUtils";
+import { CollisionManager, downwardFilter } from "../engine/Collisions2D";
+import { HSLColor, Palette } from "../engine/Color";
+import { lerp, Point } from "../utils/MathUtils";
+import { State } from "../engine/Physics2D";
+import { Ripple } from "../engine/Ripple";
+import { MyCanvas, Stage } from "../engine/Stage";
+import { Clock } from "../utils/TimeUtils";
+import sfx, { zzfxP } from "../engine/sfx";
 import TrampofelineManager from "./Trampofeline";
 import { YarnBall } from "./YarnBall";
-import sfx from "../sfx";
 
 export class Tube {
   public position: Point;

@@ -1,17 +1,16 @@
-import { drawLives, GAMESTATE } from "../GameState";
+import { drawLives, GAMESTATE } from "../engine/GameState";
 import {
   CollisionManager,
   downwardFilter,
   SegmentCollider,
-} from "../lib/Collisions2D";
-import { Palette } from "../lib/Color";
-import { DEG2RAD, Point } from "../lib/MathUtils";
-import { DynamicBody } from "../lib/Physics2D";
-import { Stage } from "../lib/Stage";
-import sfx from "../sfx";
-import { zzfxP } from "../zzfx";
-import { Tube } from "./Tube";
-import { YarnBall } from "./YarnBall";
+} from "../engine/Collisions2D";
+import { Palette } from "../engine/Color";
+import { DEG2RAD, Point } from "../utils/MathUtils";
+import { DynamicBody } from "../engine/Physics2D";
+import { Stage } from "../engine/Stage";
+import sfx, { zzfxP } from "../engine/sfx";
+import { Tube } from "../entities/Tube";
+import { YarnBall } from "../entities/YarnBall";
 
 export class BasketballCourt {
   static backBoard: DynamicBody;
