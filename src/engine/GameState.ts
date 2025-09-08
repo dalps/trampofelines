@@ -43,6 +43,7 @@ export enum State {
 
 export function gameOver() {
   switch (GAMESTATE.state) {
+    case State.Title:
     case State.Playing:
       drawGameoverUI();
       zzfxP(sfx.gameover);
@@ -171,7 +172,7 @@ export function drawLives() {
 }
 
 export const FONT = "Roboto,tsans-serif";
-
+import { drawText } from "./font";
 export function drawGameoverUI() {
   Stage.setActiveLayer("game-info");
   const { ctx, cw, ch } = Stage;
@@ -193,15 +194,17 @@ export function drawGameoverUI() {
 
   ctx.save();
   ctx.translate(cw * 0.5 - 250, ch * 0.5 - 200);
-  ctx.scale(5, 5);
-  ctx.stroke(gameOver);
-  ctx.fill(gameOver);
+  // ctx.scale(5, 5);
+  drawText("Game Over", { fill: "#c4de69", stroke: "#5a7bff", lineWidth: 3 });
+  // ctx.stroke(gameOver);
+  // ctx.fill(gameOver);
   ctx.restore();
 
-  ctx.font = `28px ${FONT}`;
-  ctx.fillText(gameOver2, cw * 0.5, ch * 0.5 - 50);
-
-  ctx.fillStyle = "#fff";
-  ctx.font = `36px ${FONT}`;
-  ctx.fillText(score, cw * 0.5, ch * 0.5);
+  ctx.save();
+  ctx.translate(cw * 0.5 - 250, ch * 0.5);
+  ctx.scale(0.2, 0.2);
+  drawText(`You rescued 0123456789${GAMESTATE.score} yarn balls`, {
+    fill: Palette.colors.white,
+  });
+  ctx.restore();
 }
