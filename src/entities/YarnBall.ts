@@ -1,5 +1,5 @@
 import { CircleCollider } from "../engine/Collisions2D";
-import { Palette, type Color } from "../engine/Color";
+import palette, { type Color } from "../engine/color";
 import Math2D, { Point } from "../utils/MathUtils";
 import { DynamicBody, Gravity } from "../engine/Physics2D";
 import { Stage } from "../engine/Stage";
@@ -90,7 +90,7 @@ export class YarnBall extends DynamicBody {
     position: Point,
     {
       radius = 100,
-      color = Palette.colors.coral,
+      color = palette.coral,
       color2 = color.lighten(1.1),
       lineWidth = 7,
       rotation = 0,

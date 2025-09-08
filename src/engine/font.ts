@@ -1,8 +1,8 @@
 import { Stage } from "./Stage";
 
 interface Letter {
-  path: string;
-  size: number;
+  path?: string;
+  size?: number;
 }
 
 function Letter(path: string, size = 75): Letter {

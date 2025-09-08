@@ -7,7 +7,7 @@ import type { Tube } from "../entities/Tube";
 import { YarnBall } from "../entities/YarnBall";
 import { star } from "../utils/CanvasUtils";
 import { Point } from "../utils/MathUtils";
-import { Palette } from "./Color";
+import palette from "./color";
 import { drawText, engrave } from "./font";
 import { gameoverElements, Stage, titleElements } from "./Stage";
 
@@ -154,7 +154,7 @@ export function drawLives() {
   for (let i = 0; i < GAMESTATE.lives; i++) {
     YarnBall.drawYarnball(pos.add(center), {
       radius,
-      color: Palette.colors.fuchsia,
+      color: palette.fuchsia,
       lineWidth: 2,
       decoration: true,
     });
@@ -180,8 +180,8 @@ export function drawGameoverUI() {
 
   {
     ctx.save();
-    ctx.fillStyle = Palette.colors.blue3;
-    ctx.strokeStyle = Palette.colors.blue0;
+    ctx.fillStyle = palette.blue3;
+    ctx.strokeStyle = palette.blue0;
     ctx.lineWidth = 3;
     const { path, length } = engrave(`game over`);
 
@@ -191,7 +191,7 @@ export function drawGameoverUI() {
     ctx.restore();
   }
 
-  ctx.fillStyle = Palette.colors.white;
+  ctx.fillStyle = palette.white;
 
   {
     ctx.save();

@@ -5,7 +5,7 @@ import {
   CollisionManager,
   downwardFilter,
 } from "../engine/Collisions2D";
-import { Palette } from "../engine/Color";
+import palette, { setTransparency } from "../engine/color";
 import { ElasticLine } from "../engine/ElasticLine";
 import Math2D, { damp, lerp, Point, RAD2DEG } from "../utils/MathUtils";
 import { Gravity, State } from "../engine/Physics2D";
@@ -27,7 +27,7 @@ let valid = true;
 let soundInterval: number;
 let mouseSpeed = 0;
 
-const { nightBlue: coatColor, blueGray: detailColor } = Palette.colors;
+const { nightBlue: coatColor, blueGray: detailColor } = palette;
 const MAX_CATS = 3;
 const MIN_LENGTH = 100;
 const MAX_STEEPNESS_TO_90 = 25;
@@ -253,7 +253,7 @@ export class Trampofeline extends ElasticLine {
 
   draw() {
     const { ctx } = Stage;
-    Palette.setTransparency(this._transparency);
+    setTransparency(this._transparency);
 
     ctx.lineWidth = 25;
     ctx.strokeStyle = `${coatColor}`;
@@ -302,16 +302,16 @@ export class Trampofeline extends ElasticLine {
     //   popsicle(inter, inter, "yellow");
     // }
 
-    Palette.setTransparency(1);
+    setTransparency(1);
   }
 }
 
 export function drawCatFace({
-  coatColor = Palette.colors.nightBlue,
-  detailColor = Palette.colors.blueGray,
-  pink = Palette.colors.pink,
-  white = Palette.colors.white,
-  black = Palette.colors.black,
+  coatColor = palette.nightBlue,
+  detailColor = palette.blueGray,
+  pink = palette.pink,
+  white = palette.white,
+  black = palette.black,
   drawPaws = true,
 } = {}) {
   const { ctx } = Stage;

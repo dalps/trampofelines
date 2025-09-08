@@ -1,14 +1,14 @@
 import { circle, popsicle } from "../utils/CanvasUtils";
 import { SegmentCollider } from "../engine/Collisions2D";
-import { Palette } from "../engine/Color";
+import palette from "../engine/color";
 import { DEG2RAD, Point } from "../utils/MathUtils";
 import { DynamicBody } from "../engine/Physics2D";
 import { Stage } from "../engine/Stage";
 import { Clock, instant, timestamp } from "../utils/TimeUtils";
 import { YarnBall } from "./YarnBall";
 
-const basketColor2 = "#9d5d2cff";
-const basketColor1 = "#c07b3aff";
+const basketColor2 = "#9d5d2c";
+const basketColor1 = "#c07b3a";
 
 export class Basket extends DynamicBody {
   constructor(center: Point) {
@@ -61,22 +61,16 @@ export class Basket extends DynamicBody {
     ctx.translate(100, 100);
     ctx.lineWidth = 2;
     ctx.lineJoin = "round";
-    const basket = new Path2D(`m -69,-12.5
-c -37.6,75.2 175.6,75.2 137.9,0 0,16.5 -137.9,16.3 -137.9,0
-z`);
-    const empty = new Path2D(`m 0,0
-c -38.2,0 -69,-5.7 -69,-12.5 -0,-6.9 30.7,-12.5 68.7,-12.5 38.3,-0 69.3,5.6 69.3,12.5
-C 69,-5.7 38.2,0 0,0
+    const basket = new Path2D(
+      `m -69,-12.5 c -37.6,75.2 175.6,75.2 137.9,0 0,16.5 -137.9,16.3 -137.9,0 z`
+    );
+    const empty =
+      new Path2D(`m 0,0 c -38.2,0 -69,-5.7 -69,-12.5 -0,-6.9 30.7,-12.5 68.7,-12.5 38.3,-0 69.3,5.6 69.3,12.5 C 69,-5.7 38.2,0 0,0
 Z`);
-    const emptyDown = new Path2D(`m -69,-12.5
-c -0,16.4 137.9,16.4 137.9,0`);
-    const handle = new Path2D(`M 21.9 -0.9
-      C 21.9 -0.9 25.1 -50.2 0 -50.2
-      C -25.1 -50.2 -21.9 -25.1 -21.9 -25.1
-      L -28.2 -25.1
-      C -28.2 -25.1 -31.3 -56.4 0 -56.4
-      C 31.3 -56.4 28.2 -0.9 28.2 -0.9
-      Z`);
+    const emptyDown = new Path2D(`m -69,-12.5 c -0,16.4 137.9,16.4 137.9,0`);
+    const handle = new Path2D(
+      `M 21.9 -0.9 C 21.9 -0.9 25.1 -50.2 0 -50.2 C -25.1 -50.2 -21.9 -25.1 -21.9 -25.1 L -28.2 -25.1 C -28.2 -25.1 -31.3 -56.4 0 -56.4 C 31.3 -56.4 28.2 -0.9 28.2 -0.9 Z`
+    );
 
     this.drawCrissCrossPattern();
     const pattern = ctx.createPattern(Stage.getLayer("pattern"), "repeat");
@@ -95,18 +89,18 @@ c -0,16.4 137.9,16.4 137.9,0`);
 
     YarnBall.drawYarnball(new Point(30, -10), {
       radius: 20,
-      color: Palette.colors.fuchsia,
+      color: palette.fuchsia,
       lineWidth: 2,
       rotation: 45 * DEG2RAD,
     });
     YarnBall.drawYarnball(new Point(50, -5), {
       radius: 20,
-      color: Palette.colors.chartreuse,
+      color: palette.chartreuse,
       lineWidth: 2,
     });
     YarnBall.drawYarnball(new Point(-48, -5), {
       radius: 20,
-      color: Palette.colors.coral,
+      color: palette.coral,
       lineWidth: 2,
       rotation: 30 * DEG2RAD,
     });

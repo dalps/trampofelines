@@ -1,4 +1,4 @@
-import { HSLColor, Palette } from "../engine/Color";
+import palette, { HSLColor } from "../engine/color";
 import { GAMESTATE } from "../engine/GameState";
 import { DynamicBody } from "../engine/Physics2D";
 import { Stage } from "../engine/Stage";
@@ -69,8 +69,8 @@ export class City {
     ctx.fill();
 
     // beams
-    // ctx.strokeStyle = "#d62b2bff";
-    // ctx.fillStyle = "#e74747ff";
+    // ctx.strokeStyle = "#d62b2b";
+    // ctx.fillStyle = "#e74747";
     // ctx.lineWidth = 3;
     // const wallWidth = 20;
 

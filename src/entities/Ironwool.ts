@@ -14,8 +14,8 @@ z`),
     );
 
     ctx.lineWidth = 3;
-    ctx.fillStyle = "#b5b5b5ff";
-    ctx.strokeStyle = "#6f6f6fff";
+    ctx.fillStyle = "#b5b5b5";
+    ctx.strokeStyle = "#6f6f6f";
     ctx.fill(path);
     ctx.stroke(path);
 

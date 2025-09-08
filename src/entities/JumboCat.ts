@@ -58,7 +58,7 @@ export class JumboCat extends ElasticShape {
   draw() {
     const { ctx } = Stage;
 
-    super.draw({ fillColor: Palette.colors.nightBlue.toString() });
+    super.draw({ fillColor: palette.nightBlue.toString() });
 
     let {
       position: { x, y },

@@ -1,4 +1,4 @@
-import { Palette } from "../engine/Color";
+import palette from "../engine/color";
 import { engrave } from "../engine/font";
 import { Stage } from "../engine/Stage";
 import { YarnBall } from "../entities/YarnBall";
@@ -6,7 +6,7 @@ import { circle, star } from "../utils/CanvasUtils";
 import { distribute, Point } from "../utils/MathUtils";
 import { Clock } from "../utils/TimeUtils";
 
-export function toranporin(position: Point, { color = Palette.colors.blue0 }) {
+export function toranporin(position: Point, { color = palette.blue0 }) {
   Stage.setActiveLayer("game");
   const { ctx } = Stage;
 
@@ -19,7 +19,7 @@ export function toranporin(position: Point, { color = Palette.colors.blue0 }) {
   ctx.fillStyle = color;
   ctx.fillText(text, position.x, position.y + 48);
 
-  // ctx.strokeStyle = Palette.colors.blue1;
+  // ctx.strokeStyle = palette.blue1;
   // ctx.strokeText(text, 0, 48);
 }
 
@@ -27,7 +27,7 @@ export function drawTitle() {
   Stage.setActiveLayer("game");
   const { ctx, cw, ch } = Stage;
   const { time } = Clock;
-  const { white, blue0, blue1, blue2, blue3 } = Palette.colors;
+  const { white, blue0, blue1, blue2, blue3 } = palette;
 
   ctx.fillStyle = blue1;
   ctx.fillRect(0, 0, cw, ch);

@@ -9,7 +9,7 @@ import {
   title,
 } from "./GameState";
 import { drawTitle } from "../backdrops/Title";
-import { Palette } from "./Color";
+import palette from "./color";
 import { Point } from "../utils/MathUtils";
 import { City } from "../entities/City";
 
@@ -138,7 +138,7 @@ export class Stage {
 
     this.setActiveLayer("game");
 
-    const { white, blue0, blue1, blue2, blue3 } = Palette.colors;
+    const { white, blue0, blue1, blue2, blue3 } = palette;
     Stage.newOffscreenLayer("catFace", 50, 100);
     Stage.setActiveLayer("catFace");
     Stage.ctx.translate(25, 50);

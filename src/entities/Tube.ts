@@ -1,7 +1,7 @@
 import { drawLives, GAMESTATE, State as GameState } from "../engine/GameState";
 import { makeGradient } from "../utils/CanvasUtils";
 import { CollisionManager, downwardFilter } from "../engine/Collisions2D";
-import { HSLColor, Palette } from "../engine/Color";
+import palette, { HSLColor } from "../engine/color";
 import { lerp, Point } from "../utils/MathUtils";
 import { State } from "../engine/Physics2D";
 import { Ripple } from "../engine/Ripple";
@@ -44,7 +44,7 @@ export class Tube {
     const headLength = Math.max(sx * 0.1, 20);
 
     const colorOptions = ["coral", "fuchsia", "chartreuse", "hotPink"];
-    const color = Palette.colors[
+    const color = palette[
       colorOptions[Math.floor(Math.random() * colorOptions.length)]
     ] as HSLColor;
 
@@ -222,7 +222,7 @@ export class Tube {
 
     ctx.fillStyle = makeGradient(new Point(0, 0), new Point(0, sy), {
       color1: "black",
-      color2: "#298529ff",
+      color2: "#298529",
       shineSize: 0,
     });
     ctx.fill(hole);

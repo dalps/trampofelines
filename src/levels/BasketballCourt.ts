@@ -4,7 +4,7 @@ import {
   downwardFilter,
   SegmentCollider,
 } from "../engine/Collisions2D";
-import { Palette } from "../engine/Color";
+import palette from "../engine/color";
 import { DEG2RAD, Point } from "../utils/MathUtils";
 import { DynamicBody } from "../engine/Physics2D";
 import { Stage } from "../engine/Stage";
@@ -65,10 +65,10 @@ export class BasketballCourt {
 
     const floorHeight = 0.6;
 
-    ctx.fillStyle = "#aae0ffff";
+    ctx.fillStyle = "#aae0ff";
     ctx.fillRect(0, 0, cw, ch * floorHeight);
 
-    ctx.fillStyle = Palette.colors.coral.toString();
+    ctx.fillStyle = palette.coral.toString();
     ctx.fillRect(0, ch * floorHeight, cw, ch * (1 - floorHeight));
 
     ctx.strokeStyle = "white";
@@ -87,7 +87,7 @@ export class BasketballCourt {
     ctx.stroke();
 
     ctx.strokeStyle = "yellow";
-    ctx.fillStyle = "#d7ff72ff";
+    ctx.fillStyle = "#d7ff72";
     ctx.lineWidth = 3;
 
     ctx.save();
