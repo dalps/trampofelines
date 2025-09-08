@@ -1,16 +1,15 @@
 import { drawTitle } from "../backdrops/Title";
 import sfx, { zzfxP } from "../engine/sfx";
 import { Basket } from "../entities/Basket";
+import { City } from "../entities/City";
 import TrampofelineManager from "../entities/Trampofeline";
 import type { Tube } from "../entities/Tube";
 import { YarnBall } from "../entities/YarnBall";
-import { BasketballCourt } from "../levels/BasketballCourt";
 import { star } from "../utils/CanvasUtils";
 import { Point } from "../utils/MathUtils";
 import { Palette } from "./Color";
+import { drawText, engrave } from "./font";
 import { gameoverElements, Stage, titleElements } from "./Stage";
-import { City } from "../entities/City";
-import { type Level } from "../levels/levels";
 
 export const settings = {
   showJoints: false,
@@ -172,7 +171,6 @@ export function drawLives() {
 }
 
 export const FONT = "Roboto,tsans-serif";
-import { drawText } from "./font";
 export function drawGameoverUI() {
   Stage.setActiveLayer("game-info");
   const { ctx, cw, ch } = Stage;
@@ -180,31 +178,40 @@ export function drawGameoverUI() {
   ctx.fillStyle = "#0000007f";
   ctx.fillRect(0, 0, cw, ch);
 
-  const gameOver = new Path2D(
-    `M 6.3 8.2  L 6.3 7.7  L 5.4 7.7  L 5.4 5  L 9.7 5  L 9.7 10.9  L 7.5 11.5  L 5.3 11.7  L 2.8 11.3  L 1.1 10.2  L 0.3 8.4  L 0.1 5.9  L 0.3 3.4  L 1.2 1.6  L 1.9 0.9  L 2.9 0.5  L 5.7 0.1  L 7.5 0.2  L 9.1 0.5  L 8.6 3.3  L 6 3  L 4.4 3.2  L 3.9 3.9  L 3.9 8.9  L 5.1 8.9  L 6 8.8  L 6.3 8.2  L 6.3 8.2    M 14.4 11.4  L 10.7 11.4  L 13.6 0.4  L 19.1 0.4  L 21.9 11.4  L 18.2 11.4  L 17.8 9.7  L 14.9 9.7  L 14.4 11.4    M 16.2 3.7  L 15.5 6.8  L 17.1 6.8  L 16.4 3.8  L 16.2 3.7    M 26.4 11.4  L 22.7 11.4  L 23.4 0.4  L 28 0.4  L 29.4 6  L 29.5 6  L 30.9 0.4  L 35.5 0.4  L 36.2 11.4  L 32.5 11.4  L 32.3 6.1  L 32.2 6.1  L 30.8 11.4  L 28.1 11.4  L 26.7 6.1  L 26.6 6.1  L 26.4 11.4    M 45.1 7.3  L 41.6 7.3  L 41.6 8.6  L 45.9 8.6  L 45.9 11.4  L 38 11.4  L 38 0.4  L 45.8 0.4  L 45.4 3.2  L 41.6 3.2  L 41.6 4.7  L 45.1 4.7  L 45.1 7.3    M 51 6  L 51.3 3.4  L 52.1 1.6  L 53.7 0.6  L 56.2 0.2  L 58.7 0.6  L 60.3 1.6  L 61.1 3.4  L 61.4 6  L 61.2 8.5  L 60.4 10.3  L 59.7 11  L 58.8 11.4  L 56.2 11.8  L 53.6 11.4  L 52 10.3  L 51.2 8.5  L 51 6  L 51 6    M 54.8 4.2  L 54.8 8.8  L 56.3 8.8  L 57.3 8.6  L 57.6 7.8  L 57.6 3.1  L 56.1 3.1  L 55.1 3.3  L 54.8 4.1  L 54.8 4.2    M 69.3 0.4  L 73 0.4  L 70.3 11.4  L 65.1 11.4  L 62.4 0.4  L 66.1 0.4  L 67.6 7.4  L 67.8 7.4  L 69.3 0.4    M 81.5 7.3  L 78 7.3  L 78 8.6  L 82.3 8.6  L 82.3 11.4  L 74.5 11.4  L 74.5 0.4  L 82.3 0.4  L 81.8 3.2  L 78 3.2  L 78 4.7  L 81.5 4.7  L 81.5 7.3    M 94 11.4  L 90.1 11.4  L 88.7 8.1  L 87.9 8.1  L 87.9 11.4  L 84.4 11.4  L 84.4 0.4  L 90 0.4  L 91.7 0.6  L 92.8 1.4  L 93.6 2.6  L 93.8 4.3  L 93.4 6.5  L 92.9 7.3  L 92.2 7.8  L 94 11.4    M 87.9 3.2  L 87.9 5.4  L 88.7 5.4  L 89.6 5.3  L 89.9 4.7  L 89.9 3.9  L 89.6 3.3  L 88.7 3.2  L 87.9 3.2    M 99.3 8.4  L 96.4 8.4  L 95.8 0.8  L 96 0.4  L 96.5 0.3  L 99.3 0.3  L 99.8 0.4  L 100 0.8  L 99.3 8.4    M 96.2 11.2  L 95.8 10.1  L 96.2 9  L 97.8 8.7  L 99.4 9  L 99.8 10.1  L 99.4 11.2  L 97.8 11.5  L 96.2 11.2  L 96.2 11.2`
-  );
-  const gameOver2 = `All the yarn balls dropped into the void :(`;
-  const score = `Rescued: ${GAMESTATE.score}`;
+  {
+    ctx.save();
+    ctx.fillStyle = Palette.colors.blue3;
+    ctx.strokeStyle = Palette.colors.blue0;
+    ctx.lineWidth = 3;
+    const { path, length } = engrave(`game over`);
 
-  ctx.fillStyle = "#c4de69ff";
-  ctx.lineWidth = 3;
-  ctx.strokeStyle = "#5a7bffff";
-  ctx.textAlign = "center";
-  ctx.font = `48px ${FONT}`;
+    ctx.translate(cw * 0.5 - length * 0.5, ch * 0.5 - 200);
+    ctx.fill(path);
+    ctx.stroke(path);
+    ctx.restore();
+  }
 
-  ctx.save();
-  ctx.translate(cw * 0.5 - 250, ch * 0.5 - 200);
-  // ctx.scale(5, 5);
-  drawText("Game Over", { fill: "#c4de69", stroke: "#5a7bff", lineWidth: 3 });
-  // ctx.stroke(gameOver);
-  // ctx.fill(gameOver);
-  ctx.restore();
+  ctx.fillStyle = Palette.colors.white;
 
-  ctx.save();
-  ctx.translate(cw * 0.5 - 250, ch * 0.5);
-  ctx.scale(0.2, 0.2);
-  drawText(`You rescued 0123456789${GAMESTATE.score} yarn balls`, {
-    fill: Palette.colors.white,
+  {
+    ctx.save();
+    const { path, length } = engrave(
+      `you rescued ${GAMESTATE.score} yarn balls`
+    );
+    const scale = 0.2;
+    ctx.translate(cw * 0.5 - length * 0.5 * scale, ch * 0.5 - 100);
+    ctx.scale(scale, scale);
+    ctx.fill(path);
+    ctx.restore();
+  }
+
+  ["retry", "quit"].forEach((t, i) => {
+    ctx.save();
+    const { path, length } = engrave(t);
+    const scale = 0.3;
+    ctx.translate(cw * 0.5 - length * 0.5 * scale, ch * 0.5 + i * 50);
+    ctx.scale(scale, scale);
+    ctx.fill(path);
+    ctx.restore();
   });
-  ctx.restore();
 }

@@ -187,3 +187,21 @@ export function drawText(
   }
   ctx.restore();
 }
+
+export function engrave(text: string): { path: Path2D; length: number } {
+  let length = 0;
+  const acc = new Path2D();
+  const mat = new DOMMatrix();
+
+  Array.from(text)
+    .map((c) => KUROKANE[c.toUpperCase()])
+    .forEach(({ size = 0, path = "" }) => {
+      const p = new Path2D(path);
+      p.closePath();
+      acc.addPath(p, mat);
+      length += size;
+      mat.translateSelf(size, 0, 0);
+    });
+
+  return { path: acc, length };
+}
