@@ -25,6 +25,7 @@ let distance = 0;
 let drawing = false;
 let valid = true;
 let soundInterval: number;
+let mouseSpeed = 0;
 
 const { nightBlue: coatColor, blueGray: detailColor } = Palette.colors;
 const MAX_CATS = 3;
@@ -96,13 +97,18 @@ export default class TrampofelineManager {
 
       Stage.setActiveLayer("game");
 
-      soundInterval = setInterval(() => zzfxP(sfx.drawing), 50);
+      soundInterval = setInterval(
+        () => mouseSpeed > 2 && zzfxP(sfx.drawing),
+        50
+      );
 
       mouseDown = true;
     }
 
     function handleMouseMove(e: MouseEvent) {
       e.preventDefault();
+
+      mouseSpeed = Math.hypot(e.movementX, e.movementY);
 
       if (!mouseDown || e.buttons === 0) {
         mouseDown = false;
@@ -136,7 +142,7 @@ export default class TrampofelineManager {
 
       valid && TrampofelineManager.makeCat();
       console.log(valid);
-      // valid && zzfxP(sfx.meow);
+      valid && zzfxP(sfx.meow);
       !valid && zzfxP(sfx.badPlacement);
 
       p1 = p2 = undefined;
@@ -191,19 +197,14 @@ export default class TrampofelineManager {
     let sep: Point;
     let angle: number;
     valid =
-      (distance >= MIN_LENGTH &&
-        TrampofelineManager.entities.size < MAX_CATS &&
-        Array.from(TrampofelineManager.entities.values()).filter(
-          ({ joints }) => {
-            p3 = joints.at(0).position;
-            p4 = joints.at(-1).position;
-            inter = Math2D.properInter(p1, p2, p3, p4);
-            return inter;
-          }
-        ).length === 0 &&
-        (angle = Math.abs(Math.atan2((sep = p2.sub(p1)).y, sep.x)) * RAD2DEG) <=
-          90 - MAX_STEEPNESS_TO_90) ||
-      angle >= 90 + MAX_STEEPNESS_TO_90;
+      distance >= MIN_LENGTH &&
+      TrampofelineManager.entities.size < MAX_CATS &&
+      Array.from(TrampofelineManager.entities.values()).filter(({ joints }) => {
+        p3 = joints.at(0).position;
+        p4 = joints.at(-1).position;
+        inter = Math2D.properInter(p1, p2, p3, p4);
+        return inter;
+      }).length === 0;
     return valid;
   }
 
