@@ -29,7 +29,7 @@ function init() {
   // BasketballCourt.init(new Point(Stage.cw * 0.5, Stage.ch * 0.5));
   City.init();
 
-  restart();
+  title();
 
   requestAnimationFrame(draw);
 }
@@ -40,7 +40,6 @@ function init() {
 function draw(time: timestamp) {
   time *= 0.01;
   Clock.update(time);
-  const { dt } = Clock;
 
   switch (GAMESTATE.state) {
     case State.Title:
@@ -77,7 +76,7 @@ function draw(time: timestamp) {
 
       balls.forEach((b, i) => {
         const threadEndPos = b.thread.at(-1).position;
-        if (threadEndPos.x < 0 || threadEndPos.x > cw || threadEndPos.y > ch) {
+        if (threadEndPos.y > ch) {
           CollisionManager.unregisterBody(b);
           GAMESTATE.state === State.Playing && zzfxP(sfx.drop);
           GAMESTATE.balls.delete(b.id);
@@ -86,6 +85,11 @@ function draw(time: timestamp) {
           GAMESTATE.state === State.Playing && drawLives();
           GAMESTATE.lives <= 0 && gameOver();
           return;
+        }
+
+        const threshold = b.radius * 0.5;
+        if (b.position.x - threshold < 0 || b.position.x + threshold > cw) {
+          b.velocity.x *= -1;
         }
 
         Stage.setActiveLayer("game");
