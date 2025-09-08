@@ -26,8 +26,8 @@ class Joint extends DynamicBody {
     t.addForce(new Repulsion(t.position, this.position, this.repulsion));
   }
 
-  update(): void {
-    super.update();
+  updateAndDraw(): void {
+    super.updateAndDraw();
   }
 }
 
@@ -118,7 +118,7 @@ export class ElasticShape {
 
   update() {
     this.joints.forEach((joint) => {
-      joint.update();
+      joint.updateAndDraw();
     });
   }
 }

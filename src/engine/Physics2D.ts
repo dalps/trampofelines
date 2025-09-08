@@ -186,7 +186,7 @@ export class DynamicBody {
     this._fixed = !this._fixed;
   }
 
-  update() {
+  updateAndDraw() {
     const { dt } = Clock;
 
     if (this._fixed) return;

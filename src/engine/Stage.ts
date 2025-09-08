@@ -11,6 +11,7 @@ import {
 import { drawTitle } from "../backdrops/Title";
 import { Palette } from "./Color";
 import { Point } from "../utils/MathUtils";
+import { City } from "../entities/City";
 
 export const restartBtn = document.getElementById("restart-btn");
 export const playBtn = document.getElementById("play-btn");
@@ -182,11 +183,12 @@ export class Stage {
         drawTitle();
         break;
       case State.Playing:
-        BasketballCourt.draw();
+        // BasketballCourt.draw();
+        City.drawBackground();
         drawPlayingUI();
         break;
       case State.GameOver:
-        BasketballCourt.draw();
+        // BasketballCourt.draw();
         drawGameoverUI();
         break;
     }

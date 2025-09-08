@@ -219,7 +219,6 @@ export class Tube {
       }
     );
     ctx.fill(lid);
-    // ctx.stroke(lid);
 
     ctx.fillStyle = makeGradient(new Point(0, 0), new Point(0, sy), {
       color1: "black",
@@ -227,7 +226,6 @@ export class Tube {
       shineSize: 0,
     });
     ctx.fill(hole);
-    // ctx.stroke(hole);
 
     ctx.lineWidth = 3;
     [highlightL, highlightR].forEach((path) => {

@@ -1,5 +1,5 @@
 import { drawTitle } from "../backdrops/Title";
-import sfx from "../engine/sfx";
+import sfx, { zzfxP } from "../engine/sfx";
 import { Basket } from "../entities/Basket";
 import TrampofelineManager from "../entities/Trampofeline";
 import type { Tube } from "../entities/Tube";
@@ -9,7 +9,8 @@ import { star } from "../utils/CanvasUtils";
 import { Point } from "../utils/MathUtils";
 import { Palette } from "./Color";
 import { gameoverElements, Stage, titleElements } from "./Stage";
-import { zzfxP } from "./zzfx";
+import { City } from "../entities/City";
+import { type Level } from "../levels/levels";
 
 export const settings = {
   showJoints: false,
@@ -28,7 +29,7 @@ export interface GameState {
   state: State;
   balls: Map<string, YarnBall>;
   tubes: Tube[];
-  basket?: Basket;
+  baskets: Basket[];
   lives: number;
   score: number;
   settings: typeof settings;
@@ -66,7 +67,8 @@ export function restart() {
       Stage.stage.appendChild(Stage.getLayer("ui"));
 
       Stage.setActiveLayer("bg");
-      BasketballCourt.draw();
+      // BasketballCourt.draw();
+      City.drawBackground();
 
       drawLives();
 
@@ -106,6 +108,7 @@ export const GAMESTATE: GameState = {
   state: State.Title,
   balls: new Map(),
   tubes: [],
+  baskets: [],
   lives: TOTAL_LIVES,
   score: 0,
   settings,
@@ -162,7 +165,7 @@ export function drawLives() {
   // Print the score
   const score = `Rescued: ${GAMESTATE.score}`;
   ctx.font = `24px ${FONT}`;
-  ctx.fillStyle = "black";
+  ctx.fillStyle = "white";
   ctx.textAlign = "right";
   ctx.fillText(score, cw - 20, 48);
 }

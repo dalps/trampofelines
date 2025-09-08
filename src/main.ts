@@ -4,6 +4,7 @@ import {
   drawLives,
   gameOver,
   GAMESTATE,
+  restart,
   settings,
   State,
   title,
@@ -12,7 +13,9 @@ import { RippleManager } from "./engine/Ripple";
 import sfx from "./engine/sfx";
 import { Stage } from "./engine/Stage";
 import { zzfxP } from "./engine/zzfx";
+import { Basket } from "./entities/Basket";
 import TrampofelineManager from "./entities/Trampofeline";
+import { City } from "./entities/City";
 import { BasketballCourt } from "./levels/BasketballCourt";
 import { Point } from "./utils/MathUtils";
 import { Clock, type timestamp } from "./utils/TimeUtils";
@@ -21,10 +24,12 @@ const { balls } = GAMESTATE;
 function init() {
   Stage.init(document.getElementById("stage"));
 
-  BasketballCourt.init(new Point(Stage.cw * 0.5, Stage.ch * 0.5));
   TrampofelineManager.init();
 
-  title();
+  // BasketballCourt.init(new Point(Stage.cw * 0.5, Stage.ch * 0.5));
+  City.init();
+
+  restart();
 
   requestAnimationFrame(draw);
 }
@@ -50,7 +55,7 @@ function draw(time: timestamp) {
       const { cw, ch } = Stage;
 
       GAMESTATE.tubes.forEach((tube) => tube.draw());
-      GAMESTATE.basket?.update();
+      GAMESTATE.baskets.forEach((basket) => basket.updateAndDraw());
 
       settings.play && CollisionManager.update();
 
@@ -85,7 +90,7 @@ function draw(time: timestamp) {
 
         Stage.setActiveLayer("game");
 
-        settings.play && b.update();
+        settings.play && b.updateAndDraw();
 
         b.draw();
         settings.showForces && b.drawForces();

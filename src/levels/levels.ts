@@ -5,6 +5,9 @@ export interface Level {
   enemies: Point[];
   tubes: Point[];
   yarnBallsToRescue: number;
+  draw: Function;
+  drawBackground: Function;
+  init: Function;
 }
 
 export const LEVELS: Level[] = [

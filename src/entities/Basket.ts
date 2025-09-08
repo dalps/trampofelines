@@ -7,9 +7,6 @@ import { Stage } from "../engine/Stage";
 import { Clock, instant, timestamp } from "../utils/TimeUtils";
 import { YarnBall } from "./YarnBall";
 
-Stage.newOffscreenLayer("pattern", 16, 16);
-Stage.newOffscreenLayer("basket", 200, 200);
-
 const basketColor2 = "#9d5d2cff";
 const basketColor1 = "#c07b3aff";
 
@@ -20,7 +17,7 @@ export class Basket extends DynamicBody {
     this.collider = new SegmentCollider(center.addX(-75), center.addX(75));
   }
 
-  update() {
+  updateAndDraw() {
     const { time, dt } = Clock;
     const c = this.collider as SegmentCollider;
 
@@ -38,7 +35,8 @@ export class Basket extends DynamicBody {
     ctx.restore();
   }
 
-  static drawPattern() {
+  static drawCrissCrossPattern() {
+    Stage.newOffscreenLayer("pattern", 16, 16);
     Stage.setActiveLayer("pattern");
     const { ctx, cw, ch } = Stage;
 
@@ -54,7 +52,8 @@ export class Basket extends DynamicBody {
     ctx.stroke();
   }
 
-  static drawBasket() {
+  static drawTexture() {
+    Stage.newOffscreenLayer("basket", 200, 200);
     Stage.setActiveLayer("basket");
     const { ctx } = Stage;
 
@@ -79,6 +78,7 @@ c -0,16.4 137.9,16.4 137.9,0`);
       C 31.3 -56.4 28.2 -0.9 28.2 -0.9
       Z`);
 
+    this.drawCrissCrossPattern();
     const pattern = ctx.createPattern(Stage.getLayer("pattern"), "repeat");
 
     ctx.lineWidth = 5;
@@ -129,6 +129,3 @@ c -0,16.4 137.9,16.4 137.9,0`);
     ctx.restore();
   }
 }
-
-Basket.drawPattern();
-Basket.drawBasket();
