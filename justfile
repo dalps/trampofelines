@@ -11,8 +11,14 @@ build:
     esbuild --minify --bundle --loader:.html=copy --outdir=dist --format=esm index.html src/main.ts
 
 zip: clean build
-    advzip pack.zip -a dist/*
+    mkdir -p tmp tmp/src
+    roadroller dist/src/main.js -o tmp/src/main.js
+    advzip pack.zip -a tmp/* dist/index.html
+    rm -rf tmp/
     stat pack.zip
+
+unzip:
+    unzip pack.zip -d game
 
 clean:
     rm -rf ./dist ./pack.zip

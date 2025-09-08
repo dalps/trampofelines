@@ -163,14 +163,17 @@ export function drawLives() {
   }
 
   // Print the score
-  const score = `Rescued: ${GAMESTATE.score}`;
-  ctx.font = `24px ${FONT}`;
-  ctx.fillStyle = "white";
-  ctx.textAlign = "right";
-  ctx.fillText(score, cw - 20, 48);
+  {
+    const { path, length } = engrave(`Rescued ${GAMESTATE.score}`);
+    ctx.fillStyle = palette.white;
+    ctx.save();
+    ctx.translate(cw - 20 - length * 0.5, 48);
+    ctx.scale(0.2, 0.2);
+    ctx.fill(path);
+    ctx.restore();
+  }
 }
 
-export const FONT = "Roboto,tsans-serif";
 export function drawGameoverUI() {
   Stage.setActiveLayer("game-info");
   const { ctx, cw, ch } = Stage;
