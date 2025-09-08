@@ -41,9 +41,9 @@ export class YarnBall extends DynamicBody {
     this.thread = points.map((p) => new DynamicBody(p));
   }
 
-  update(): void {
+  updateAndDraw(): void {
     const { dt } = Clock;
-    super.update();
+    super.updateAndDraw();
 
     this.threadLength += dt * 0.01;
     this.thread[0].position = this.position
@@ -63,13 +63,11 @@ export class YarnBall extends DynamicBody {
   draw() {
     const { ctx } = Stage;
 
-    Palette.setTransparency(1);
-
     ctx.beginPath();
     ctx.lineWidth = 4;
     ctx.lineCap = "butt";
     ctx.lineJoin = "bevel";
-    ctx.strokeStyle = this.color.setAlpha(0.9).toString();
+    ctx.strokeStyle = this.color.toString();
     ctx.moveTo(this.position.x, this.position.y);
     this.thread.forEach((joint, i) => {
       i >= 0 && ctx.lineTo(joint.position.x, joint.position.y);
