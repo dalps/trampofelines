@@ -1,4 +1,5 @@
 import { Point } from "../utils/MathUtils";
+import PALETTE from "./color";
 import { Stage } from "./Stage";
 
 interface Glyph {
@@ -60,7 +61,6 @@ const KUROKANE: Record<string, Glyph> = {
   A: {
     path: "m75.7 72.7-1.2-1.3-3.4-3.7-4.7-5.9-5.6-7.9h-30.0l-7.3 17.9-13.4-5.0 27.1-66.8h22.5l30.0 65.5-14.0 7.2m-23.0-33.1-4.3-10.0-3.4-10.8-8.4 20.8h16.1",
     size: 80,
-    kernings: { Y: 2, G: 5, T: 2, V: 8, K: 8 },
   },
   B: {
     path: "m23.9 71.2v-71.2h30.2l6.5 0.9 6.4 3.1 4.8 6.0 1.9 9.5-4.6 14.0 4.9 6.1 2.0 9.3-1.5 9.6-3.6 7.1-8.2 5.7h-38.8m30.6-56.8h-12.6v14.2h12.6v-14.2m0.4 28.4h-13.0v14.1h13.0v-14.1",
@@ -165,37 +165,38 @@ const KUROKANE: Record<string, Glyph> = {
 };
 
 KUROKANE[" "] = { size: 20 };
+KUROKANE["A"].kernings = { Y: 2, G: 5, T: 2, V: 8, K: 8, B: 8 };
+KUROKANE["Y"].kernings = { A: 2 };
+KUROKANE["O"].kernings = { P: 5 };
+
+const lineHeight = 40;
+const defaultKerning = 12;
+const frameSize = 100;
 
 export function drawText(
   text: string,
   {
     pos = new Point(0, 0),
-    fill = "white",
+    fontSize = 16,
+    fill = PALETTE.white,
     stroke = undefined,
     lineWidth = 2,
   } = {}
 ) {
   const { ctx } = Stage;
-
-  let totalLength = 0;
-  let char: Glyph;
+  const scale = fontSize / frameSize;
+  const { path, length } = engrave(text);
 
   ctx.save();
-  ctx.translate(-10, 0);
-  for (let i = 0, x = 0; i < text.length; i++, x += char?.size ?? 0) {
+  ctx.translate(pos.x - length * 0.5 * scale, pos.y - lineHeight * 0.5 * scale);
+  ctx.scale(scale, scale);
+  if (fill) {
     ctx.fillStyle = fill;
+    ctx.fill(path);
+  }
+  if (stroke) {
     ctx.strokeStyle = stroke;
-    ctx.lineWidth = lineWidth;
-    char = KUROKANE[text[i].toUpperCase()];
-    totalLength += char?.size ?? 0;
-    const p = new Path2D(char?.path ?? ``);
-    p.closePath();
-    fill && ctx.fill(p);
-    stroke && ctx.stroke(p);
-    ctx.strokeStyle = "yellow";
-    ctx.lineWidth = 2;
-    // ctx.strokeRect(0, 0, char?.size ?? 0, 100);
-    ctx.translate(char?.size, 0);
+    ctx.stroke(path);
   }
   ctx.restore();
 }
@@ -209,17 +210,22 @@ export function engrave(text: string): { path: Path2D; length: number } {
   Array.from(text).forEach((c) => {
     const C = c.toUpperCase();
     const { size = 0, path = "", kernings = {} } = KUROKANE[C];
+    const space = (frameSize - size) * 0.5;
     const p = new Path2D(path);
     p.closePath();
-    const space = (100 - size) * 0.5;
-    const kerning = kernings[prevChar] ?? 12;
-    console.log(kerning);
-    mat.translateSelf(kerning, 0, 0);
+
+    if (prevChar) {
+      const kerning = kernings[prevChar] ?? defaultKerning;
+      mat.translateSelf(kerning, 0, 0);
+      length += kerning;
+    }
+
     mat.translateSelf(-space, 0, 0);
     acc.addPath(p, mat);
     mat.translateSelf(size, 0, 0);
     mat.translateSelf(space, 0, 0);
-    length += kerning + size;
+
+    length += size;
     prevChar = C;
   });
 

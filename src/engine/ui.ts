@@ -1,7 +1,7 @@
 import { YarnBall } from "../entities/YarnBall";
 import { star } from "../utils/CanvasUtils";
 import { Point } from "../utils/MathUtils";
-import { engrave } from "./font";
+import { drawText, engrave } from "./font";
 import { GAMESTATE, TOTAL_LIVES } from "./GameState";
 import { Stage } from "./Stage";
 import palette from "./color";
@@ -54,16 +54,9 @@ export function drawLives() {
     pos.incrX(sectionSize);
   }
 
-  // Print the score
-  {
-    const { path, length } = engrave(`Rescued ${GAMESTATE.score}`);
-    ctx.fillStyle = palette.white;
-    ctx.save();
-    ctx.translate(cw - 20 - length * 0.5, 48);
-    ctx.scale(0.2, 0.2);
-    ctx.fill(path);
-    ctx.restore();
-  }
+  drawText(`score ${GAMESTATE.score}`, {
+    pos: new Point(cw * 0.5, 100),
+  });
 }
 
 export function drawGameoverUI() {
@@ -73,30 +66,15 @@ export function drawGameoverUI() {
   ctx.fillStyle = palette.black.clone().setAlpha(0.5);
   ctx.fillRect(0, 0, cw, ch);
 
-  {
-    ctx.save();
-    ctx.fillStyle = palette.blue3;
-    ctx.strokeStyle = palette.blue0;
-    ctx.lineWidth = 3;
-    const { path, length } = engrave(`game over!`);
+  ctx.lineWidth = 3;
+  drawText(`game over!`, {
+    pos: new Point(cw * 0.5, ch * 0.5 - 200),
+    fill: palette.blue3,
+    stroke: palette.blue0,
+    fontSize: 80,
+  });
 
-    ctx.translate(cw * 0.5 - length * 0.5, ch * 0.5 - 200);
-    ctx.fill(path);
-    ctx.stroke(path);
-    ctx.restore();
-  }
-
-  ctx.fillStyle = palette.white;
-
-  {
-    ctx.save();
-    const { path, length } = engrave(
-      `you rescued ${GAMESTATE.score} yarn balls`
-    );
-    const scale = 0.2;
-    ctx.translate(cw * 0.5 - length * 0.5 * scale, ch * 0.5 - 100);
-    ctx.scale(scale, scale);
-    ctx.fill(path);
-    ctx.restore();
-  }
+  drawText(`you rescued ${GAMESTATE.score} yarn balls`, {
+    pos: new Point(cw * 0.5, ch * 0.5 - 100),
+  });
 }

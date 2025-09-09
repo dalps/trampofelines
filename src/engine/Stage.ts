@@ -3,7 +3,7 @@ import { City } from "../entities/City";
 import { drawCatFace, drawCatRear } from "../entities/Trampofeline";
 import { Point } from "../utils/MathUtils";
 import PALETTE from "./color";
-import { engrave } from "./font";
+import { drawText, engrave } from "./font";
 import { GAMESTATE, restart, State, title } from "./GameState";
 import { drawGameoverUI, drawLives } from "./ui";
 
@@ -125,13 +125,8 @@ export class Stage {
       data["ref"] = node;
       this.newOffscreenLayer(id, 200, 48);
       this.setActiveLayer(id);
-      const { ctx, cw, ch } = this;
-      ctx.fillStyle = PALETTE.white;
-      const { path, length } = engrave(data.text);
-      const scale = 0.3;
-      ctx.translate(cw * 0.5 - length * 0.5 * scale, ch * 0.5 - 30 * scale);
-      ctx.scale(scale, scale);
-      ctx.fill(path);
+      const { cw, ch } = this;
+      drawText(data.text, { pos: new Point(cw * 0.5, ch * 0.5), fontSize: 24 });
       node.appendChild(this.getLayer(id));
       node.onclick = data.onclick;
     });
