@@ -119,8 +119,8 @@ export function drawTitle() {
   );
 
   [
-    ["trampo", 50, -65],
-    ["felines", 50, 25],
+    ["trampo", 60, -40],
+    ["felines!", 40, 50],
   ].forEach(([t, dx, dy]: [string, number, number]) => {
     const p = new Path2D();
     const { path, length } = engrave(t);

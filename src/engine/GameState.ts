@@ -186,7 +186,7 @@ export function drawGameoverUI() {
     ctx.fillStyle = palette.blue3;
     ctx.strokeStyle = palette.blue0;
     ctx.lineWidth = 3;
-    const { path, length } = engrave(`game over`);
+    const { path, length } = engrave(`game over!`);
 
     ctx.translate(cw * 0.5 - length * 0.5, ch * 0.5 - 200);
     ctx.fill(path);
