@@ -4,8 +4,8 @@ import { DynamicBody } from "../engine/Physics2D";
 import { Stage } from "../engine/Stage";
 import { makeGradient } from "../utils/CanvasUtils";
 import { distribute, Point } from "../utils/MathUtils";
-import { Basket } from "./Basket";
-import { Tube } from "./Tube";
+import { Basket } from "../entities/Basket";
+import { Tube } from "../entities/Tube";
 
 export class City {
   static init() {

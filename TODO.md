@@ -6,6 +6,8 @@
 
 ## TODO
 
+SWAP the numbers!!
+
 ~~* fade out feline when hit once~~
 ~~* title screen with play button~~
 ~~* sfx~~
@@ -18,4 +20,5 @@
 * star particles
 * draw tube in any direction
 * tube shake before spawning a ball
-* custom text with Path2D
+~~* custom text with Path2D~~
+* buttons

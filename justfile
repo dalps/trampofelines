@@ -21,7 +21,7 @@ unzip:
     unzip pack.zip -d game
 
 clean:
-    rm -rf ./dist ./pack.zip
+    rm -rf ./dist ./pack.zip ./game
 
 linecount:
     find src/ -name '*.ts' | xargs wc -lc

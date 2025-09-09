@@ -1,5 +1,5 @@
-import { drawTitle } from "../backdrops/Title";
-import { City } from "../entities/City";
+import { drawTitle } from "../scenes/Title";
+import { City } from "../scenes/City";
 import { drawCatFace, drawCatRear } from "../entities/Trampofeline";
 import { Point } from "../utils/MathUtils";
 import PALETTE from "./color";

@@ -1,7 +1,7 @@
-import { drawTitle } from "../backdrops/Title";
+import { drawTitle } from "../scenes/Title";
 import sfx, { zzfxP } from "../engine/sfx";
 import { Basket } from "../entities/Basket";
-import { City } from "../entities/City";
+import { City } from "../scenes/City";
 import TrampofelineManager from "../entities/Trampofeline";
 import type { Tube } from "../entities/Tube";
 import { YarnBall } from "../entities/YarnBall";
@@ -19,7 +19,7 @@ export const settings = {
   ballRadius: 20,
   ballVelocity: new Point(50, -10),
   gravity: true,
-  volume: true,
+  volume: 0,
 };
 
 export interface GameState {

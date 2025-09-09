@@ -1,4 +1,4 @@
-import { drawTitle } from "./backdrops/Title";
+import { drawTitle } from "./scenes/Title";
 import { CollisionManager } from "./engine/Collisions2D";
 import {
   gameOver,
@@ -14,14 +14,11 @@ import { Stage } from "./engine/Stage";
 import { zzfxP } from "./engine/zzfx";
 import { Basket } from "./entities/Basket";
 import TrampofelineManager from "./entities/Trampofeline";
-import { City } from "./entities/City";
-import { BasketballCourt } from "./levels/BasketballCourt";
+import { City } from "./scenes/City";
+import { BasketballCourt } from "./scenes/BasketballCourt";
 import { Point } from "./utils/MathUtils";
 import { Clock, type timestamp } from "./utils/TimeUtils";
 import { drawLives } from "./engine/ui";
-import "./get-font-data"
-const { yarnballs: balls } = GAMESTATE;
-
 
 function init() {
   Stage.init(document.getElementById("stage"));
@@ -76,11 +73,11 @@ function draw(time: timestamp) {
 
       settings.showForces && GAMESTATE.baskets.forEach((b) => b.drawCollider());
 
-      balls.forEach((b, i) => {
+      GAMESTATE.yarnballs.forEach((b, i) => {
         const threadEndPos = b.thread.at(-1).position;
         if (threadEndPos.y > ch) {
           CollisionManager.unregisterBody(b);
-          GAMESTATE.state === State.Playing && zzfxP(sfx.drop);
+          // GAMESTATE.state === State.Playing && zzfxP(sfx.drop);
           GAMESTATE.yarnballs.delete(b.id);
           GAMESTATE.lives = Math.max(0, GAMESTATE.lives - 1);
 
