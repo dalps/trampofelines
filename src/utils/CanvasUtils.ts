@@ -152,3 +152,9 @@ export function drawSector(
     ctx.fill();
   }
 }
+
+// export function button(pos: Point, { onclick = () => {} } = {}) {
+//   const { ctx } = Stage;
+
+//   if (ctx.isPointInPath()) {}
+// }

@@ -171,7 +171,7 @@ export default class TrampofelineManager {
         new CircleCollider(j.position, GAMESTATE.settings.colliderRadius)
       );
 
-      GAMESTATE.balls.forEach((b) =>
+      GAMESTATE.yarnballs.forEach((b) =>
         CollisionManager.register(j, b, {
           filter: downwardFilter,
           cb: () => {

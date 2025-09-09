@@ -42,7 +42,7 @@ export class BasketballCourt {
       })
     );
 
-    GAMESTATE.balls.forEach(BasketballCourt.registerBall);
+    GAMESTATE.yarnballs.forEach(BasketballCourt.registerBall);
   }
 
   static registerBall(b: YarnBall) {

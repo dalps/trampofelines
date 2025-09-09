@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>^o.o^ Trampofelines! ^o.o^</title>
+    <title>Trampofelines!</title>
     <style>
       body,
       html {
@@ -40,28 +40,25 @@
 
       button {
         --w: 200px;
-        display: block;
-        position: absolute;
         z-index: 4;
+        position: absolute;
         width: var(--w);
         left: calc(50% - var(--w) * 0.5);
         bottom: 20%;
-        padding-block: 0.5em;
-        color: white;
         outline: none;
-        background-color: #5073fd;
+        background: #5073fd;
         border: none;
         border-radius: 5px;
-        font-size: 1.5em;
-        font-weight: bold;
-        text-transform: uppercase;
-        font-family: Roboto, Arial, sans-serif;
         cursor: pointer;
         animation: a1 2s ease-in-out alternate infinite;
-      }
 
-      button:hover {
-        animation: a2 1s ease-in-out alternate infinite;
+        canvas {
+          position: relative;
+        }
+        
+        &:hover {
+          animation: a2 1s ease-in-out alternate infinite;
+        }
       }
 
       @keyframes a1 {
@@ -70,7 +67,7 @@
         }
 
         50% {
-          transform: scale(1.1);
+          transform: scale(1.05);
         }
 
         to {
@@ -96,14 +93,11 @@
   <body>
     <div id="stage">
       <div id="title" style="display: none">
-        <button id="play-btn" style="bottom: 30%">Play Levels</button>
-        <button id="play-infinite-btn">Infinite Mode</button>
+        <button id="play" style="bottom: 30%"></button>
       </div>
       <div id="gameover" style="display: none">
-        <button id="restart-btn" style="background: #fd5050; bottom: 30%">
-          Retry
-        </button>
-        <button id="quit-btn">Quit</button>
+        <button id="retry" style="background: #fd5050; bottom: 30%"></button>
+        <button id="quit"></button>
       </div>
     </div>
     <script type="module" src="./src/main.js"></script>

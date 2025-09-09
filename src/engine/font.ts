@@ -1,3 +1,4 @@
+import { Point } from "../utils/MathUtils";
 import { Stage } from "./Stage";
 
 interface Glyph {
@@ -167,7 +168,12 @@ KUROKANE[" "] = { size: 20 };
 
 export function drawText(
   text: string,
-  { fill = "white", stroke = undefined, lineWidth = 2 } = {}
+  {
+    pos = new Point(0, 0),
+    fill = "white",
+    stroke = undefined,
+    lineWidth = 2,
+  } = {}
 ) {
   const { ctx } = Stage;
 

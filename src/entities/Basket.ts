@@ -11,10 +11,17 @@ const basketColor2 = "#9d5d2c";
 const basketColor1 = "#c07b3a";
 
 export class Basket extends DynamicBody {
+  content: YarnBall[] = [];
+
   constructor(center: Point) {
     super(center);
     this.name = "Basket";
     this.collider = new SegmentCollider(center.addX(-75), center.addX(75));
+  }
+
+  addYarnball(b: YarnBall) {
+    this.content.push(b)
+    Basket.drawTexture()
   }
 
   updateAndDraw() {
@@ -87,31 +94,15 @@ Z`);
     popsicle(new Point(30, 0), new Point(30, -70), "#bbb");
     popsicle(new Point(20, 0), new Point(50, -60), "#bbb");
 
-    YarnBall.drawYarnball(new Point(30, -10), {
-      radius: 20,
-      color: palette.fuchsia,
-      lineWidth: 2,
-      rotation: 45 * DEG2RAD,
-    });
-    YarnBall.drawYarnball(new Point(50, -5), {
-      radius: 20,
-      color: palette.chartreuse,
-      lineWidth: 2,
-    });
-    YarnBall.drawYarnball(new Point(-48, -5), {
-      radius: 20,
-      color: palette.coral,
-      lineWidth: 2,
-      rotation: 30 * DEG2RAD,
-    });
+    const slots = [new Point(30, -10), new Point(50, -5), new Point(-48, -5)];
 
     ctx.fillStyle = pattern;
     ctx.fill(basket);
 
+    ctx.lineWidth = 2;
     ctx.strokeStyle = basketColor2;
     ctx.stroke(basket);
 
-    ctx.strokeStyle = basketColor2;
     ctx.lineWidth = 5;
     ctx.stroke(emptyDown);
 

@@ -1,22 +1,18 @@
-import { BasketballCourt } from "../levels/BasketballCourt";
-import { drawCatFace, drawCatRear } from "../entities/Trampofeline";
-import {
-  drawGameoverUI,
-  drawLives as drawPlayingUI,
-  GAMESTATE,
-  restart,
-  State,
-  title,
-} from "./GameState";
 import { drawTitle } from "../backdrops/Title";
-import palette from "./color";
-import { Point } from "../utils/MathUtils";
 import { City } from "../entities/City";
+import { drawCatFace, drawCatRear } from "../entities/Trampofeline";
+import { Point } from "../utils/MathUtils";
+import PALETTE from "./color";
+import { engrave } from "./font";
+import { GAMESTATE, restart, State, title } from "./GameState";
+import { drawGameoverUI, drawLives } from "./ui";
 
-export const restartBtn = document.getElementById("restart-btn");
-export const playBtn = document.getElementById("play-btn");
-export const quitBtn = document.getElementById("quit-btn");
-export const playInfiniteBtn = document.getElementById("play-infinite-btn");
+export const BUTTONS = {
+  retry: { text: "Retry", onclick: restart },
+  play: { text: "Play!", onclick: restart },
+  quit: { text: "Quit", onclick: title },
+};
+
 export const titleElements = document.getElementById("title");
 export const gameoverElements = document.getElementById("gameover");
 
@@ -122,10 +118,25 @@ export class Stage {
   static init(stage: HTMLElement) {
     this.stage = stage;
 
-    restartBtn.addEventListener("click", restart);
-    playInfiniteBtn.addEventListener("click", restart);
-    quitBtn.addEventListener("click", title);
+    // Create the buttons and draw their textures
+    Object.entries(BUTTONS).forEach(([name, data]) => {
+      const id = `${name}`;
+      const node = document.getElementById(id);
+      data["ref"] = node;
+      this.newOffscreenLayer(id, 200, 48);
+      this.setActiveLayer(id);
+      const { ctx, cw, ch } = this;
+      ctx.fillStyle = PALETTE.white;
+      const { path, length } = engrave(data.text);
+      const scale = 0.3;
+      ctx.translate(cw * 0.5 - length * 0.5 * scale, ch * 0.5 - 30 * scale);
+      ctx.scale(scale, scale);
+      ctx.fill(path);
+      node.appendChild(this.getLayer(id));
+      node.onclick = data.onclick;
+    });
 
+    // Create the game's layers and add them to the DOM
     CANVASES.forEach((name, i) => {
       const layer = document.createElement("canvas", {
         is: "my-canvas",
@@ -138,7 +149,7 @@ export class Stage {
 
     this.setActiveLayer("game");
 
-    const { white, blue0, blue1, blue2, blue3 } = palette;
+    const { white, blue0, blue1, blue2, blue3 } = PALETTE;
     Stage.newOffscreenLayer("catFace", 50, 100);
     Stage.setActiveLayer("catFace");
     Stage.ctx.translate(25, 50);
@@ -183,12 +194,10 @@ export class Stage {
         drawTitle();
         break;
       case State.Playing:
-        // BasketballCourt.draw();
         City.drawBackground();
-        drawPlayingUI();
+        drawLives();
         break;
       case State.GameOver:
-        // BasketballCourt.draw();
         drawGameoverUI();
         break;
     }

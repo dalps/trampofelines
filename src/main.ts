@@ -1,7 +1,6 @@
 import { drawTitle } from "./backdrops/Title";
 import { CollisionManager } from "./engine/Collisions2D";
 import {
-  drawLives,
   gameOver,
   GAMESTATE,
   restart,
@@ -19,7 +18,8 @@ import { City } from "./entities/City";
 import { BasketballCourt } from "./levels/BasketballCourt";
 import { Point } from "./utils/MathUtils";
 import { Clock, type timestamp } from "./utils/TimeUtils";
-const { balls } = GAMESTATE;
+import { drawLives } from "./engine/ui";
+const { yarnballs: balls } = GAMESTATE;
 
 function init() {
   Stage.init(document.getElementById("stage"));
@@ -29,7 +29,7 @@ function init() {
   // BasketballCourt.init(new Point(Stage.cw * 0.5, Stage.ch * 0.5));
   City.init();
 
-  title();
+  gameOver();
 
   requestAnimationFrame(draw);
 }
@@ -72,14 +72,14 @@ function draw(time: timestamp) {
 
       TrampofelineManager.drawGuides(time);
 
-      settings.showForces && GAMESTATE.basket?.drawCollider();
+      settings.showForces && GAMESTATE.baskets.forEach((b) => b.drawCollider());
 
       balls.forEach((b, i) => {
         const threadEndPos = b.thread.at(-1).position;
         if (threadEndPos.y > ch) {
           CollisionManager.unregisterBody(b);
           GAMESTATE.state === State.Playing && zzfxP(sfx.drop);
-          GAMESTATE.balls.delete(b.id);
+          GAMESTATE.yarnballs.delete(b.id);
           GAMESTATE.lives = Math.max(0, GAMESTATE.lives - 1);
 
           GAMESTATE.state === State.Playing && drawLives();

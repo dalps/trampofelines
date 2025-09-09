@@ -1,4 +1,4 @@
-import { drawLives, GAMESTATE, State as GameState } from "../engine/GameState";
+import { GAMESTATE, State as GameState } from "../engine/GameState";
 import { makeGradient } from "../utils/CanvasUtils";
 import { CollisionManager, downwardFilter } from "../engine/Collisions2D";
 import palette, { HSLColor } from "../engine/color";
@@ -10,6 +10,7 @@ import { Clock } from "../utils/TimeUtils";
 import sfx, { zzfxP } from "../engine/sfx";
 import TrampofelineManager from "./Trampofeline";
 import { YarnBall } from "./YarnBall";
+import { drawLives } from "../engine/ui";
 
 export class Tube {
   public position: Point;
@@ -28,7 +29,10 @@ export class Tube {
     Tube.drawTube(this.size.x, this.size.y);
 
     Clock.every(20, () => {
-      if (GAMESTATE.balls.size < 3) {
+      if (
+        GAMESTATE.state === GameState.Playing &&
+        GAMESTATE.yarnballs.size < 3
+      ) {
         zzfxP(sfx.spawn);
         const ball = this.spawnYarnBall();
         cb(ball);
@@ -71,7 +75,7 @@ export class Tube {
       new Ripple(Point.random(p1, p2), startRadius, startRadius + 10);
     }
 
-    GAMESTATE.balls.set(ball.id, ball);
+    GAMESTATE.yarnballs.set(ball.id, ball);
 
     TrampofelineManager.trampolines.forEach((cat) =>
       cat.joints.forEach((j) =>
@@ -86,8 +90,8 @@ export class Tube {
       )
     );
 
-    GAMESTATE.basket &&
-      CollisionManager.register(GAMESTATE.basket, ball, {
+    GAMESTATE.baskets.forEach((basket) =>
+      CollisionManager.register(basket, ball, {
         sensor: true,
         filter: downwardFilter,
         cb: () => {
@@ -99,10 +103,11 @@ export class Tube {
           drawLives();
           zzfxP(sfx.score);
           Stage.setActiveLayer("game");
-          GAMESTATE.balls.delete(ball.id);
+          GAMESTATE.yarnballs.delete(ball.id);
           new Ripple(ball.position.clone(), 15, 30, 0.3, 0);
         },
-      });
+      })
+    );
 
     return ball;
   }
