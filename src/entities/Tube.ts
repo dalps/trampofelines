@@ -72,7 +72,10 @@ export class Tube {
     const nRipples = 5;
     for (let i = 0; i < nRipples; i++) {
       const startRadius = lerp(10, 20, i / nRipples);
-      new Ripple(Point.random(p1, p2), startRadius, startRadius + 10);
+      new Ripple(Point.random(p1, p2), {
+        startRadius,
+        finalRadius: startRadius + 10,
+      });
     }
 
     GAMESTATE.yarnballs.set(b.id, b);
@@ -82,7 +85,12 @@ export class Tube {
         CollisionManager.register(j, b, {
           filter: downwardFilter,
           cb: () => {
-            new Ripple(j.position, 15, 30, 0.3, 0);
+            new Ripple(j.position, {
+              startRadius: 15,
+              finalRadius: 30,
+              startTransparency: 0.3,
+              finalTransparency: 0,
+            });
             zzfxP(sfx.bounce);
             TrampofelineManager.killCat(cat);
           },
@@ -102,10 +110,16 @@ export class Tube {
           b.state = State.Dead;
           drawLives();
           zzfxP(sfx.score);
-          basket.addYarnball(b)
+          basket.addYarnball(b);
           Stage.setActiveLayer("game");
           GAMESTATE.yarnballs.delete(b.id);
-          new Ripple(b.position.clone(), 15, 30, 0.3, 0);
+          new Ripple(b.position.clone(), {
+            startRadius: 25,
+            finalRadius: 50,
+            startTransparency: 0.3,
+            finalTransparency: 0,
+            fillColor: b.color,
+          });
         },
       })
     );

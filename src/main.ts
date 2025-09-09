@@ -19,6 +19,7 @@ import { BasketballCourt } from "./scenes/BasketballCourt";
 import { Point } from "./utils/MathUtils";
 import { Clock, type timestamp } from "./utils/TimeUtils";
 import { drawLives } from "./engine/ui";
+import { TweenManager } from "./engine/tween";
 
 function init() {
   Stage.init(document.getElementById("stage"));
@@ -61,10 +62,10 @@ function draw(time: timestamp) {
 
       TrampofelineManager.drawGuides(time);
 
-      RippleManager.updateAndDraw();
-
       break;
   }
+
+  TweenManager.update();
 
   requestAnimationFrame(draw);
 }

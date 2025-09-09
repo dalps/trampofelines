@@ -1,85 +1,50 @@
-import { Stage } from "./Stage";
 import { circle } from "../utils/CanvasUtils";
-import { damp, type Point } from "../utils/MathUtils";
-import { Clock } from "../utils/TimeUtils";
+import { type Point } from "../utils/MathUtils";
+import PALETTE, { Color } from "./color";
+import { Stage } from "./Stage";
+import { Tween } from "./tween";
 
-const EPSILON = 0.001;
-
-export class RippleManager {
-  private static _ripples: Set<WeakRef<Ripple>> = new Set();
-
-  static add(ripple: Ripple) {
-    const ref = new WeakRef(ripple);
-    this._ripples.add(ref);
-    return ref;
-  }
-
-  static delete(ref: WeakRef<Ripple>) {
-    this._ripples.delete(ref);
-  }
-
-  static draw() {
-    for (let ref of this._ripples.values()) {
-      ref.deref()?.draw();
-    }
-  }
-
-  static update() {
-    for (let ref of this._ripples.values()) {
-      ref.deref()?.update();
-    }
-  }
-
-  static updateAndDraw() {
-    this.update();
-    this.draw();
-  }
-}
-
+/**
+ * A circle that changes in radius and transparency over time.
+ */
 export class Ripple {
-  private _radius: number;
-  private _transparency: number;
-  private _ref: WeakRef<Ripple>;
+  radius: number;
+  transparency: number;
+  color: Color;
 
   constructor(
     public position: Point,
-    public initialRadius = 5,
-    public finalRadius = 10,
-    public initialTransparency = 1,
-    public finalTransparency = 0,
-    public fillColor = "rgb(0,0,0,0.2)",
-    public speed = 7
+    {
+      startRadius = 5,
+      finalRadius = 10,
+      startTransparency = 1,
+      finalTransparency = 0,
+      fillColor = PALETTE.white.clone(),
+      speed = 7,
+    }
   ) {
-    this._radius = initialRadius;
-    this._transparency = initialTransparency;
-    this._ref = RippleManager.add(this);
+    this.radius = startRadius;
+    this.transparency = startTransparency;
+    this.color = fillColor;
+
+    new Tween(this, "transparency", {
+      startValue: startTransparency,
+      finalValue: finalTransparency,
+      speed,
+    });
+    new Tween(this, "radius", {
+      startValue: startRadius,
+      finalValue: finalRadius,
+      speed,
+    });
   }
 
   draw() {
     const { ctx } = Stage;
 
-    ctx.fillStyle = `rgb(255,255,255,${this._transparency})`;
+    ctx.fillStyle = this.color.clone().setAlpha(this.transparency);
     ctx.beginPath();
-    circle(this.position, this._radius);
-    ctx.closePath();
+    circle(this.position, this.radius);
     ctx.fill();
-  }
-
-  update() {
-    const dt = Clock.dt * 0.1;
-    this._radius = damp(this._radius, this.finalRadius, this.speed, dt);
-    this._transparency = damp(
-      this._transparency,
-      this.finalTransparency,
-      this.speed,
-      dt
-    );
-
-    if (
-      Math.abs(this._radius - this.finalRadius) <= EPSILON ||
-      Math.abs(this._transparency - this.finalTransparency) <= EPSILON
-    ) {
-      RippleManager.delete(this._ref);
-    }
   }
 }
