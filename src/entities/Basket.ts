@@ -1,8 +1,10 @@
 import { SegmentCollider } from "../engine/Collisions2D";
 import palette from "../engine/color";
 import { drawText } from "../engine/font";
+import { GAMESTATE } from "../engine/GameState";
 import { DynamicBody } from "../engine/Physics2D";
 import { Stage } from "../engine/Stage";
+import { Tween } from "../engine/tween";
 import { popsicle } from "../utils/CanvasUtils";
 import { DEG2RAD, distribute, lerp, Point } from "../utils/MathUtils";
 import { Clock } from "../utils/TimeUtils";
@@ -10,15 +12,15 @@ import { YarnBall } from "./YarnBall";
 
 export class Basket extends DynamicBody {
   content: YarnBall[] = [];
+  filled = false;
 
-  constructor(center: Point, public wanted = 5) {
-    super(center);
+  constructor(pos: Point, public wanted = 5) {
+    super(pos);
     this.name = crypto.randomUUID();
-    const colliderWidth = 50;
-    this.collider = new SegmentCollider(
-      center.addX(-colliderWidth),
-      center.addX(colliderWidth)
-    );
+    const colliderWidth = 100;
+    this.toggleX();
+    this.toggleY();
+    this.attachCollider(new SegmentCollider(pos, colliderWidth));
     Stage.newOffscreenLayer(this.name, 200, 200);
   }
 
@@ -32,17 +34,30 @@ export class Basket extends DynamicBody {
     const c = this.collider as SegmentCollider;
 
     const da = Math.cos(time * 0.1) * 1 * DEG2RAD * dt;
-    this.orientation += da;
-    c.a.rotateAboutI(this.position, da);
-    c.b.rotateAboutI(this.position, da);
+    c.dir += da;
+    c.center.rotate(da);
 
+    // Is it filled up?
+    if (!this.filled && this.content.length >= this.wanted) {
+      new Tween(this.position, "y", {
+        startValue: this.position.y,
+        finalValue: -200,
+        speed: 1,
+      });
+      this.filled = true;
+    }
+
+    // draw
     const { ctx } = Stage;
 
     ctx.save();
-    ctx.translate(this.collider.center.x, this.collider.center.y);
-    ctx.rotate(this.orientation);
+    ctx.translate(this.position.x, this.position.y);
+    ctx.rotate(this.collider.dir);
     ctx.drawImage(Stage.getLayer(this.name), -100, -90);
     ctx.restore();
+
+    this.drawForces();
+    this.drawCollider();
   }
 
   static drawCrissCrossPattern() {

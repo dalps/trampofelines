@@ -167,20 +167,30 @@ export class CircleCollider extends Collider {
 }
 
 export class SegmentCollider extends Collider {
-  constructor(public a: Point, public b: Point) {
+  static fromEndPoints(a: Point, b: Point) {
+    const sep = a.sub(b);
+
+    new SegmentCollider(
+      Math2D.lerp2(a, b, 0.5),
+      sep.abs(),
+      Math.atan2(sep.y, sep.x)
+    );
+  }
+
+  constructor(public center: Point, public length: number, public dir = 0) {
     super("Segment");
   }
 
-  get center(): Point {
-    return Math2D.lerp2(this.a, this.b, 0.5);
+  get a(): Point {
+    return this.center.add(
+      new Point(1, 0).multiplyScalar(this.length * 0.5).rotate(this.dir)
+    );
   }
 
-  get direction(): Point {
-    return this.a.sub(this.b);
-  }
-
-  get length(): number {
-    return this.direction.abs();
+  get b(): Point {
+    return this.center.add(
+      new Point(1, 0).multiplyScalar(this.length * -0.5).rotate(this.dir)
+    );
   }
 
   checkContact(that: Collider) {
@@ -193,8 +203,8 @@ export class SegmentCollider extends Collider {
   }
 
   draw() {
-    popsicle(this.a, this.b, debugColor);
-    popsicle(this.b, this.a, debugColor);
+    popsicle(this.center, this.a, debugColor);
+    popsicle(this.center, this.b, debugColor);
   }
 }
 
