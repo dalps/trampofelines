@@ -121,14 +121,17 @@ export class Stage {
     // Create the buttons and draw their textures
     Object.entries(BUTTONS).forEach(([name, data]) => {
       const id = `${name}`;
-      const node = document.getElementById(id);
-      data["ref"] = node;
-      this.newOffscreenLayer(id, 200, 48);
+      const btn = document.getElementById(id);
+      data["ref"] = btn;
+      const { x: w, y: h } = new Point(200, 48);
+      this.newOffscreenLayer(id, w, h);
+      btn.style.width = `${w}px`;
+      btn.style.height = `${h}px`;
       this.setActiveLayer(id);
       const { cw, ch } = this;
       drawText(data.text, { pos: new Point(cw * 0.5, ch * 0.5), fontSize: 24 });
-      node.appendChild(this.getLayer(id));
-      node.onclick = data.onclick;
+      btn.appendChild(this.getLayer(id));
+      btn.onclick = data.onclick;
     });
 
     // Create the game's layers and add them to the DOM

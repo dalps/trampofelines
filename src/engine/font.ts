@@ -1,3 +1,4 @@
+import { circle } from "../utils/CanvasUtils";
 import { Point } from "../utils/MathUtils";
 import PALETTE from "./color";
 import { Stage } from "./Stage";
@@ -8,47 +9,51 @@ interface Glyph {
   kernings?: { [index: string]: number };
 }
 
-// Grab the output of measure-font.ts from the browser console
-const KUROKANE: Record<string, Glyph> = {
+/**
+ * Kurokane-EB by Fontworks LETS
+ * https://lets.fontworks.co.jp/fontworks
+*/
+// Paste the output object of get-font-data.ts here
+const kurokaneFont: Record<string, Glyph> = {
   "0": {
-    path: "m46.2 71.2v-58.1h-10.3v-13.1h28.3v71.2h-18.0",
-    size: 28,
-  },
-  "1": {
     path: "m31.5 70.8c-1.3-3.3-2.2-6.7-3.2-10.1l-2.3-11.4-1.0-14.5 1.4-16.7 4.8-18.1h35.9c1.7 2.8 2.7 5.9 3.9 9.0l2.6 10.8 1.3 14.7-1.3 16.7-4.8 19.7h-37.2m23.6-56.6h-10.2v42.5h10.2v-42.5",
     size: 50,
   },
-  "2": {
-    path: "m27.7 71.3v-14.2h29.4v-12.8h-25.9l-5.2-8.4-1.5-9.7 1.0-9.6 2.2-8.4 2.2-6.0 1.0-2.2h33.8l6.3 8.7 3.3 11.9 0.8 5.8 0.6 8.1c0.1 1.8-0.1 3.6-0.2 5.4l-0.6 4.4-1.0 5.5-4.2 11.8-8.1 9.7h-33.9m29.4-57.0h-16.1v15.8h16.1v-15.8",
-    size: 51,
+  "1": {
+    path: "m46.2 71.2v-58.1h-10.3v-13.1h28.3v71.2h-18.0",
+    size: 28,
   },
-  "3": {
-    path: "m31.5 71.2c-1.2-1.7-2.1-3.5-3.2-5.3l-2.2-6.4-1.0-8.5 0.6-7.1 2.3-8.1-2.1-12.3 1.4-10.8 5.1-12.7h34.8c1.4 1.8 2.6 3.7 3.7 5.7l2.5 6.8 1.2 9.0-2.5 13.6 1.9 6.0 0.8 7.8-1.3 10.3-4.8 11.9h-37.1m25.9-56.9h-14.9v14.4h14.9v-14.4m0.0 28.5h-14.9v14.2h14.9v-14.2",
+  "2": {
+    path: "m25.2 71.2v-14.2l29.7-44.4h-25.6v-12.6h29.4l7.4 5.0 3.1 5.8 1.3 7.7-5.5 17.3-8.0 10.2-12.4 11.1h30.1v14.2h-49.6",
     size: 50,
   },
-  "4": {
-    path: "m34.3 66.7 18.6-54.1h-27.0v-12.6h47.7l0.2 1.3 0.2 4.0-0.8 9.1-3.3 14.0-7.2 18.8-5.6 11.3-7.1 12.6-15.8-4.5",
-    size: 48,
-  },
-  "5": {
-    path: "m32.1 71.3-4.2-8.7-2.1-11.9-0.6-5.8-0.3-4.8-0.1-4.5 2.3-16.4 5.4-11.1 6.0-6.2 4.2-1.9h25.3v14.3h-24.7v12.8h23.7l1.4 1.5 2.9 4.3 2.9 7.0 1.2 9.3-1.4 10.3-5.2 11.8h-36.6m25.8-30.0h-14.6v15.8h14.6v-15.8",
-    size: 51,
-  },
-  "6": {
-    path: "m42.5 68.2 11.0-31.0h-27.4v-37.2h42.5v13.1h-24.5v11.6h18.3l7.1 4.5 3.1 5.5 1.3 7.4-3.8 13.8-13.9 16.9-13.6-4.6",
-    size: 48,
-  },
-  "7": {
-    path: "m51.5 73.1v-13.7h-27.1l-0.1-13.9 5.2-14.8 2.9-7.6 2.8-7.2 6.5-15.9 16.8 6.8-2.4 7.0-2.4 6.3h15.6v25.2h6.5v14.2h-6.5v13.7h-17.7m0.0-48.3-4.9 9.2-4.1 6.4-2.9 3.6-1.0 1.2h12.9v-20.4",
-    size: 51,
-  },
-  "8": {
+  "3": {
     path: "m42.1 69.3 11.6-29.7h-27.4v-12.5h19.6l5.9-14.5h-24.9v-12.6h27.8l8.4 4.9 4.9 12.0-3.7 10.8 6.2 5.4 3.1 10.5-3.9 13.6-14.1 17.0-13.6-5.0",
     size: 47,
   },
-  "9": {
-    path: "m25.2 71.2v-14.2l29.7-44.4h-25.6v-12.6h29.4l7.4 5.0 3.1 5.8 1.3 7.7-5.5 17.3-8.0 10.2-12.4 11.1h30.1v14.2h-49.6",
+  "4": {
+    path: "m51.5 73.1v-13.7h-27.1l-0.1-13.9 5.2-14.8 2.9-7.6 2.8-7.2 6.5-15.9 16.8 6.8-2.4 7.0-2.4 6.3h15.6v25.2h6.5v14.2h-6.5v13.7h-17.7m0.0-48.3-4.9 9.2-4.1 6.4-2.9 3.6-1.0 1.2h12.9v-20.4",
+    size: 51,
+  },
+  "5": {
+    path: "m42.5 68.2 11.0-31.0h-27.4v-37.2h42.5v13.1h-24.5v11.6h18.3l7.1 4.5 3.1 5.5 1.3 7.4-3.8 13.8-13.9 16.9-13.6-4.6",
+    size: 48,
+  },
+  "6": {
+    path: "m32.1 71.3-4.2-8.7-2.1-11.9-0.6-5.8-0.3-4.8-0.1-4.5 2.3-16.4 5.4-11.1 6.0-6.2 4.2-1.9h25.3v14.3h-24.7v12.8h23.7l1.4 1.5 2.9 4.3 2.9 7.0 1.2 9.3-1.4 10.3-5.2 11.8h-36.6m25.8-30.0h-14.6v15.8h14.6v-15.8",
+    size: 51,
+  },
+  "7": {
+    path: "m34.3 66.7 18.6-54.1h-27.0v-12.6h47.7l0.2 1.3 0.2 4.0-0.8 9.1-3.3 14.0-7.2 18.8-5.6 11.3-7.1 12.6-15.8-4.5",
+    size: 48,
+  },
+  "8": {
+    path: "m31.5 71.2c-1.2-1.7-2.1-3.5-3.2-5.3l-2.2-6.4-1.0-8.5 0.6-7.1 2.3-8.1-2.1-12.3 1.4-10.8 5.1-12.7h34.8c1.4 1.8 2.6 3.7 3.7 5.7l2.5 6.8 1.2 9.0-2.5 13.6 1.9 6.0 0.8 7.8-1.3 10.3-4.8 11.9h-37.1m25.9-56.9h-14.9v14.4h14.9v-14.4m0.0 28.5h-14.9v14.2h14.9v-14.2",
     size: 50,
+  },
+  "9": {
+    path: "m27.7 71.3v-14.2h29.4v-12.8h-25.9l-5.2-8.4-1.5-9.7 1.0-9.6 2.2-8.4 2.2-6.0 1.0-2.2h33.8l6.3 8.7 3.3 11.9 0.8 5.8 0.6 8.1c0.1 1.8-0.1 3.6-0.2 5.4l-0.6 4.4-1.0 5.5-4.2 11.8-8.1 9.7h-33.9m29.4-57.0h-16.1v15.8h16.1v-15.8",
+    size: 51,
   },
   "!": {
     path: "m41.9 45.6v-45.6h16.2v45.6h-16.2zm0.0 25.6v-16.0h16.2v16.0h-16.2z",
@@ -164,12 +169,15 @@ const KUROKANE: Record<string, Glyph> = {
   },
 };
 
-KUROKANE[" "] = { size: 20 };
-KUROKANE["A"].kernings = { Y: 2, G: 5, T: 2, V: 8, K: 8, B: 8 };
-KUROKANE["Y"].kernings = { A: 2 };
-KUROKANE["O"].kernings = { P: 5 };
+// type GlyphName = keyof typeof KUROKANE;
+// const kernings: Map<[GlyphName, GlyphName], number> = new Map();
 
-const lineHeight = 40;
+kurokaneFont[" "] = { size: 20 };
+kurokaneFont["A"].kernings = { Y: 2, G: 5, T: 2, V: 8, K: 8, B: 8 };
+kurokaneFont["Y"].kernings = { A: 2 };
+kurokaneFont["O"].kernings = { P: 5 };
+
+const lineHeight = 70;
 const defaultKerning = 12;
 const frameSize = 100;
 
@@ -180,7 +188,6 @@ export function drawText(
     fontSize = 16,
     fill = PALETTE.white,
     stroke = undefined,
-    lineWidth = 2,
   } = {}
 ) {
   const { ctx } = Stage;
@@ -188,6 +195,12 @@ export function drawText(
   const { path, length } = engrave(text);
 
   ctx.save();
+  // ctx.fillStyle = "yellow";
+  // circle(
+  //   new Point(pos.x, pos.y),
+  //   4
+  // );
+  // ctx.fill();
   ctx.translate(pos.x - length * 0.5 * scale, pos.y - lineHeight * 0.5 * scale);
   ctx.scale(scale, scale);
   if (fill) {
@@ -209,7 +222,7 @@ export function engrave(text: string): { path: Path2D; length: number } {
 
   Array.from(text).forEach((c) => {
     const C = c.toUpperCase();
-    const { size = 0, path = "", kernings = {} } = KUROKANE[C];
+    const { size = 0, path = "", kernings = {} } = kurokaneFont[C];
     const space = (frameSize - size) * 0.5;
     const p = new Path2D(path);
     p.closePath();

@@ -19,7 +19,9 @@ import { BasketballCourt } from "./levels/BasketballCourt";
 import { Point } from "./utils/MathUtils";
 import { Clock, type timestamp } from "./utils/TimeUtils";
 import { drawLives } from "./engine/ui";
+import "./get-font-data"
 const { yarnballs: balls } = GAMESTATE;
+
 
 function init() {
   Stage.init(document.getElementById("stage"));
