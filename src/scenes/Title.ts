@@ -1,5 +1,5 @@
 import palette from "../engine/color";
-import { engrave } from "../engine/font";
+import { drawText, engrave } from "../engine/font";
 import { Stage } from "../engine/Stage";
 import { YarnBall } from "../entities/YarnBall";
 import { circle, star } from "../utils/CanvasUtils";
@@ -21,6 +21,13 @@ export function toranporin(position: Point, { color = palette.blue0 }) {
 
   // ctx.strokeStyle = palette.blue1;
   // ctx.strokeText(text, 0, 48);
+}
+
+export function help() {
+  drawText(`draw trampofelines by dragging your pointer across the screen!`)
+  drawText(`catch the flying yarn balls and fill up as many baskets as you can!`)
+  drawText(`you lose as soon as three yarn balls fall into the void`)
+  drawText(`good luck meow!`)
 }
 
 export function drawTitle() {

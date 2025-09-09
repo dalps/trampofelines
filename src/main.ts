@@ -25,10 +25,9 @@ function init() {
 
   TrampofelineManager.init();
 
-  // BasketballCourt.init(new Point(Stage.cw * 0.5, Stage.ch * 0.5));
   City.init();
 
-  gameOver();
+  restart();
 
   requestAnimationFrame(draw);
 }
@@ -50,58 +49,17 @@ function draw(time: timestamp) {
       Stage.setActiveLayer("game");
       Stage.clearLayer("game");
 
-      const { cw, ch } = Stage;
+      City.update();
 
-      GAMESTATE.tubes.forEach((tube) => tube.draw());
-      GAMESTATE.baskets.forEach((basket) => basket.updateAndDraw());
-
-      settings.play && CollisionManager.update();
+      CollisionManager.update();
 
       TrampofelineManager.trampolines.forEach((l) => {
-        settings.play && l.update();
-
+        l.update();
         l.draw();
-        settings.showJoints && l.drawJoints();
-
-        l.joints.forEach((j) => {
-          settings.showForces && j.drawForces();
-          settings.showForces && j.drawCollider();
-        });
+        l.drawJoints();
       });
 
       TrampofelineManager.drawGuides(time);
-
-      settings.showForces && GAMESTATE.baskets.forEach((b) => b.drawCollider());
-
-      GAMESTATE.yarnballs.forEach((b, i) => {
-        const threadEndPos = b.thread.at(-1).position;
-        if (threadEndPos.y > ch) {
-          CollisionManager.unregisterBody(b);
-          // GAMESTATE.state === State.Playing && zzfxP(sfx.drop);
-          GAMESTATE.yarnballs.delete(b.id);
-          GAMESTATE.lives = Math.max(0, GAMESTATE.lives - 1);
-
-          GAMESTATE.state === State.Playing && drawLives();
-          GAMESTATE.lives <= 0 && gameOver();
-          return;
-        }
-
-        const threshold = b.radius * 0.5;
-        if (b.position.x - threshold < 0 || b.position.x + threshold > cw) {
-          b.velocity.x *= -1;
-        }
-
-        Stage.setActiveLayer("game");
-
-        settings.play && b.updateAndDraw();
-
-        b.draw();
-        settings.showForces && b.drawForces();
-        settings.showForces && b.drawCollider();
-      });
-
-      // settings.showForces && BasketballCourt.backBoard.collider.draw();
-      // settings.showForces && BasketballCourt.hoop.collider.draw();
 
       RippleManager.updateAndDraw();
 

@@ -1,22 +1,58 @@
 import palette, { HSLColor } from "../engine/color";
-import { GAMESTATE } from "../engine/GameState";
+import { gameOver, GAMESTATE, State } from "../engine/GameState";
 import { DynamicBody } from "../engine/Physics2D";
 import { Stage } from "../engine/Stage";
 import { makeGradient } from "../utils/CanvasUtils";
 import { distribute, Point } from "../utils/MathUtils";
 import { Basket } from "../entities/Basket";
 import { Tube } from "../entities/Tube";
+import type { Backdrop } from "./Backdrop";
+import { CollisionManager } from "../engine/Collisions2D";
+import { drawLives } from "../engine/ui";
 
 export class City {
   static init() {
     const { cw, ch } = Stage;
-    Basket.drawTexture();
+
     GAMESTATE.baskets.push(
       new Basket(new Point(cw * 0.8, ch - 100)),
       new Basket(new Point(cw * 0.8, 100))
     );
 
+    GAMESTATE.baskets.forEach((b) => b.drawTexture());
+
     GAMESTATE.tubes.push(new Tube(new Point(0, 100)));
+  }
+
+  static update() {
+    const { cw, ch } = Stage;
+
+    GAMESTATE.tubes.forEach((tube) => tube.draw());
+    GAMESTATE.baskets.forEach((basket) => basket.update());
+
+    GAMESTATE.yarnballs.forEach((b, i) => {
+      const threadEndPos = b.thread.at(-1).position;
+      if (threadEndPos.y > ch) {
+        CollisionManager.unregisterBody(b);
+        // GAMESTATE.state === State.Playing && zzfxP(sfx.drop);
+        GAMESTATE.yarnballs.delete(b.id);
+        GAMESTATE.lives = Math.max(0, GAMESTATE.lives - 1);
+
+        GAMESTATE.state === State.Playing && drawLives();
+        GAMESTATE.lives <= 0 && gameOver();
+        return;
+      }
+
+      const threshold = b.radius * 0.5;
+      if (b.position.x - threshold < 0 || b.position.x + threshold > cw || b.position.y + threshold > ch) {
+        b.velocity.x *= -1;
+      }
+
+      Stage.setActiveLayer("game");
+
+      b.update();
+      b.draw();
+    });
   }
 
   static draw() {}

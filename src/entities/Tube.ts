@@ -60,14 +60,14 @@ export class Tube {
     const p1 = startPos.addY(-30);
     const p2 = startPos.addY(30).addX(20);
 
-    const ball = new YarnBall(
+    const b = new YarnBall(
       startPos,
       GAMESTATE.settings.ballVelocity,
       GAMESTATE.settings.ballMass,
       GAMESTATE.settings.ballRadius,
       color
     );
-    ball.name = "YarnBall";
+    b.name = "YarnBall";
 
     const nRipples = 5;
     for (let i = 0; i < nRipples; i++) {
@@ -75,11 +75,11 @@ export class Tube {
       new Ripple(Point.random(p1, p2), startRadius, startRadius + 10);
     }
 
-    GAMESTATE.yarnballs.set(ball.id, ball);
+    GAMESTATE.yarnballs.set(b.id, b);
 
     TrampofelineManager.trampolines.forEach((cat) =>
       cat.joints.forEach((j) =>
-        CollisionManager.register(j, ball, {
+        CollisionManager.register(j, b, {
           filter: downwardFilter,
           cb: () => {
             new Ripple(j.position, 15, 30, 0.3, 0);
@@ -91,25 +91,26 @@ export class Tube {
     );
 
     GAMESTATE.baskets.forEach((basket) =>
-      CollisionManager.register(basket, ball, {
+      CollisionManager.register(basket, b, {
         sensor: true,
         filter: downwardFilter,
         cb: () => {
           if (GAMESTATE.state !== GameState.Playing) return;
 
           GAMESTATE.score += 1;
-          CollisionManager.unregisterBody(ball);
-          ball.state = State.Dead;
+          CollisionManager.unregisterBody(b);
+          b.state = State.Dead;
           drawLives();
           zzfxP(sfx.score);
+          basket.addYarnball(b)
           Stage.setActiveLayer("game");
-          GAMESTATE.yarnballs.delete(ball.id);
-          new Ripple(ball.position.clone(), 15, 30, 0.3, 0);
+          GAMESTATE.yarnballs.delete(b.id);
+          new Ripple(b.position.clone(), 15, 30, 0.3, 0);
         },
       })
     );
 
-    return ball;
+    return b;
   }
 
   draw() {

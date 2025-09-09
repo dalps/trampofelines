@@ -41,9 +41,9 @@ export class YarnBall extends DynamicBody {
     this.thread = points.map((p) => new DynamicBody(p));
   }
 
-  updateAndDraw(): void {
+  update(): void {
     const { dt } = Clock;
-    super.updateAndDraw();
+    super.update();
 
     this.threadLength += dt * 0.01;
     this.thread[0].position = this.position
@@ -91,7 +91,6 @@ export class YarnBall extends DynamicBody {
     {
       radius = 100,
       color = palette.coral,
-      color2 = color.lighten(1.1),
       lineWidth = 7,
       rotation = 0,
       decoration = false,
@@ -99,11 +98,9 @@ export class YarnBall extends DynamicBody {
   ) {
     const { ctx } = Stage;
     const stripes = new Path2D(
-      `M 6.2,5.3 C 5.4,2.5 -3.8,0.5 -6.5,3.9    M 34.2,-14.2 C 20.5,-36.9 -4.3,-41 -25.9,-26.9    M 26.1,-6.4 C 19.8,-20.8 -5.4,-27.6 -21.1,-16.8    M 17.3,0 C 10.5,-9.4 -4.6,-12.3 -14.4,-6    M 45.8,8.7 C 44.1,15.3 30.8,22.3 17.5,23.7    M 46,-8.1 C 41.9,-0.5 24.8,13.6 5,15    M 41,-22.2 C 35.6,-15.3 18.5,5.5 -3.3,7.3    M -45.4,-11 c 3.7,18.6 21.5,45.1 55.2,56.6    M -39.5,-24.9 c 8.9,27.5 29.2,51.4 64.5,64.3    M -29.4,-36.2 C -16.9,3.3 15.3,27.1 35.3,30.5`
+      `M 6.2,5.3 C 5.4,2.5 -3.8,0.5 -6.5,3.9M 34.2,-14.2 C 20.5,-36.9 -4.3,-41 -25.9,-26.9M 26.1,-6.4 C 19.8,-20.8 -5.4,-27.6 -21.1,-16.8M 17.3,0 C 10.5,-9.4 -4.6,-12.3 -14.4,-6M 45.8,8.7 C 44.1,15.3 30.8,22.3 17.5,23.7M 46,-8.1 C 41.9,-0.5 24.8,13.6 5,15M 41,-22.2 C 35.6,-15.3 18.5,5.5 -3.3,7.3M -45.4,-11 c 3.7,18.6 21.5,45.1 55.2,56.6M -39.5,-24.9 c 8.9,27.5 29.2,51.4 64.5,64.3M -29.4,-36.2 C -16.9,3.3 15.3,27.1 35.3,30.5`
     );
-    const excess = new Path2D(
-      `M 0,46 C -35,47 -75,46 -50,29 -36,19 -100,32 -64,12`
-    );
+    const excess = new Path2D(`M0,46C-35,47-75,46-50,29-36,19-100,32-64,12`);
     const originalRadius = 50;
     const p = new Path2D();
     const arc = new Path2D();
@@ -121,7 +118,7 @@ export class YarnBall extends DynamicBody {
 
     ctx.beginPath();
     bg.addPath(arc, mat);
-    ctx.fillStyle = color2;
+    ctx.fillStyle = color.lighten(1.1);
     ctx.fill(bg);
 
     ctx.lineCap = "butt";

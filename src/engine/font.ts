@@ -12,7 +12,7 @@ interface Glyph {
 /**
  * Kurokane-EB by Fontworks LETS
  * https://lets.fontworks.co.jp/fontworks
-*/
+ */
 // Paste the output object of get-font-data.ts here
 const kurokaneFont: Record<string, Glyph> = {
   "0": {
@@ -195,12 +195,6 @@ export function drawText(
   const { path, length } = engrave(text);
 
   ctx.save();
-  // ctx.fillStyle = "yellow";
-  // circle(
-  //   new Point(pos.x, pos.y),
-  //   4
-  // );
-  // ctx.fill();
   ctx.translate(pos.x - length * 0.5 * scale, pos.y - lineHeight * 0.5 * scale);
   ctx.scale(scale, scale);
   if (fill) {

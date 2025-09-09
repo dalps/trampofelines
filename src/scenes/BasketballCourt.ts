@@ -45,6 +45,11 @@ export class BasketballCourt {
     GAMESTATE.yarnballs.forEach(BasketballCourt.registerBall);
   }
 
+  static update() {
+    GAMESTATE.settings.showForces && BasketballCourt.backBoard.collider.draw();
+    GAMESTATE.settings.showForces && BasketballCourt.hoop.collider.draw();
+  }
+
   static registerBall(b: YarnBall) {
     CollisionManager.register(b, this.backBoard);
     CollisionManager.register(b, this.hoop, {

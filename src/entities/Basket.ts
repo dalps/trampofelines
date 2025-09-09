@@ -1,30 +1,33 @@
-import { circle, popsicle } from "../utils/CanvasUtils";
 import { SegmentCollider } from "../engine/Collisions2D";
 import palette from "../engine/color";
-import { DEG2RAD, Point } from "../utils/MathUtils";
+import { drawText } from "../engine/font";
 import { DynamicBody } from "../engine/Physics2D";
 import { Stage } from "../engine/Stage";
-import { Clock, instant, timestamp } from "../utils/TimeUtils";
+import { popsicle } from "../utils/CanvasUtils";
+import { DEG2RAD, distribute, lerp, Point } from "../utils/MathUtils";
+import { Clock } from "../utils/TimeUtils";
 import { YarnBall } from "./YarnBall";
-
-const basketColor2 = "#9d5d2c";
-const basketColor1 = "#c07b3a";
 
 export class Basket extends DynamicBody {
   content: YarnBall[] = [];
 
-  constructor(center: Point) {
+  constructor(center: Point, public wanted = 5) {
     super(center);
-    this.name = "Basket";
-    this.collider = new SegmentCollider(center.addX(-75), center.addX(75));
+    this.name = crypto.randomUUID();
+    const colliderWidth = 50;
+    this.collider = new SegmentCollider(
+      center.addX(-colliderWidth),
+      center.addX(colliderWidth)
+    );
+    Stage.newOffscreenLayer(this.name, 200, 200);
   }
 
   addYarnball(b: YarnBall) {
-    this.content.push(b)
-    Basket.drawTexture()
+    this.content.push(b);
+    this.drawTexture();
   }
 
-  updateAndDraw() {
+  update() {
     const { time, dt } = Clock;
     const c = this.collider as SegmentCollider;
 
@@ -33,12 +36,12 @@ export class Basket extends DynamicBody {
     c.a.rotateAboutI(this.position, da);
     c.b.rotateAboutI(this.position, da);
 
-    const { ctx, cw, ch } = Stage;
+    const { ctx } = Stage;
 
     ctx.save();
     ctx.translate(this.collider.center.x, this.collider.center.y);
     ctx.rotate(this.orientation);
-    ctx.drawImage(Stage.getLayer("basket"), -100, -90);
+    ctx.drawImage(Stage.getLayer(this.name), -100, -90);
     ctx.restore();
   }
 
@@ -47,9 +50,9 @@ export class Basket extends DynamicBody {
     Stage.setActiveLayer("pattern");
     const { ctx, cw, ch } = Stage;
 
-    ctx.fillStyle = basketColor1;
+    ctx.fillStyle = palette.basket1;
     ctx.fillRect(0, 0, cw, ch);
-    ctx.strokeStyle = basketColor2;
+    ctx.strokeStyle = palette.basket2;
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(0, 0);
@@ -59,9 +62,8 @@ export class Basket extends DynamicBody {
     ctx.stroke();
   }
 
-  static drawTexture() {
-    Stage.newOffscreenLayer("basket", 200, 200);
-    Stage.setActiveLayer("basket");
+  drawTexture() {
+    Stage.setActiveLayer(this.name);
     const { ctx } = Stage;
 
     ctx.save();
@@ -79,28 +81,36 @@ Z`);
       `M 21.9 -0.9 C 21.9 -0.9 25.1 -50.2 0 -50.2 C -25.1 -50.2 -21.9 -25.1 -21.9 -25.1 L -28.2 -25.1 C -28.2 -25.1 -31.3 -56.4 0 -56.4 C 31.3 -56.4 28.2 -0.9 28.2 -0.9 Z`
     );
 
-    this.drawCrissCrossPattern();
     const pattern = ctx.createPattern(Stage.getLayer("pattern"), "repeat");
 
     ctx.lineWidth = 5;
-    ctx.strokeStyle = basketColor2;
+    ctx.strokeStyle = palette.basket2;
     ctx.fillStyle = pattern;
     ctx.stroke(empty);
     ctx.fill(empty);
 
-    ctx.fillStyle = "#00000077";
+    ctx.fillStyle = palette.black.clone().setAlpha(0.7);
     ctx.fill(empty);
 
-    popsicle(new Point(30, 0), new Point(30, -70), "#bbb");
-    popsicle(new Point(20, 0), new Point(50, -60), "#bbb");
+    if (this.content.length === 5) {
+      popsicle(new Point(45, 0), new Point(60, -50), palette.gray);
+      popsicle(new Point(40, 0), new Point(45, -60), palette.gray);
+    }
 
-    const slots = [new Point(30, -10), new Point(50, -5), new Point(-48, -5)];
+    const slots = distribute(-40, 60, 5);
+    this.content.slice(0, 5).forEach((b, i) =>
+      YarnBall.drawYarnball(new Point(slots[i], i % 2 === 0 ? -10 : -5), {
+        color: b.color,
+        radius: b.radius,
+        lineWidth: 2,
+      })
+    );
 
     ctx.fillStyle = pattern;
     ctx.fill(basket);
 
     ctx.lineWidth = 2;
-    ctx.strokeStyle = basketColor2;
+    ctx.strokeStyle = palette.basket2;
     ctx.stroke(basket);
 
     ctx.lineWidth = 5;
@@ -110,6 +120,11 @@ Z`);
     ctx.fillStyle = pattern;
     ctx.fill(handle);
     ctx.stroke(handle);
+
+    drawText(`${Math.max(0, this.wanted - this.content.length)}`, {
+      pos: new Point(0, 20),
+      fontSize: 36,
+    });
 
     ctx.restore();
   }

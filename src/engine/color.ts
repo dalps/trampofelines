@@ -59,6 +59,7 @@ export class HSLColor extends Color {
 const PALETTE = {
   white: new RGBColor(),
   black: new RGBColor(0, 0, 0),
+  gray: new HSLColor(0, 0, 75), // "hsla(0, 0%, 75%, 1.00)"
   pink: new RGBColor(255, 192, 203), // "#ffc0cb"
   hotPink: new HSLColor(330, 100, 71), // "hsla(330, 100%, 71%, 1.00)"
   coral: new HSLColor(16, 100, 66), // "hsla(16, 100%, 66%, 1.00)"
@@ -67,7 +68,8 @@ const PALETTE = {
   nightBlue: new RGBColor(1, 17, 35), // "#011123"
   darkBlue: new RGBColor(17, 34, 54), // "#112236"
   blueGray: new RGBColor(85, 102, 121), // "#556679"
-  cardboard: new HSLColor(56, 38, 58), // "hsla(56, 38%, 58%, 1.00)"
+  basket2: new HSLColor(26, 56, 39), // "hsla(26, 56%, 39%, 1.00)"
+  basket1: new HSLColor(29, 54, 49), // "hsla(29, 54%, 49%, 1.00)"
   blue0: new HSLColor(210, 100, 35), // "hsla(210, 100%, 35%, 1.00)";
   blue1: new HSLColor(210, 100, 40), // "hsla(210, 100%, 40%, 1.00)",
   blue2: new HSLColor(210, 100, 50), // "hsla(210, 100%, 50%, 1.00)",

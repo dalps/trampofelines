@@ -1,7 +1,8 @@
 import { popsicle } from "../utils/CanvasUtils";
-import type { Collider } from "./Collisions2D";
 import { damp, Point } from "../utils/MathUtils";
-import { Clock, instant } from "../utils/TimeUtils";
+import { Clock } from "../utils/TimeUtils";
+import type { Collider } from "./Collisions2D";
+import { GAMESTATE } from "./GameState";
 
 /**
  * A static force that can be applied to a dynamic body
@@ -186,7 +187,7 @@ export class DynamicBody {
     this._fixed = !this._fixed;
   }
 
-  updateAndDraw() {
+  update() {
     const { dt } = Clock;
 
     if (this._fixed) return;
@@ -209,6 +210,8 @@ export class DynamicBody {
       this.position.y +=
         this.velocity.y * dt + this.acceleration.y * dt * dt * 0.5;
     }
+
+    GAMESTATE.settings.showForces && (this.drawForces(), this.drawCollider());
   }
 
   drawForces() {

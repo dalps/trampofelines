@@ -1,6 +1,6 @@
 import { Point } from "../utils/MathUtils";
 
-export interface Level {
+export interface Scene {
   goal: Point;
   enemies: Point[];
   tubes: Point[];
@@ -10,6 +10,6 @@ export interface Level {
   init: Function;
 }
 
-export const LEVELS: Level[] = [
+export const LEVELS: Scene[] = [
   // TODO: design some levels
 ];

@@ -8,10 +8,11 @@ import { YarnBall } from "../entities/YarnBall";
 import { Point } from "../utils/MathUtils";
 import { gameoverElements, Stage, titleElements } from "./Stage";
 import { drawGameoverUI, drawLives } from "./ui";
+import { Backdrop } from "../scenes/Backdrop";
 
 export const settings = {
   showJoints: false,
-  showForces: false,
+  showForces: true,
   play: true,
   colliderRadius: 20,
   lineMass: 2,
@@ -23,6 +24,7 @@ export const settings = {
 };
 
 export interface GameState {
+  scene: Backdrop;
   state: State;
   yarnballs: Map<string, YarnBall>;
   tubes: Tube[];

@@ -9,12 +9,15 @@ export function distribute(
   min: number,
   max: number,
   subs: number,
-  cb: (n: number, i: number) => void
+  cb: (n: number, i: number) => void = () => {}
 ) {
+  const points: number[] = [];
   for (let i = 0; i < subs; i++) {
     const n = lerp(min, max, i / subs);
+    points.push(n);
     cb(n, i);
   }
+  return points;
 }
 
 export function damp(

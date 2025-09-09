@@ -6,6 +6,7 @@ import PALETTE from "./color";
 import { drawText, engrave } from "./font";
 import { GAMESTATE, restart, State, title } from "./GameState";
 import { drawGameoverUI, drawLives } from "./ui";
+import { Basket } from "../entities/Basket";
 
 export const BUTTONS = {
   retry: { text: "Retry", onclick: restart },
@@ -117,6 +118,8 @@ export class Stage {
 
   static init(stage: HTMLElement) {
     this.stage = stage;
+
+    Basket.drawCrissCrossPattern();
 
     // Create the buttons and draw their textures
     Object.entries(BUTTONS).forEach(([name, data]) => {
