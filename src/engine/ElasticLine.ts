@@ -1,7 +1,8 @@
 import Math2D, { Point } from "../utils/MathUtils";
-import { Attraction, DynamicBody, Repulsion } from "./Physics2D";
+import { Pull, DynamicBody, Repulsion } from "./Physics2D";
 import { Stage } from "./Stage";
 import { instant } from "../utils/TimeUtils";
+import PALETTE from "./color";
 
 class Joint extends DynamicBody {
   public neighbors: Joint[] = [];
@@ -19,11 +20,8 @@ class Joint extends DynamicBody {
     this.neighbors.push(t);
     t.neighbors.push(this);
 
-    this.addForce(new Attraction(this.position, t.position, this.attraction));
-    t.addForce(new Attraction(t.position, this.position, this.attraction));
-
-    this.addForce(new Repulsion(this.position, t.position, this.repulsion));
-    t.addForce(new Repulsion(t.position, this.position, this.repulsion));
+    this.addForce(new Pull(this.position, t.position, this.attraction));
+    t.addForce(new Pull(t.position, this.position, this.attraction));
   }
 
   update(): void {
@@ -76,8 +74,8 @@ export class ElasticShape {
   }
 
   draw({
-    fillColor = "black",
-    strokeColor = "black",
+    fillColor = PALETTE.black,
+    strokeColor = PALETTE.black,
     lineWidth = 1,
     lineCap = "round" as CanvasLineCap,
     stroke = true,
@@ -100,17 +98,15 @@ export class ElasticShape {
     fill && ctx.fill();
   }
 
-  drawJoints(colors = ["yellow", "magenta", "cyan"]) {
+  drawJoints() {
     const { ctx } = Stage;
 
     ctx.lineWidth = 2;
     ctx.strokeStyle = "black";
     this.joints.forEach((j, i) => {
-      ctx.fillStyle = colors[i % colors.length];
+      ctx.fillStyle = PALETTE.white;
       ctx.beginPath();
       ctx.arc(j.position.x, j.position.y, 3, 0, Math.PI * 2);
-      ctx.closePath();
-
       ctx.fill();
       ctx.stroke();
     });
@@ -119,44 +115,6 @@ export class ElasticShape {
   update() {
     this.joints.forEach((joint) => {
       joint.update();
-    });
-  }
-}
-
-export class ElasticTightLoop extends ElasticShape {
-  constructor(
-    points: Point[],
-    public mass = 0.05,
-    public damping = 20,
-    public jointsAttraction = 100,
-    public jointsRepulsion = 100,
-    public closed = false
-  ) {
-    super([], {
-      mass,
-      damping,
-      jointsAttraction,
-      jointsRepulsion,
-      closed: true,
-    });
-
-    this.joints = points.map((p) => {
-      const joint = new Joint(
-        p,
-        mass,
-        damping,
-        jointsAttraction,
-        jointsRepulsion
-      );
-      return joint;
-    });
-
-    this.joints.forEach((j) => {
-      this.joints.forEach((j2) => {
-        if (j.position.x !== j2.position.x && j.position.y !== j2.position.y) {
-          j.addNeighbor(j2);
-        }
-      });
     });
   }
 }

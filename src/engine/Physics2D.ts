@@ -5,7 +5,7 @@ import type { Collider } from "./Collisions2D";
 import Game from "./GameState";
 
 /**
- * A static force that can be applied to a dynamic body
+ * A permanent force that can be applied to a dynamic body
  */
 export class Force {
   constructor(
@@ -34,28 +34,16 @@ export class Force {
   }
 }
 
-type AttractionStrengthBehavior = "Additive" | "Multiplicative";
-
 /**
  * A pull towards another body in space
  */
-export class Attraction extends Force {
-  constructor(
-    public from: Point,
-    public to: Point,
-    public strength = 1,
-    public behavior: AttractionStrengthBehavior = "Additive"
-  ) {
+export class Pull extends Force {
+  constructor(public from: Point, public to: Point, public strength = 1) {
     super();
   }
 
   override get magnitude(): number {
-    switch (this.behavior) {
-      case "Additive":
-        return this.strength + this.to.sub(this.from).abs();
-      case "Multiplicative":
-        return this.strength * this.to.sub(this.from).abs();
-    }
+    return this.strength + this.to.sub(this.from).abs();
   }
 
   override get direction(): Point {
@@ -63,30 +51,9 @@ export class Attraction extends Force {
   }
 }
 
-export class Repulsion extends Force {
-  constructor(
-    public from: Point,
-    public to: Point,
-    public strength = 1,
-    public behavior: AttractionStrengthBehavior = "Additive"
-  ) {
-    super();
-  }
-
-  override get magnitude(): number {
-    switch (this.behavior) {
-      case "Additive":
-        return this.strength - this.from.sub(this.to).abs();
-      case "Multiplicative":
-        return this.strength / this.from.sub(this.to).abs();
-    }
-  }
-
-  override get direction(): Point {
-    return this.from.sub(this.to).normalize();
-  }
-}
-
+/**
+ * A force that lasts a very short amount of time
+ */
 export class ContactForce extends Force {
   static EPSILON = 0.000001;
 
