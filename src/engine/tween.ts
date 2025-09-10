@@ -11,6 +11,18 @@ export class TweenManager {
   private static activeTweens: Set<WeakRef<any>> = new Set();
 
   static add(tween) {
+    // Cancel any existing tweens running on the same object and property
+    Array.from(this.activeTweens.values()).forEach((tref) => {
+      const otherTween = tref.deref() as Tween<any>;
+      if (
+        otherTween &&
+        otherTween.obj === tween.obj &&
+        otherTween.property === tween.property
+      ) {
+        this.activeTweens.delete(tref);
+      }
+    });
+
     const ref = new WeakRef(tween);
     this.activeTweens.add(ref);
     return ref;
@@ -71,7 +83,8 @@ export class Tween<T> {
 
     this.onUpdate && this.onUpdate();
 
-    if (Math.abs(this.value - this.targetValue) <= EPSILON) {
+    if (Math.abs(this.value - this.targetValue) < EPSILON) {
+      this.obj[this.property] = this.targetValue;
       this.onComplete && this.onComplete();
       TweenManager.delete(this.ref);
       return;
