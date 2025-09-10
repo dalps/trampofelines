@@ -1,7 +1,7 @@
-import { GAMESTATE, State as GameState } from "../engine/GameState";
+import Game, { game, State as GameState } from "../engine/GameState";
 import { makeGradient } from "../utils/CanvasUtils";
 import { CollisionManager, downwardFilter } from "../engine/Collisions2D";
-import palette, { HSLColor } from "../engine/color";
+import palette, { HSLColor, RGBColor } from "../engine/color";
 import { lerp, Point } from "../utils/MathUtils";
 import { State } from "../engine/Physics2D";
 import { Ripple } from "../engine/Ripple";
@@ -15,7 +15,8 @@ import { drawLives } from "../engine/ui";
 export class Tube {
   public position: Point;
   public size: Point;
-  private canvas: MyCanvas;
+  public direction = 0;
+  public shootVelocity = 50;
 
   constructor(
     position: Point,
@@ -23,16 +24,12 @@ export class Tube {
   ) {
     this.position = position;
     this.size = size;
-    this.canvas = Stage.getLayer("tube");
 
     Stage.newOffscreenLayer("tube", size.x * 1.5, size.y);
     Tube.drawTube(this.size.x, this.size.y);
 
     Clock.every(20, () => {
-      if (
-        GAMESTATE.state === GameState.Playing &&
-        GAMESTATE.yarnballs.size < 3
-      ) {
+      if (Game.state === GameState.Playing && Game.yarnballs.size < 3) {
         zzfxP(sfx.spawn);
         const ball = this.spawnYarnBall();
         cb(ball);
@@ -62,9 +59,9 @@ export class Tube {
 
     const b = new YarnBall(
       startPos,
-      GAMESTATE.settings.ballVelocity,
-      GAMESTATE.settings.ballMass,
-      GAMESTATE.settings.ballRadius,
+      new Point(1, 0).multiplyScalar(this.shootVelocity).rotate(this.direction),
+      Game.settings.ballMass,
+      Game.settings.ballRadius,
       color
     );
     b.name = "YarnBall";
@@ -78,7 +75,7 @@ export class Tube {
       });
     }
 
-    GAMESTATE.yarnballs.set(b.id, b);
+    Game.yarnballs.set(b.id, b);
 
     TrampofelineManager.trampolines.forEach((cat) =>
       cat.joints.forEach((j) =>
@@ -98,21 +95,21 @@ export class Tube {
       )
     );
 
-    GAMESTATE.baskets.forEach((basket) =>
+    Game.baskets.forEach((basket) =>
       CollisionManager.register(basket, b, {
         sensor: true,
         filter: downwardFilter,
         cb: () => {
-          if (GAMESTATE.state !== GameState.Playing) return;
+          if (Game.state !== GameState.Playing) return;
 
-          GAMESTATE.score += 1;
+          Game.score += 1;
           CollisionManager.unregisterBody(b);
           b.state = State.Dead;
           drawLives();
           zzfxP(sfx.score);
           basket.addYarnball(b);
           Stage.setActiveLayer("game");
-          GAMESTATE.yarnballs.delete(b.id);
+          Game.yarnballs.delete(b.id);
           new Ripple(b.position.clone(), {
             startRadius: 25,
             finalRadius: 50,
@@ -218,7 +215,7 @@ export class Tube {
       shineSize: 0.2,
     });
     ctx.fillRect;
-    ctx.strokeStyle = "#2cbb2c";
+    ctx.strokeStyle = palette.tube1;
     ctx.fill(body);
 
     // ctx.stroke(body);
@@ -241,8 +238,8 @@ export class Tube {
     ctx.fill(lid);
 
     ctx.fillStyle = makeGradient(new Point(0, 0), new Point(0, sy), {
-      color1: "black",
-      color2: "#298529",
+      color1: palette.black,
+      color2: palette.tube2,
       shineSize: 0,
     });
     ctx.fill(hole);
@@ -253,8 +250,8 @@ export class Tube {
         new Point(0, -overhang * 3),
         new Point(0, sy + overhang * 3),
         {
-          color1: "rgba(255, 255, 255, 0)",
-          color2: "rgba(255, 2, 2, 0)",
+          color1: palette.white.clone().setAlpha(0),
+          color2: new RGBColor(255, 2, 2, 0),
           shineSize: 0.55,
           shinePos: 0,
           shineSmoothness: 1,

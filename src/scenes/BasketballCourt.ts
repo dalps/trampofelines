@@ -1,4 +1,4 @@
-import { drawLives, GAMESTATE } from "../engine/GameState";
+import { drawLives, game } from "../engine/GameState";
 import {
   CollisionManager,
   downwardFilter,
@@ -36,18 +36,18 @@ export class BasketballCourt {
     this.hoop.attachCollider(hoopSensor);
     this.backBoard.attachCollider(boardCollider);
 
-    GAMESTATE.tubes.push(
+    Game.tubes.push(
       new Tube(new Point(0, 100), {
         cb: BasketballCourt.registerBall.bind(this),
       })
     );
 
-    GAMESTATE.yarnballs.forEach(BasketballCourt.registerBall);
+    Game.yarnballs.forEach(BasketballCourt.registerBall);
   }
 
   static update() {
-    GAMESTATE.settings.showForces && BasketballCourt.backBoard.collider.draw();
-    GAMESTATE.settings.showForces && BasketballCourt.hoop.collider.draw();
+    Game.settings.showForces && BasketballCourt.backBoard.collider.draw();
+    Game.settings.showForces && BasketballCourt.hoop.collider.draw();
   }
 
   static registerBall(b: YarnBall) {
@@ -56,7 +56,7 @@ export class BasketballCourt {
       sensor: true,
       filter: downwardFilter,
       cb: () => {
-        GAMESTATE.score += 1;
+        Game.score += 1;
         drawLives();
         zzfxP(sfx.score);
       },

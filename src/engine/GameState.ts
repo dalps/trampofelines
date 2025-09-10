@@ -1,38 +1,13 @@
-import { drawTitle } from "../scenes/Title";
-import sfx, { zzfxP } from "../engine/sfx";
+import sfx, { zzfxP } from "./sfx";
 import { Basket } from "../entities/Basket";
-import { City } from "../scenes/City";
 import TrampofelineManager from "../entities/Trampofeline";
 import type { Tube } from "../entities/Tube";
 import { YarnBall } from "../entities/YarnBall";
-import { Point } from "../utils/MathUtils";
+import { City } from "../scenes/City";
+import { drawTitle } from "../scenes/Title";
+import { CollisionManager } from "./Collisions2D";
 import { gameoverElements, Stage, titleElements } from "./Stage";
 import { drawGameoverUI, drawLives } from "./ui";
-import { Backdrop } from "../scenes/Backdrop";
-
-export const settings = {
-  showJoints: false,
-  showForces: true,
-  play: true,
-  colliderRadius: 20,
-  lineMass: 2,
-  ballMass: 3,
-  ballRadius: 20,
-  ballVelocity: new Point(50, -10),
-  gravity: true,
-  volume: 0,
-};
-
-export interface GameState {
-  scene: Backdrop;
-  state: State;
-  yarnballs: Map<string, YarnBall>;
-  tubes: Tube[];
-  baskets: Basket[];
-  lives: number;
-  score: number;
-  settings: typeof settings;
-}
 
 export enum State {
   Title,
@@ -40,76 +15,114 @@ export enum State {
   GameOver,
 }
 
-export function gameOver() {
-  switch (GAMESTATE.state) {
-    case State.Title:
-    case State.Playing:
-      drawGameoverUI();
-      zzfxP(sfx.gameover);
-      gameoverElements.style.display = "block";
-      titleElements.style.display = "none";
-      TrampofelineManager.disableUI();
+/**
+ * Functions to manage the game state
+ */
+export default class Game {
+  public static TOTAL_LIVES = 3;
+  public static state = State.Title;
+  public static yarnballs: Map<string, YarnBall> = new Map();
+  public static tubes: Tube[] = [];
+  public static baskets: Basket[] = [];
+  public static lives = this.TOTAL_LIVES;
+  public static score = 0;
+  public static settings = {
+    showJoints: false,
+    showForces: true,
+    lineMass: 2,
+    ballMass: 3,
+    ballRadius: 20,
+    colliderRadius: 20,
+    gravity: true,
+    volume: 0,
+  };
 
-      GAMESTATE.state = State.GameOver;
+  static update() {
+    switch (this.state) {
+      case State.Title:
+        Stage.setActiveLayer("bg");
+        drawTitle();
+        break;
+      case State.GameOver:
+      case State.Playing:
+        Stage.setActiveLayer("game");
+        Stage.clearLayer("game");
+
+        City.update();
+
+        CollisionManager.update();
+
+        TrampofelineManager.trampolines.forEach((l) => {
+          l.update();
+          l.draw();
+        });
+
+        TrampofelineManager.drawGuides();
+
+        break;
+    }
+  }
+
+  static gameOver() {
+    switch (this.state) {
+      case State.Title:
+      case State.Playing:
+        drawGameoverUI();
+        zzfxP(sfx.gameover);
+        gameoverElements.style.display = "block";
+        titleElements.style.display = "none";
+        TrampofelineManager.disableUI();
+
+        this.state = State.GameOver;
+    }
+  }
+
+  static restart() {
+    switch (this.state) {
+      case State.Title:
+      case State.GameOver:
+        this.lives = this.TOTAL_LIVES;
+        this.yarnballs.clear();
+        TrampofelineManager.clearEntities();
+        TrampofelineManager.enableUI();
+        gameoverElements.style.display = "none";
+        titleElements.style.display = "none";
+        Stage.stage.appendChild(Stage.getLayer("ui"));
+
+        Stage.setActiveLayer("bg");
+        // BasketballCourt.draw();
+        City.drawBackground();
+
+        drawLives();
+
+        this.state = State.Playing;
+    }
+  }
+
+  static title() {
+    switch (this.state) {
+      case State.GameOver:
+      case State.Title:
+        this.lives = this.TOTAL_LIVES;
+        this.yarnballs.clear();
+        TrampofelineManager.clearEntities();
+        TrampofelineManager.disableUI();
+        gameoverElements.style.display = "none";
+        titleElements.style.display = "block";
+
+        Stage.clearLayer("game-info");
+
+        drawTitle();
+
+        this.state = State.Title;
+      // No transition
+    }
+  }
+
+  static quit() {
+    switch (this.state) {
+      case State.GameOver:
+        this.title();
+    }
   }
 }
-
-export function restart() {
-  switch (GAMESTATE.state) {
-    case State.Title:
-    case State.GameOver:
-      GAMESTATE.lives = TOTAL_LIVES;
-      GAMESTATE.yarnballs.clear();
-      TrampofelineManager.enableUI();
-      TrampofelineManager.entities.clear();
-      gameoverElements.style.display = "none";
-      titleElements.style.display = "none";
-      Stage.stage.appendChild(Stage.getLayer("ui"));
-
-      Stage.setActiveLayer("bg");
-      // BasketballCourt.draw();
-      City.drawBackground();
-
-      drawLives();
-
-      GAMESTATE.state = State.Playing;
-  }
-}
-
-export function title() {
-  switch (GAMESTATE.state) {
-    case State.GameOver:
-    case State.Title:
-      GAMESTATE.lives = TOTAL_LIVES;
-      GAMESTATE.yarnballs.clear();
-      TrampofelineManager.entities.clear();
-      TrampofelineManager.disableUI();
-      gameoverElements.style.display = "none";
-      titleElements.style.display = "block";
-
-      Stage.clearLayer("game-info");
-
-      drawTitle();
-
-      GAMESTATE.state = State.Title;
-    // No transition
-  }
-}
-
-export function quit() {
-  switch (GAMESTATE.state) {
-    case State.GameOver:
-      title();
-  }
-}
-
-export const TOTAL_LIVES = 3;
-export const GAMESTATE: GameState = {
-  state: State.Title,
-  yarnballs: new Map(),
-  tubes: [],
-  baskets: [],
-  lives: TOTAL_LIVES,
-  score: 0,
-  settings,
-};

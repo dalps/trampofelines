@@ -1,7 +1,7 @@
 import { SegmentCollider } from "../engine/Collisions2D";
 import palette from "../engine/color";
 import { drawText } from "../engine/font";
-import { GAMESTATE } from "../engine/GameState";
+import { game } from "../engine/GameState";
 import { DynamicBody } from "../engine/Physics2D";
 import { Stage } from "../engine/Stage";
 import { Tween } from "../engine/tween";

@@ -55,7 +55,7 @@ export class HSLColor extends Color {
     return `hsla(${this.h},${this.s}%,${this.l}%,${this.alpha})`;
   }
 }
-
+window.CSS.lvi
 const PALETTE = {
   white: new RGBColor(),
   black: new RGBColor(0, 0, 0),
@@ -65,6 +65,8 @@ const PALETTE = {
   coral: new HSLColor(16, 100, 66), // "hsla(16, 100%, 66%, 1.00)"
   fuchsia: new HSLColor(300, 100, 66), // "hsla(300, 100%, 66%, 1.00)"
   chartreuse: new HSLColor(131, 77, 44), // "hsla(131, 77%, 44%, 1.00)"
+  tube1: new HSLColor(120, 62, 45), // "hsla(120, 62%, 45%, 1.00)"
+  tube2: new HSLColor(120, 53, 34), // "hsla(120, 53%, 34%, 1.00)",
   nightBlue: new RGBColor(1, 17, 35), // "#011123"
   darkBlue: new RGBColor(17, 34, 54), // "#112236"
   blueGray: new RGBColor(85, 102, 121), // "#556679"

@@ -4,15 +4,9 @@ import { drawCatFace, drawCatRear } from "../entities/Trampofeline";
 import { Point } from "../utils/MathUtils";
 import PALETTE from "./color";
 import { drawText, engrave } from "./font";
-import { GAMESTATE, restart, State, title } from "./GameState";
+import Game, { State } from "./GameState";
 import { drawGameoverUI, drawLives } from "./ui";
 import { Basket } from "../entities/Basket";
-
-export const BUTTONS = {
-  retry: { text: "Retry", onclick: restart },
-  play: { text: "Play!", onclick: restart },
-  quit: { text: "Quit", onclick: title },
-};
 
 export const titleElements = document.getElementById("title");
 export const gameoverElements = document.getElementById("gameover");
@@ -121,6 +115,12 @@ export class Stage {
 
     Basket.drawCrissCrossPattern();
 
+    const BUTTONS = {
+      retry: { text: "Retry", onclick: () => Game.restart() },
+      play: { text: "Play!", onclick: () => Game.restart() },
+      quit: { text: "Quit", onclick: () => Game.title() },
+    };
+
     // Create the buttons and draw their textures
     Object.entries(BUTTONS).forEach(([name, data]) => {
       const id = `${name}`;
@@ -190,7 +190,7 @@ export class Stage {
     });
 
     // Redraw backgrounds
-    switch (GAMESTATE.state) {
+    switch (Game.state) {
       case State.Title:
         drawTitle();
         break;

@@ -1,10 +1,10 @@
 import { YarnBall } from "../entities/YarnBall";
 import { star } from "../utils/CanvasUtils";
 import { Point } from "../utils/MathUtils";
-import { drawText, engrave } from "./font";
-import { GAMESTATE, TOTAL_LIVES } from "./GameState";
-import { Stage } from "./Stage";
 import palette from "./color";
+import { drawText } from "./font";
+import Game from "./GameState";
+import { Stage } from "./Stage";
 
 export function drawLives() {
   Stage.setActiveLayer("game-info");
@@ -18,7 +18,7 @@ export function drawLives() {
 
   ctx.lineJoin = "round";
   ctx.lineCap = "round";
-  for (let i = 0; i < TOTAL_LIVES - GAMESTATE.lives; i++) {
+  for (let i = 0; i < Game.TOTAL_LIVES - Game.lives; i++) {
     ctx.strokeStyle = "white";
     ctx.lineWidth = 8;
     star(pos.add(center), {
@@ -43,7 +43,7 @@ export function drawLives() {
   }
 
   // const colors = ["fuchsia", "chartreuse", "coral"]
-  for (let i = 0; i < GAMESTATE.lives; i++) {
+  for (let i = 0; i < Game.lives; i++) {
     YarnBall.drawYarnball(pos.add(center), {
       radius,
       color: palette.fuchsia,
@@ -54,7 +54,7 @@ export function drawLives() {
     pos.incrX(sectionSize);
   }
 
-  drawText(`score ${GAMESTATE.score}`, {
+  drawText(`score ${Game.score}`, {
     pos: new Point(cw * 0.5, 100),
   });
 }
@@ -74,7 +74,7 @@ export function drawGameoverUI() {
     fontSize: 80,
   });
 
-  drawText(`you rescued ${GAMESTATE.score} yarn balls`, {
+  drawText(`you rescued ${Game.score} yarn balls`, {
     pos: new Point(cw * 0.5, ch * 0.5 - 100),
   });
 }

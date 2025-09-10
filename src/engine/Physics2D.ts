@@ -2,7 +2,7 @@ import { popsicle } from "../utils/CanvasUtils";
 import { damp, Point } from "../utils/MathUtils";
 import { Clock } from "../utils/TimeUtils";
 import type { Collider } from "./Collisions2D";
-import { GAMESTATE } from "./GameState";
+import Game from "./GameState";
 
 /**
  * A static force that can be applied to a dynamic body
@@ -211,7 +211,7 @@ export class DynamicBody {
         this.velocity.y * dt + this.acceleration.y * dt * dt * 0.5;
     }
 
-    GAMESTATE.settings.showForces && (this.drawForces(), this.drawCollider());
+    Game.settings.showForces && (this.drawForces(), this.drawCollider());
   }
 
   drawForces() {

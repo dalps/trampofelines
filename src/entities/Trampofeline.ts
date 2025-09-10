@@ -1,4 +1,4 @@
-import { GAMESTATE } from "../engine/GameState";
+import Game from "../engine/GameState";
 import { circle } from "../utils/CanvasUtils";
 import {
   CircleCollider,
@@ -30,13 +30,16 @@ let mouseSpeed = 0;
 const { nightBlue: coatColor, blueGray: detailColor } = palette;
 const MAX_CATS = 3;
 const MIN_LENGTH = 100;
-const MAX_STEEPNESS_TO_90 = 25;
 
 export default class TrampofelineManager {
   private static entities: Map<string, Trampofeline> = new Map();
 
   public static get trampolines() {
     return Array.from(this.entities.values());
+  }
+
+  static clearEntities() {
+    this.entities.clear();
   }
 
   static enableUI() {
@@ -165,17 +168,22 @@ export default class TrampofelineManager {
     this.entities.set(cat.id, cat);
 
     cat.joints.forEach((j) => {
-      GAMESTATE.settings.gravity && j.addForce(Gravity);
+      Game.settings.gravity && j.addForce(Gravity);
 
       j.attachCollider(
-        new CircleCollider(j.position, GAMESTATE.settings.colliderRadius)
+        new CircleCollider(j.position, Game.settings.colliderRadius)
       );
 
-      GAMESTATE.yarnballs.forEach((b) =>
+      Game.yarnballs.forEach((b) =>
         CollisionManager.register(j, b, {
           filter: downwardFilter,
           cb: () => {
-            new Ripple(j.position, 15, 30, 0.3, 0);
+            new Ripple(j.position, {
+              startRadius: 15,
+              finalRadius: 30,
+              startTransparency: 0.3,
+              finalTransparency: 0,
+            });
             zzfxP(sfx.bounce);
             TrampofelineManager.killCat(cat);
           },
@@ -194,8 +202,6 @@ export default class TrampofelineManager {
   }
 
   static testPlacement(): boolean {
-    let sep: Point;
-    let angle: number;
     valid =
       distance >= MIN_LENGTH &&
       TrampofelineManager.entities.size < MAX_CATS &&
@@ -208,7 +214,8 @@ export default class TrampofelineManager {
     return valid;
   }
 
-  static drawGuides(time: number) {
+  static drawGuides() {
+    const { time } = Clock;
     Stage.setActiveLayer("ui");
     Stage.clearLayer("ui");
 
