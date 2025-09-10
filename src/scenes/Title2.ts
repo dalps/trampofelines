@@ -6,6 +6,8 @@ import { YarnBall } from "../entities/YarnBall";
 import { circle, star } from "../utils/CanvasUtils";
 import { distribute, Point } from "../utils/MathUtils";
 import { Clock } from "../utils/TimeUtils";
+import { Firework } from "../engine/Firework";
+import { Ripple } from "../engine/Ripple";
 
 export class Title2 {
   static vignette: number = 0;
@@ -18,9 +20,14 @@ export class Title2 {
   static intro() {
     const { ctx, cw, ch } = Stage;
 
+    new Firework(new Point(cw * 0.5, ch * 0.5), {
+      startRadius: 5,
+      finalRadius: 100,
+      speed: 1,
+    });
     new Tween(this, "vignette", {
       finalValue: 0.5,
-      speed: 0.7
+      speed: 0.7,
     });
     new Tween(this.trampoPos, "x", {
       finalValue: cw * 0.5,
@@ -33,10 +40,10 @@ export class Title2 {
       finalValue: -0.2,
     });
   }
-  
+
   static outro() {
     const { ctx, cw, ch } = Stage;
-    
+
     new Tween(this, "vignette", {
       finalValue: 0,
     });
@@ -49,13 +56,10 @@ export class Title2 {
   }
 
   static draw() {
-    console.log(this.vignette)
     Stage.setActiveLayer("game");
     const { ctx, cw, ch } = Stage;
     const { time } = Clock;
     const { white, blue0, blue1, blue2, blue3 } = palette;
-
-    Stage.clearLayer();
 
     ctx.fillStyle = palette.black.toAlpha(this.vignette);
     ctx.fillRect(0, 0, cw, ch);
@@ -64,23 +68,6 @@ export class Title2 {
     {
       const c1 = new Point(cw * 0.5 - 150, ch * 0.35);
       const c2 = new Point(cw * 0.5 + 150, ch * 0.45);
-
-      ctx.fillStyle = blue3;
-      ctx.strokeStyle = white;
-
-      [c1, c2].forEach((c, i) =>
-        star(c, {
-          outerRadius: 100,
-          innerRadius: 100,
-          angle: (i % 2 === 0 ? -1 : 1) * 0.05 * time,
-          cb: (p, j) => {
-            star(p, { angle: (i % 2 === 0 ? -1 : 1) * 0.3 * time });
-            ctx.closePath();
-            j % 2 === 0 && ctx.fill();
-            j % 2 === 1 && ctx.stroke();
-          },
-        })
-      );
     }
 
     ctx.fillStyle = palette.white;

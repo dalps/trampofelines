@@ -41,12 +41,14 @@ export default class Game {
   static update() {
     switch (this.state) {
       case State.Title:
+        Stage.setActiveLayer("game");
+        Stage.clearLayer();
         Title2.draw();
         break;
-      case State.GameOver:
-      case State.Playing:
+        case State.GameOver:
+          case State.Playing:
         Stage.setActiveLayer("game");
-        Stage.clearLayer("game");
+        Stage.clearLayer();
 
         City.update();
 

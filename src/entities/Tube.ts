@@ -11,6 +11,7 @@ import sfx, { zzfxP } from "../engine/sfx";
 import TrampofelineManager from "./Trampofeline";
 import { YarnBall } from "./YarnBall";
 import { drawLives } from "../engine/ui";
+import { Firework } from "../engine/Firework";
 
 export class Tube {
   public position: Point;
@@ -86,6 +87,15 @@ export class Tube {
         cb: () => {
           if (Game.state !== GameState.Playing) return;
 
+          new Firework(b.position, {
+            startRadius: 5,
+            finalRadius: 50,
+            points: 3,
+            speed: 4,
+            color: b.color,
+            color2: palette.white,
+          });
+
           Game.score += 1;
           b.die();
           drawLives();
@@ -98,7 +108,7 @@ export class Tube {
             finalRadius: 50,
             startTransparency: 0.3,
             finalTransparency: 0,
-            fillColor: b.color,
+            color: b.color,
           });
         },
       })

@@ -39,6 +39,7 @@ const PALETTE = {
   black: hsl(0, 0, 0), // hsla(0, 0%, 0%, 1.00)
   white: hsl(0, 0, 100), // hsla(0, 0%, 100%, 1.00)
   gray: hsl(0, 0, 75), // hsla(0, 0%, 75%, 1.00)
+  brightYellow: hsl(64, 97, 56), // hsla(64, 97%, 56%, 1.00)
   pink: hsl(350, 100, 88), // hsla(350, 100%, 88%, 1.00)
   hotPink: hsl(330, 100, 71), // hsla(330, 100%, 71%, 1.00)
   coral: hsl(16, 100, 66), // hsla(16, 100%, 66%, 1.00)

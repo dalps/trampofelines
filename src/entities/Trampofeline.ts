@@ -197,7 +197,7 @@ export default class TrampofelineManager {
   static drawGuides() {
     const { time } = Clock;
     Stage.setActiveLayer("ui");
-    Stage.clearLayer("ui");
+    Stage.clearLayer();
 
     const { ctx } = Stage;
 
@@ -240,7 +240,6 @@ export class Trampofeline extends ElasticLine {
             startRadius: 15,
             finalRadius: 30,
             startTransparency: 0.3,
-            finalTransparency: 0,
           });
           zzfxP(sfx.bounce);
           this.die();
@@ -254,9 +253,8 @@ export class Trampofeline extends ElasticLine {
     this.joints.forEach((j) => j.die());
 
     new Tween(this, "transparency", {
-      startValue: this.transparency,
       finalValue: 0,
-      cb: () => TrampofelineManager.entities.delete(this.id),
+      onComplete: () => TrampofelineManager.entities.delete(this.id),
     });
   }
 

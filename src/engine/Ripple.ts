@@ -1,15 +1,24 @@
 import { circle } from "../utils/CanvasUtils";
 import { type Point } from "../utils/MathUtils";
-import PALETTE, { Color } from "./color";
+import PALETTE, { Color, HSLColor } from "./color";
 import { Stage } from "./Stage";
 import { Tween } from "./tween";
+
+export interface RippleParams {
+  startRadius?: number;
+  finalRadius?: number;
+  startTransparency?: number;
+  finalTransparency?: number;
+  color?: HSLColor;
+  speed?: number;
+}
 
 /**
  * A circle that changes in radius and transparency over time.
  */
 export class Ripple {
   radius: number;
-  transparency: number;
+  alpha: number;
   color: Color;
 
   constructor(
@@ -19,21 +28,19 @@ export class Ripple {
       finalRadius = 10,
       startTransparency = 1,
       finalTransparency = 0,
-      fillColor = PALETTE.white.clone(),
+      color = PALETTE.white,
       speed = 7,
-    }
+    }: RippleParams = {}
   ) {
     this.radius = startRadius;
-    this.transparency = startTransparency;
-    this.color = fillColor;
+    this.alpha = startTransparency;
+    this.color = color.clone();
 
-    new Tween(this, "transparency", {
-      startValue: startTransparency,
+    new Tween(this, "alpha", {
       finalValue: finalTransparency,
       speed,
     });
     new Tween(this, "radius", {
-      startValue: startRadius,
       finalValue: finalRadius,
       speed,
     });
@@ -42,7 +49,7 @@ export class Ripple {
   draw() {
     const { ctx } = Stage;
 
-    ctx.fillStyle = this.color.toAlpha(this.transparency);
+    ctx.fillStyle = this.color.setAlpha(this.alpha);
     ctx.beginPath();
     circle(this.position, this.radius);
     ctx.fill();

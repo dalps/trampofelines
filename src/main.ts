@@ -23,8 +23,7 @@ function init() {
  */
 function draw(time: timestamp) {
   Clock.update(time * 0.01);
-  // Game.update();
-  Title2.draw();
+  Game.update();
   TweenManager.update();
 
   requestAnimationFrame(draw);

@@ -7,6 +7,7 @@ import { drawText, engrave } from "./font";
 import Game, { State } from "./GameState";
 import { drawGameoverUI, drawLives } from "./ui";
 import { Basket } from "../entities/Basket";
+import { Title2 } from "../scenes/Title2";
 
 export const titleElements = document.getElementById("title");
 export const gameoverElements = document.getElementById("gameover");
@@ -194,7 +195,7 @@ export class Stage {
     // Redraw backgrounds
     switch (Game.state) {
       case State.Title:
-        drawTitle();
+        Title2.draw();
         break;
       case State.Playing:
         City.draw();

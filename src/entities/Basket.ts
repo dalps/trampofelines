@@ -1,5 +1,6 @@
 import { SegmentCollider } from "../engine/Collisions2D";
 import palette from "../engine/color";
+import { Firework } from "../engine/Firework";
 import { drawText } from "../engine/font";
 import { game } from "../engine/GameState";
 import { DynamicBody } from "../engine/Physics2D";
@@ -39,6 +40,18 @@ export class Basket extends DynamicBody {
 
     // Is it filled up?
     if (!this.filled && this.content.length >= this.wanted) {
+      new Firework(this.position, {
+        startRadius: 5,
+        finalRadius: 100,
+        speed: 3,
+        color: palette.brightYellow,
+        color2: palette.white,
+        drawOdd: (ctx, c1, c2) => {
+          ctx.fill();
+          ctx.strokeStyle = c2;
+          ctx.stroke();
+        },
+      });
       new Tween(this.position, "y", {
         startValue: this.position.y,
         finalValue: -200,

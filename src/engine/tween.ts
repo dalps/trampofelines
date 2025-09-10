@@ -58,7 +58,7 @@ export class Tween<T> {
       startValue = undefined,
       finalValue = 1,
       speed = 7,
-      onUpdate = undefined,
+      onUpdate = obj.draw?.bind(obj) ?? undefined,
       onComplete = undefined,
     } = {}
   ) {
