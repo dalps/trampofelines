@@ -5,7 +5,7 @@ import {
   CollisionManager,
   downwardFilter,
 } from "../engine/Collisions2D";
-import palette, { HSLColor, setTransparency } from "../engine/color";
+import palette, { hsl, HSLColor, setTransparency } from "../engine/color";
 import { ElasticLine } from "../engine/ElasticLine";
 import Math2D, { damp, lerp, Point, RAD2DEG } from "../utils/MathUtils";
 import { Gravity, State } from "../engine/Physics2D";
@@ -28,7 +28,7 @@ let drawing = false;
 let valid = true;
 let soundInterval: number;
 let mouseSpeed = 0;
-let guideColor = new HSLColor(0, 100, 0); // hsla(0, 100%, 0%, 1.00)
+let guideColor = hsl(0, 100, 0); // hsla(0, 100%, 0%, 1.00)
 
 const { nightBlue: coatColor, blueGray: detailColor } = palette;
 const MAX_CATS = 3;

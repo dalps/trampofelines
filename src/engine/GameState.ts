@@ -28,7 +28,7 @@ export default class Game {
   public static score = 0;
   public static settings = {
     showJoints: false,
-    showForces: true,
+    showForces: false,
     lineMass: 2,
     ballMass: 3,
     ballRadius: 20,

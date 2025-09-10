@@ -56,8 +56,8 @@ export class Basket extends DynamicBody {
     ctx.drawImage(Stage.getLayer(this.name), -100, -90);
     ctx.restore();
 
-    this.drawForces();
-    this.drawCollider();
+    // this.drawForces();
+    // this.drawCollider();
   }
 
   static drawCrissCrossPattern() {
