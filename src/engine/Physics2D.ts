@@ -1,7 +1,7 @@
 import { popsicle } from "../utils/CanvasUtils";
 import { damp, Point } from "../utils/MathUtils";
 import { Clock } from "../utils/TimeUtils";
-import type { Collider } from "./Collisions2D";
+import { CollisionManager, type Collider } from "./Collisions2D";
 import Game from "./GameState";
 
 /**
@@ -109,6 +109,11 @@ export class DynamicBody {
     this.friction = friction;
     this.orientation = orientation;
     this.angularVelocity = angularVelocity;
+  }
+
+  die() {
+    this.state = State.Dead;
+    CollisionManager.unregisterBody(this);
   }
 
   translate(x: number, y: number) {

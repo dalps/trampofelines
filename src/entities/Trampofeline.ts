@@ -1,11 +1,11 @@
 import Game from "../engine/GameState";
-import { circle } from "../utils/CanvasUtils";
+import { circle, popsicle } from "../utils/CanvasUtils";
 import {
   CircleCollider,
   CollisionManager,
   downwardFilter,
 } from "../engine/Collisions2D";
-import palette, { setTransparency } from "../engine/color";
+import palette, { HSLColor, setTransparency } from "../engine/color";
 import { ElasticLine } from "../engine/ElasticLine";
 import Math2D, { damp, lerp, Point, RAD2DEG } from "../utils/MathUtils";
 import { Gravity, State } from "../engine/Physics2D";
@@ -14,6 +14,8 @@ import { Stage } from "../engine/Stage";
 import { Clock } from "../utils/TimeUtils";
 import { zzfxP } from "../engine/zzfx";
 import sfx from "../engine/sfx";
+import { Tween } from "../engine/tween";
+import { YarnBall } from "./YarnBall";
 
 let p1: Point | undefined;
 let p2: Point | undefined;
@@ -26,6 +28,7 @@ let drawing = false;
 let valid = true;
 let soundInterval: number;
 let mouseSpeed = 0;
+let guideColor = new HSLColor(0, 100, 0); // hsla(0, 100%, 0%, 1.00)
 
 const { nightBlue: coatColor, blueGray: detailColor } = palette;
 const MAX_CATS = 3;
@@ -144,7 +147,6 @@ export default class TrampofelineManager {
       }
 
       valid && TrampofelineManager.makeCat();
-      console.log(valid);
       valid && zzfxP(sfx.meow);
       !valid && zzfxP(sfx.badPlacement);
 
@@ -154,8 +156,6 @@ export default class TrampofelineManager {
 
   static makeCat() {
     if (!p1 || !p2 || p1.equals(p2)) return;
-
-    console.log("hello?");
 
     const cat = new Trampofeline(p2, p1, 10, {
       damping: 2,
@@ -174,41 +174,21 @@ export default class TrampofelineManager {
         new CircleCollider(j.position, Game.settings.colliderRadius)
       );
 
-      Game.yarnballs.forEach((b) =>
-        CollisionManager.register(j, b, {
-          filter: downwardFilter,
-          cb: () => {
-            new Ripple(j.position, {
-              startRadius: 15,
-              finalRadius: 30,
-              startTransparency: 0.3,
-              finalTransparency: 0,
-            });
-            zzfxP(sfx.bounce);
-            TrampofelineManager.killCat(cat);
-          },
-        })
-      );
+      Game.yarnballs.forEach((b) => cat.catch(b));
     });
-  }
-
-  static killCat(cat: Trampofeline) {
-    cat.joints.forEach((j) => {
-      j.state = State.Dead;
-      CollisionManager.unregisterBody(j);
-    });
-    cat.kill();
-    setTimeout(() => this.entities.delete(cat.id), 500);
   }
 
   static testPlacement(): boolean {
     valid =
       distance >= MIN_LENGTH &&
       TrampofelineManager.entities.size < MAX_CATS &&
-      Array.from(TrampofelineManager.entities.values()).filter(({ joints }) => {
+      TrampofelineManager.trampolines.filter(({ joints, dead }) => {
+        if (dead) return false;
+
         p3 = joints.at(0).position;
         p4 = joints.at(-1).position;
         inter = Math2D.properInter(p1, p2, p3, p4);
+
         return inter;
       }).length === 0;
     return valid;
@@ -226,9 +206,12 @@ export default class TrampofelineManager {
     ctx.lineWidth = 10;
     ctx.lineDashOffset = -time * 5;
     ctx.setLineDash([5, 15]);
-    ctx.strokeStyle = `rgba(${
-      this.testPlacement() ? `0,0,0` : `255,0,0`
-    },${lerp(0.6, 0.8, Math.sin(time))})`;
+
+    guideColor.l = this.testPlacement() ? 0 : 50;
+    guideColor.alpha = lerp(0.6, 0.8, Math.sin(time));
+
+    ctx.strokeStyle = guideColor;
+
     ctx.lineCap = "round";
     ctx.beginPath();
     ctx.moveTo(p1.x, p1.y);
@@ -244,26 +227,45 @@ export default class TrampofelineManager {
 }
 
 export class Trampofeline extends ElasticLine {
-  private _transparency = 1;
+  transparency = 1;
+  dead = false;
   public id: string;
-  private _killed = false;
 
-  update() {
-    super.update();
-    this._killed &&
-      (this._transparency = damp(this._transparency, 0, 0.5, Clock.dt));
+  catch(b: YarnBall) {
+    this.joints.forEach((j) =>
+      CollisionManager.register(j, b, {
+        filter: downwardFilter,
+        cb: () => {
+          new Ripple(j.position, {
+            startRadius: 15,
+            finalRadius: 30,
+            startTransparency: 0.3,
+            finalTransparency: 0,
+          });
+          zzfxP(sfx.bounce);
+          this.die();
+        },
+      })
+    );
   }
 
-  kill() {
-    this._killed = true;
+  die() {
+    this.dead = true;
+    this.joints.forEach((j) => j.die());
+
+    new Tween(this, "transparency", {
+      startValue: this.transparency,
+      finalValue: 0,
+      cb: () => TrampofelineManager.entities.delete(this.id),
+    });
   }
 
   draw() {
     const { ctx } = Stage;
-    setTransparency(this._transparency);
+    setTransparency(this.transparency);
 
     ctx.lineWidth = 25;
-    ctx.strokeStyle = `${coatColor}`;
+    ctx.strokeStyle = coatColor;
     ctx.lineJoin = "round";
     ctx.lineCap = "round";
 
@@ -272,10 +274,9 @@ export class Trampofeline extends ElasticLine {
     this.joints.forEach((j) => {
       ctx.lineTo(j.position.x, j.position.y);
     });
-    this.closed && ctx.closePath();
     ctx.stroke();
 
-    // draw the face at the first joint (where the mouse motion started)
+    // draw the face at the first joint (where the pointer landed)
     {
       const j0 = this.joints[0].position;
       const j1 = this.joints[1].position;
@@ -289,7 +290,7 @@ export class Trampofeline extends ElasticLine {
       ctx.restore();
     }
 
-    // draw the butt & the tail at the last joint (where the mouse was lifted)
+    // draw the butt & the tail at the last joint (where the pointer lifted off)
     {
       const lastJoint = this.joints.at(-1)!.position;
       const sndLastJoint = this.joints.at(-2)!.position;
@@ -302,12 +303,6 @@ export class Trampofeline extends ElasticLine {
       drawCatRear();
       ctx.restore();
     }
-
-    // if (p1 && p2 && p3 && p4 && inter) {
-    //   popsicle(p1, p2, "red");
-    //   popsicle(p3, p4, "blue");
-    //   popsicle(inter, inter, "yellow");
-    // }
 
     setTransparency(1);
   }

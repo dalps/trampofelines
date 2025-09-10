@@ -77,23 +77,7 @@ export class Tube {
 
     Game.yarnballs.set(b.id, b);
 
-    TrampofelineManager.trampolines.forEach((cat) =>
-      cat.joints.forEach((j) =>
-        CollisionManager.register(j, b, {
-          filter: downwardFilter,
-          cb: () => {
-            new Ripple(j.position, {
-              startRadius: 15,
-              finalRadius: 30,
-              startTransparency: 0.3,
-              finalTransparency: 0,
-            });
-            zzfxP(sfx.bounce);
-            TrampofelineManager.killCat(cat);
-          },
-        })
-      )
-    );
+    TrampofelineManager.trampolines.forEach((cat) => cat.catch(b));
 
     Game.baskets.forEach((basket) =>
       CollisionManager.register(basket, b, {
@@ -103,8 +87,7 @@ export class Tube {
           if (Game.state !== GameState.Playing) return;
 
           Game.score += 1;
-          CollisionManager.unregisterBody(b);
-          b.state = State.Dead;
+          b.die();
           drawLives();
           zzfxP(sfx.score);
           basket.addYarnball(b);
