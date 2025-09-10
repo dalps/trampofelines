@@ -4,10 +4,11 @@ import TrampofelineManager from "../entities/Trampofeline";
 import type { Tube } from "../entities/Tube";
 import { YarnBall } from "../entities/YarnBall";
 import { City } from "../scenes/City";
-import { drawTitle } from "../scenes/Title";
+
 import { CollisionManager } from "./Collisions2D";
 import { gameoverElements, Stage, titleElements } from "./Stage";
 import { drawGameoverUI, drawLives } from "./ui";
+import { Title2 } from "../scenes/Title2";
 
 export enum State {
   Title,
@@ -40,8 +41,7 @@ export default class Game {
   static update() {
     switch (this.state) {
       case State.Title:
-        Stage.setActiveLayer("bg");
-        drawTitle();
+        Title2.draw();
         break;
       case State.GameOver:
       case State.Playing:
@@ -83,16 +83,14 @@ export default class Game {
       case State.GameOver:
         this.lives = this.TOTAL_LIVES;
         this.yarnballs.clear();
+
         TrampofelineManager.clearEntities();
         TrampofelineManager.enableUI();
+
         gameoverElements.style.display = "none";
         titleElements.style.display = "none";
-        Stage.stage.appendChild(Stage.getLayer("ui"));
-
-        Stage.setActiveLayer("bg");
-        // BasketballCourt.draw();
-        City.drawBackground();
-
+        Title2.outro();
+        City.draw();
         drawLives();
 
         this.state = State.Playing;
@@ -110,9 +108,8 @@ export default class Game {
         gameoverElements.style.display = "none";
         titleElements.style.display = "block";
 
-        Stage.clearLayer("game-info");
-
-        drawTitle();
+        City.draw();
+        Title2.draw();
 
         this.state = State.Title;
       // No transition

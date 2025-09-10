@@ -27,3 +27,9 @@
 
 compressed title module weighs about 500 bytes
 
+* basket swapping logic
+* sky stars
+* god rays
+* score and lives on billboards
+* reuse city for title!
+* star fireworks

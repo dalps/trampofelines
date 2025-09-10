@@ -27,25 +27,36 @@ export class TweenManager {
   }
 }
 
+/**
+ * A tween over a one-dimensional property of an object.
+ */
 export class Tween<T> {
   private value: number;
   private startValue: number;
   private targetValue: number;
   public speed: number;
   private ref: WeakRef<this>;
-  private cb?: Function;
+  private onUpdate?: Function;
+  private onComplete?: Function;
 
   constructor(
     public obj: T,
     public property: keyof T,
-    { startValue = 0, finalValue = 1, speed = 7, cb = undefined } = {}
+    {
+      startValue = undefined,
+      finalValue = 1,
+      speed = 7,
+      onUpdate = undefined,
+      onComplete = undefined,
+    } = {}
   ) {
-    this.value = startValue;
-    this.startValue = startValue;
+    this.startValue = startValue ?? this.obj[property];
+    this.value = this.startValue;
     this.targetValue = finalValue;
     this.speed = speed;
     this.ref = TweenManager.add(this);
-    this.cb = cb;
+    this.onUpdate = onUpdate;
+    this.onComplete = onComplete;
   }
 
   update() {
@@ -58,11 +69,12 @@ export class Tween<T> {
       dt
     );
 
-    if (Math.abs(this.value - this.targetValue) <= EPSILON) {
-      this.cb && this.cb();
-      TweenManager.delete(this.ref);
-    }
+    this.onUpdate && this.onUpdate();
 
-    this.obj.draw && this.obj.draw();
+    if (Math.abs(this.value - this.targetValue) <= EPSILON) {
+      this.onComplete && this.onComplete();
+      TweenManager.delete(this.ref);
+      return;
+    }
   }
 }

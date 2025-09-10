@@ -76,8 +76,10 @@ export class Stage {
   /**
    * Clear the specified layer without affecting the active layer.
    */
-  public static clearLayer(layer: LayerName) {
-    const { ctx, width, height } = Stage.getLayer(layer);
+  public static clearLayer(layer?: LayerName) {
+    const { ctx, width, height } = layer
+      ? Stage.getLayer(layer)
+      : Stage.activeLayer;
 
     ctx.clearRect(0, 0, width, height);
   }
@@ -110,8 +112,8 @@ export class Stage {
     return this.activeLayer.ctx;
   }
 
-  static init(stage: HTMLElement) {
-    this.stage = stage;
+  static init() {
+    this.stage = document.getElementById("stage");
 
     Basket.drawCrissCrossPattern();
 
@@ -195,7 +197,7 @@ export class Stage {
         drawTitle();
         break;
       case State.Playing:
-        City.drawBackground();
+        City.draw();
         drawLives();
         break;
       case State.GameOver:

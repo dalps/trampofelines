@@ -1,14 +1,12 @@
-import palette, { hsl, HSLColor, setTransparency } from "../engine/color";
+import { CollisionManager } from "../engine/Collisions2D";
+import palette, { hsl } from "../engine/color";
 import Game, { State } from "../engine/GameState";
-import { DynamicBody } from "../engine/Physics2D";
 import { Stage } from "../engine/Stage";
-import { circle, makeGradient } from "../utils/CanvasUtils";
-import { distribute, Point } from "../utils/MathUtils";
+import { drawLives } from "../engine/ui";
 import { Basket } from "../entities/Basket";
 import { Tube } from "../entities/Tube";
-import type { Backdrop } from "./Backdrop";
-import { CollisionManager } from "../engine/Collisions2D";
-import { drawLives } from "../engine/ui";
+import { circle, makeGradient } from "../utils/CanvasUtils";
+import { distribute, Point } from "../utils/MathUtils";
 
 export class City {
   static init() {
@@ -55,9 +53,7 @@ export class City {
     });
   }
 
-  static draw() {}
-
-  static drawBackground() {
+  static draw() {
     Stage.setActiveLayer("bg");
     const { ctx, cw, ch } = Stage;
 
@@ -158,6 +154,7 @@ export class City {
 
       ctx.font = `${textSize}px sans-serif`;
       ctx.textBaseline = "ideographic";
+      ctx.textAlign = "left";
 
       pos.incrX(padding).incrY(padding);
       Array.from(text).forEach((m) => {
