@@ -104,7 +104,7 @@ Z`);
     ctx.stroke(empty);
     ctx.fill(empty);
 
-    ctx.fillStyle = palette.black.clone().setAlpha(0.7);
+    ctx.fillStyle = palette.black.toAlpha(0.7);
     ctx.fill(empty);
 
     if (this.content.length === 5) {

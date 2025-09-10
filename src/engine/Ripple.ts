@@ -42,7 +42,7 @@ export class Ripple {
   draw() {
     const { ctx } = Stage;
 
-    ctx.fillStyle = this.color.clone().setAlpha(this.transparency);
+    ctx.fillStyle = this.color.toAlpha(this.transparency);
     ctx.beginPath();
     circle(this.position, this.radius);
     ctx.fill();

@@ -1,7 +1,7 @@
 import Game, { game, State as GameState } from "../engine/GameState";
 import { makeGradient } from "../utils/CanvasUtils";
 import { CollisionManager, downwardFilter } from "../engine/Collisions2D";
-import palette, { HSLColor, RGBColor } from "../engine/color";
+import palette, { HSLColor } from "../engine/color";
 import { lerp, Point } from "../utils/MathUtils";
 import { State } from "../engine/Physics2D";
 import { Ripple } from "../engine/Ripple";
@@ -250,8 +250,8 @@ export class Tube {
         new Point(0, -overhang * 3),
         new Point(0, sy + overhang * 3),
         {
-          color1: palette.white.clone().setAlpha(0),
-          color2: new RGBColor(255, 2, 2, 0),
+          color1: palette.white.toAlpha(0),
+          color2: palette.white.toAlpha(0),
           shineSize: 0.55,
           shinePos: 0,
           shineSmoothness: 1,

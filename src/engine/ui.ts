@@ -63,7 +63,7 @@ export function drawGameoverUI() {
   Stage.setActiveLayer("game-info");
   const { ctx, cw, ch } = Stage;
 
-  ctx.fillStyle = palette.black.clone().setAlpha(0.5);
+  ctx.fillStyle = palette.black.toAlpha(0.5);
   ctx.fillRect(0, 0, cw, ch);
 
   ctx.lineWidth = 3;
