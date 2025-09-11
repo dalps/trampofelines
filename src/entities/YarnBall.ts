@@ -1,9 +1,10 @@
-import { CircleCollider } from "../engine/Collisions2D";
+import { CircleCollider, CollisionManager } from "../engine/Collisions2D";
 import palette, { type Color } from "../engine/color";
 import Math2D, { Point } from "../utils/MathUtils";
 import { DynamicBody, Gravity } from "../engine/Physics2D";
 import { Stage } from "../engine/Stage";
 import { Clock } from "../utils/TimeUtils";
+import Game from "../engine/GameState";
 
 export class YarnBall extends DynamicBody {
   public id: string;
@@ -38,7 +39,12 @@ export class YarnBall extends DynamicBody {
       points.push(this.position.clone());
     }
 
-    this.thread = points.map((p) => new DynamicBody(p));
+    this.thread = points.map(p => new DynamicBody(p));
+  }
+
+  die() {
+    CollisionManager.unregisterBody(this);
+    Game.yarnballs.delete(this.id);
   }
 
   update(): void {
@@ -53,7 +59,7 @@ export class YarnBall extends DynamicBody {
     let prevJoint: DynamicBody = this.thread[0];
     let lambda = 1;
 
-    this.thread.forEach((joint) => {
+    this.thread.forEach(joint => {
       Math2D.damp2I(joint.position, prevJoint.position, lambda, dt);
       // Math2D.lerp2I(joint.position, prevJoint.position, dt);
       prevJoint = joint;
@@ -78,7 +84,7 @@ export class YarnBall extends DynamicBody {
     const { x, y } = this.position;
     ctx.translate(x, y);
     ctx.rotate(this.orientation);
-    YarnBall.drawYarnball(new Point(0, 0), {
+    YarnBall.drawTexture(new Point(0, 0), {
       radius: this.radius,
       color: this.color,
       lineWidth: 2,
@@ -86,7 +92,7 @@ export class YarnBall extends DynamicBody {
     ctx.restore();
   }
 
-  static drawYarnball(
+  static drawTexture(
     position: Point,
     {
       radius = 100,

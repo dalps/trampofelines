@@ -268,13 +268,13 @@ export default class Math2D {
   }
 }
 
-function testLineIntersection() {
-  const assertTruthy = b => {
-    if (!b) {
-      throw new Error("Assertion failed.");
-    }
-  };
+const assertTruthy = b => {
+  if (!b) {
+    throw new Error("Assertion failed.");
+  }
+};
 
+function testLineIntersection() {
   const check = () => {
     const res = Math2D.properInter(p1, p2, p3, p4);
     console.log(
@@ -295,3 +295,32 @@ function testLineIntersection() {
   p4 = new Point(307, 462);
   assertTruthy(check());
 }
+
+function testSegPointDistance() {
+  const checkLessThan = n => {
+    const res = Math2D.segPointDistance(p1, p2, p3);
+    console.log(
+      `Checking intersection between (${p1}~~${p2}) and ${p3}: ${res} <= ${n} = ${
+        res <= n
+      }`
+    );
+    return res <= n;
+  };
+
+  let p1 = new Point(0, 0);
+  let p2 = new Point(1, 1);
+  let p3 = new Point(0.5, 1);
+  assertTruthy(checkLessThan(1));
+
+  p1 = new Point(25, 500);
+  p2 = new Point(25, 400);
+  p3 = new Point(25, 350);
+  assertTruthy(checkLessThan(50));
+
+  p1 = new Point(25, 500);
+  p2 = new Point(25, 400);
+  p3 = new Point(0, 500);
+  assertTruthy(checkLessThan(50));
+}
+
+testSegPointDistance();

@@ -38,7 +38,7 @@ export function drawLives() {
   }
 
   for (let i = 0; i < Game.lives; i++) {
-    YarnBall.drawYarnball(pos.add(center), {
+    YarnBall.drawTexture(pos.add(center), {
       radius,
       color: palette.fuchsia,
       lineWidth: 2,

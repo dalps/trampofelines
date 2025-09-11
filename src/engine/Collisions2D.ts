@@ -1,15 +1,11 @@
 import { circle, popsicle } from "../utils/CanvasUtils";
 import Math2D, { Point } from "../utils/MathUtils";
+import PALETTE from "./color";
+import { drawText } from "./font";
 import { ContactForce, State, type DynamicBody } from "./Physics2D";
 import { Stage } from "./Stage";
-import { instant } from "../utils/TimeUtils";
 
-const debugColor = "yellowgreen";
-const DEBUG = false;
-
-function log(msg: string) {
-  DEBUG && console.log(msg);
-}
+const debugColor = PALETTE.chartreuse;
 
 interface CollisionOptions {
   sensor?: boolean;
@@ -26,12 +22,12 @@ interface CollisionPair extends CollisionOptions {
 }
 
 export class CollisionManager {
-  private static _id = 0;
-  private static _pairsToWatch: CollisionPair[] = [];
+  private static counter = 0;
+  private static pairs: Set<CollisionPair> = new Set();
 
   static getId(b: DynamicBody) {
     if (!b.collider || b.state !== State.Alive) return undefined;
-    if (!b.collisionID) b.collisionID = `${b.name}${this._id++}`;
+    if (!b.collisionID) b.collisionID = `${b.name}${this.counter++}`;
     return b.collisionID;
   }
 
@@ -45,7 +41,7 @@ export class CollisionManager {
 
     if (!id1 || !id2) return;
 
-    this._pairsToWatch.push({
+    this.pairs.add({
       id1,
       id2,
       ref1: new WeakRef(b1),
@@ -55,27 +51,15 @@ export class CollisionManager {
   }
 
   static unregisterBody(b: DynamicBody) {
-    const entriesToRemove: number[] = [];
-
-    log(`Searching for entries containing ${b.collisionID}...`);
-
-    this._pairsToWatch.forEach(({ id1, id2 }, idx) => {
-      if (b.collisionID === id1 || b.collisionID === id2) {
-        entriesToRemove.push(idx);
-      }
-    });
-
-    log(
-      `Found ${entriesToRemove.map(
-        (v) => `(${this._pairsToWatch[v].id1},${this._pairsToWatch[v].id2})`
-      )}`
-    );
-
-    entriesToRemove.forEach((idx) => this._pairsToWatch.splice(idx, 1));
+    [...this.pairs.values()]
+      .filter(({ id1, id2 }) => b.collisionID === id1 || b.collisionID === id2)
+      .forEach(v => {
+        this.pairs.delete(v);
+      });
   }
 
   static update() {
-    this._pairsToWatch.forEach(
+    this.pairs.forEach(
       ({
         ref1: r1,
         ref2: r2,
@@ -101,8 +85,11 @@ export class CollisionManager {
         )
           return;
 
-        !sensor && b1.addForce(this.collide(b1, b2, contactForceFactor));
-        !sensor && b2.addForce(this.collide(b2, b1, contactForceFactor));
+        if (!sensor) {
+          b1.addForce(this.collide(b1, b2, contactForceFactor));
+          b2.addForce(this.collide(b2, b1, contactForceFactor));
+        }
+
         cb && cb();
       }
     );
@@ -125,15 +112,28 @@ function segSeg(c1: SegmentCollider, c2: SegmentCollider) {
 }
 
 function circleSegment(c1: CircleCollider, c2: SegmentCollider) {
-  return Math2D.segPointDistance(c2.a, c2.b, c1.center) <= c1.radius;
+  const d = Math2D.segPointDistance(c2.a, c2.b, c1.center);
+
+  popsicle(c2.center, c1.center, PALETTE.fuchsia);
+  drawText(`${d.toFixed(0)}`, { pos: Math2D.lerp2(c1.center, c2.center, 0.5) });
+
+  return d <= c1.radius;
 }
 
 function circleCircle(c1: CircleCollider, c2: CircleCollider) {
   const sep = c2.center.sub(c1.center);
-  return sep.abs() <= c1.radius + c2.radius;
+  const d = sep.abs();
+
+  popsicle(c2.center, c1.center, PALETTE.chartreuse);
+  drawText(`${d.toFixed(0)}`, { pos: Math2D.lerp2(c1.center, c2.center, 0.5) });
+
+  return d <= c1.radius + c2.radius;
 }
 
-type ColliderType = "Circle" | "Segment";
+enum ColliderType {
+  Circle,
+  Segment,
+}
 
 export abstract class Collider {
   public abstract center: Point;
@@ -144,14 +144,14 @@ export abstract class Collider {
 
 export class CircleCollider extends Collider {
   constructor(public center: Point, public radius: number) {
-    super("Circle");
+    super(ColliderType.Circle);
   }
 
   checkContact(that: Collider) {
     switch (that.type) {
-      case "Circle":
+      case ColliderType.Circle:
         return circleCircle(this, that as CircleCollider);
-      case "Segment":
+      case ColliderType.Segment:
         return circleSegment(this, that as SegmentCollider);
     }
   }
@@ -178,7 +178,7 @@ export class SegmentCollider extends Collider {
   }
 
   constructor(public center: Point, public length: number, public dir = 0) {
-    super("Segment");
+    super(ColliderType.Segment);
   }
 
   get a(): Point {
@@ -195,9 +195,9 @@ export class SegmentCollider extends Collider {
 
   checkContact(that: Collider) {
     switch (that.type) {
-      case "Circle":
+      case ColliderType.Circle:
         return circleSegment(that as CircleCollider, this);
-      case "Segment":
+      case ColliderType.Segment:
         return segSeg(this, that as SegmentCollider);
     }
   }

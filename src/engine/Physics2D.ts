@@ -1,7 +1,8 @@
 import { popsicle } from "../utils/CanvasUtils";
 import { damp, Point } from "../utils/MathUtils";
 import { Clock } from "../utils/TimeUtils";
-import { CollisionManager, type Collider } from "./Collisions2D";
+import { type Collider } from "./Collisions2D";
+import { CollisionManager } from "./Collisions2D";
 import Game from "./GameState";
 
 /**
@@ -135,7 +136,7 @@ export class DynamicBody {
 
   public get totalForce() {
     this._aux.set(0, 0);
-    this._forces.forEach((f) =>
+    this._forces.forEach(f =>
       this._aux.addI(f.direction.multiplyScalar(f.magnitude))
     );
     return this._aux;
@@ -165,7 +166,7 @@ export class DynamicBody {
     if (this._fixed) return;
 
     this._forces.forEach(
-      (f) => (f as ContactForce).update && (f as ContactForce).update()
+      f => (f as ContactForce).update && (f as ContactForce).update()
     );
 
     const o = this.orientation + this.angularVelocity * dt;
@@ -188,7 +189,7 @@ export class DynamicBody {
 
   drawForces() {
     // draw each individual force
-    this._forces.forEach((f) => {
+    this._forces.forEach(f => {
       popsicle(
         this.position,
         this.position.add(f.direction.multiplyScalar(f.magnitude)),

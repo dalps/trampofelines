@@ -12,17 +12,19 @@ import { Clock } from "../utils/TimeUtils";
 import { YarnBall } from "./YarnBall";
 
 export class Basket extends DynamicBody {
+  id: string;
   content: YarnBall[] = [];
   filled = false;
 
   constructor(pos: Point, public wanted = 5) {
     super(pos);
-    this.name = crypto.randomUUID();
+    this.name = "Basket";
+    this.id = crypto.randomUUID();
     const colliderWidth = 100;
     this.toggleX();
     this.toggleY();
     this.attachCollider(new SegmentCollider(pos, colliderWidth));
-    Stage.newOffscreenLayer(this.name, 200, 200);
+    Stage.newOffscreenLayer(this.id, 200, 200);
   }
 
   addYarnball(b: YarnBall) {
@@ -69,7 +71,7 @@ export class Basket extends DynamicBody {
     ctx.save();
     ctx.translate(this.position.x, this.position.y);
     ctx.rotate(c.dir);
-    ctx.drawImage(Stage.getLayer(this.name), -100, -90);
+    ctx.drawImage(Stage.getLayer(this.id), -100, -90);
     ctx.restore();
 
     // this.drawForces();
@@ -94,7 +96,7 @@ export class Basket extends DynamicBody {
   }
 
   drawTexture() {
-    Stage.setActiveLayer(this.name);
+    Stage.setActiveLayer(this.id);
     const { ctx } = Stage;
 
     ctx.save();
@@ -130,7 +132,7 @@ Z`);
 
     const slots = distribute(-40, 40, this.wanted);
     this.content.slice(0, 5).forEach((b, i) =>
-      YarnBall.drawYarnball(new Point(slots[i], i % 2 === 0 ? -10 : -5), {
+      YarnBall.drawTexture(new Point(slots[i], i % 2 === 0 ? -10 : -5), {
         color: b.color,
         radius: b.radius,
         lineWidth: 2,

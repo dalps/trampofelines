@@ -1,6 +1,7 @@
 import Game, { game, State as GameState } from "../engine/GameState";
 import { makeGradient } from "../utils/CanvasUtils";
-import { CollisionManager, downwardFilter } from "../engine/Collisions2D";
+import { downwardFilter } from "../engine/Collisions2D";
+import { CollisionManager } from "../engine/Collisions2D";
 import palette, { HSLColor } from "../engine/color";
 import { lerp, Point } from "../utils/MathUtils";
 import { State } from "../engine/Physics2D";
@@ -29,8 +30,8 @@ export class Tube {
     Stage.newOffscreenLayer("tube", size.x * 1.5, size.y);
     Tube.drawTube(this.size.x, this.size.y);
 
-    Clock.every(20, () => {
-      if (Game.state === GameState.Playing && Game.yarnballs.size < 3) {
+    Clock.every(30, () => {
+      if (Game.state === GameState.Playing && Game.yarnballs.size < 2) {
         zzfxP(sfx.spawn);
         const ball = this.spawnYarnBall();
         cb(ball);
@@ -78,9 +79,9 @@ export class Tube {
 
     Game.yarnballs.set(b.id, b);
 
-    TrampofelineManager.trampolines.forEach((cat) => cat.catch(b));
+    TrampofelineManager.trampolines.forEach(cat => cat.catch(b));
 
-    Game.baskets.forEach((basket) =>
+    Game.baskets.forEach(basket =>
       CollisionManager.register(basket, b, {
         sensor: true,
         filter: downwardFilter,
@@ -96,13 +97,11 @@ export class Tube {
             color2: palette.white,
           });
 
-          Game.score += 1;
           b.die();
+          basket.addYarnball(b);
           drawLives();
           zzfxP(sfx.score);
-          basket.addYarnball(b);
           Stage.setActiveLayer("game");
-          Game.yarnballs.delete(b.id);
           new Ripple(b.position.clone(), {
             startRadius: 25,
             finalRadius: 50,
@@ -186,7 +185,7 @@ export class Tube {
 
     hole.ellipse(x0 + 2, sy * 0.5, 8, sy * 0.4, 0, 0, Math.PI * 2);
 
-    const [highlightL, highlightR] = [sx, x0].map((x2) => {
+    const [highlightL, highlightR] = [sx, x0].map(x2 => {
       const p = new Path2D();
       p.moveTo(x2, 0);
       p.bezierCurveTo(
@@ -238,7 +237,7 @@ export class Tube {
     ctx.fill(hole);
 
     ctx.lineWidth = 3;
-    [highlightL, highlightR].forEach((path) => {
+    [highlightL, highlightR].forEach(path => {
       ctx.strokeStyle = ctx.fillStyle = makeGradient(
         new Point(0, -overhang * 3),
         new Point(0, sy + overhang * 3),

@@ -1,10 +1,7 @@
 import Game from "../engine/GameState";
 import { circle, popsicle } from "../utils/CanvasUtils";
-import {
-  CircleCollider,
-  CollisionManager,
-  downwardFilter,
-} from "../engine/Collisions2D";
+import { CircleCollider, downwardFilter } from "../engine/Collisions2D";
+import { CollisionManager } from "../engine/Collisions2D";
 import palette, { hsl, HSLColor, setTransparency } from "../engine/color";
 import { ElasticLine } from "../engine/ElasticLine";
 import Math2D, { damp, lerp, Point, RAD2DEG } from "../utils/MathUtils";
@@ -167,14 +164,14 @@ export default class TrampofelineManager {
     cat.id = crypto.randomUUID();
     this.entities.set(cat.id, cat);
 
-    cat.joints.forEach((j) => {
+    cat.joints.forEach(j => {
       Game.settings.gravity && j.addForce(Gravity);
 
       j.attachCollider(
         new CircleCollider(j.position, Game.settings.colliderRadius)
       );
 
-      Game.yarnballs.forEach((b) => cat.catch(b));
+      Game.yarnballs.forEach(b => cat.catch(b));
     });
   }
 
@@ -232,7 +229,7 @@ export class Trampofeline extends ElasticLine {
   public id: string;
 
   catch(b: YarnBall) {
-    this.joints.forEach((j) =>
+    this.joints.forEach(j =>
       CollisionManager.register(j, b, {
         filter: downwardFilter,
         cb: () => {
@@ -250,7 +247,7 @@ export class Trampofeline extends ElasticLine {
 
   die() {
     this.dead = true;
-    this.joints.forEach((j) => j.die());
+    this.joints.forEach(j => j.die());
 
     new Tween(this, "transparency", {
       finalValue: 0,
@@ -269,7 +266,7 @@ export class Trampofeline extends ElasticLine {
 
     ctx.beginPath();
     ctx.moveTo(this.joints[0].position.x, this.joints[0].position.y);
-    this.joints.forEach((j) => {
+    this.joints.forEach(j => {
       ctx.lineTo(j.position.x, j.position.y);
     });
     ctx.stroke();
@@ -322,7 +319,7 @@ export function drawCatFace({
     ctx.lineCap = "round";
     ctx.lineWidth = 10;
     const pawDistance = 10;
-    [pawDistance, -pawDistance].forEach((x) => {
+    [pawDistance, -pawDistance].forEach(x => {
       ctx.beginPath();
       ctx.moveTo(x, 0);
       ctx.lineTo(x, 40);
@@ -402,7 +399,7 @@ export function drawCatFace({
     [-start, -end],
     [start, end],
   ].forEach(([start, end]) => {
-    [-5, 0, 5].forEach((y) => {
+    [-5, 0, 5].forEach(y => {
       ctx.moveTo(start, 0);
       ctx.lineTo(end, y);
     });
@@ -454,7 +451,7 @@ export function drawCatRear() {
   ctx.strokeStyle = coatColor.toString();
   ctx.lineWidth = 10;
   const pawDistance = 10;
-  [pawDistance, -pawDistance].forEach((x) => {
+  [pawDistance, -pawDistance].forEach(x => {
     ctx.beginPath();
     ctx.moveTo(x, 0);
     ctx.lineTo(x, 40);

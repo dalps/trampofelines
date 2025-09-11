@@ -43,13 +43,14 @@ export class City {
             finalTransparency: 1,
           }
         );
-        CollisionManager.unregisterBody(b);
-        // Game.state === State.Playing && zzfxP(sfx.drop);
-        Game.yarnballs.delete(b.id);
-        Game.lives = Math.max(0, Game.lives - 1);
 
+        b.die();
+        
+        // Game.state === State.Playing && zzfxP(sfx.drop);
+        Game.lives = Math.max(0, Game.lives - 1);
         Game.state === State.Playing && drawLives();
-        // Game.lives <= 0 && Game.gameOver();
+        Game.lives <= 0 && Game.gameOver();
+
         return;
       }
 

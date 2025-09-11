@@ -45,8 +45,8 @@ export default class Game {
         Stage.clearLayer();
         Title2.draw();
         break;
-        case State.GameOver:
-          case State.Playing:
+      case State.GameOver:
+      case State.Playing:
         Stage.setActiveLayer("game");
         Stage.clearLayer();
 
@@ -54,7 +54,7 @@ export default class Game {
 
         CollisionManager.update();
 
-        TrampofelineManager.trampolines.forEach((l) => {
+        TrampofelineManager.trampolines.forEach(l => {
           l.update();
           l.draw();
         });
@@ -84,6 +84,7 @@ export default class Game {
       case State.Title:
       case State.GameOver:
         this.lives = this.TOTAL_LIVES;
+        this.yarnballs.forEach(v => v.die());
         this.yarnballs.clear();
 
         TrampofelineManager.clearEntities();
@@ -111,6 +112,7 @@ export default class Game {
         titleElements.style.display = "block";
 
         City.draw();
+        Title2.intro();
         Title2.draw();
 
         this.state = State.Title;
