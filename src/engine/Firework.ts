@@ -13,6 +13,7 @@ export interface FireworkParams {
 }
 
 export class Firework extends Ripple {
+  ctx: CanvasRenderingContext2D;
   color2: Color;
   points: number;
   drawEven: Function;
@@ -21,30 +22,23 @@ export class Firework extends Ripple {
   constructor(
     public center: Point,
     {
+      ctx = Stage.activeLayer.ctx,
       color2 = PALETTE.blue3,
       points = 5,
-      drawEven = (ctx: CanvasRenderingContext2D) => ctx.fill(),
-      drawOdd = (ctx: CanvasRenderingContext2D) => ctx.stroke(),
       ...options
     }: FireworkParams & RippleParams = {}
   ) {
     super(center, options);
+    this.ctx = ctx;
     this.color2 = color2.clone();
     this.points = points;
-    this.drawEven = drawEven;
-    this.drawOdd = drawOdd;
   }
 
   override draw() {
-    Stage.setActiveLayer("game");
-    const { ctx } = Stage;
     const { time } = Clock;
-    console.log(this.alpha);
 
-    ctx.fillStyle = this.color.setAlpha(this.alpha);
-    ctx.strokeStyle = this.color2.setAlpha(this.alpha);
-    ctx.lineWidth = 2;
-    ctx.lineJoin = "round";
+    this.ctx.lineWidth = 2;
+    this.ctx.lineJoin = "round";
 
     star(this.center, {
       outerRadius: this.radius,
@@ -52,10 +46,12 @@ export class Firework extends Ripple {
       points: this.points,
       angle: 0.05 * time,
       cb: (p: Point, j: number) => {
-        star(p, { angle: 0.3 * time });
-        ctx.closePath();
-        j % 2 === 0 && this.drawEven(ctx, this.color, this.color2);
-        j % 2 === 1 && this.drawOdd(ctx, this.color, this.color2);
+        star(p, {
+          angle: 0.3 * time,
+          ctx: this.ctx,
+          fill: this.color.setAlpha(this.alpha),
+          stroke: this.color2.setAlpha(this.alpha),
+        });
       },
     });
   }

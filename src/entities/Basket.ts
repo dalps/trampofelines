@@ -46,11 +46,6 @@ export class Basket extends DynamicBody {
         speed: 3,
         color: palette.brightYellow,
         color2: palette.white,
-        drawOdd: (ctx, c1, c2) => {
-          ctx.fill();
-          ctx.strokeStyle = c2;
-          ctx.stroke();
-        },
       });
       new Tween(this.position, "y", {
         startValue: this.position.y,
@@ -125,7 +120,7 @@ Z`);
       popsicle(new Point(40, 0), new Point(45, -60), palette.gray);
     }
 
-    const slots = distribute(-40, 60, 5);
+    const slots = distribute(-40, 40, this.wanted);
     this.content.slice(0, 5).forEach((b, i) =>
       YarnBall.drawYarnball(new Point(slots[i], i % 2 === 0 ? -10 : -5), {
         color: b.color,

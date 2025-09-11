@@ -12,8 +12,8 @@ export function distribute(
   cb: (n: number, i: number) => void = () => {}
 ) {
   const points: number[] = [];
-  for (let i = 0; i < subs; i++) {
-    const n = lerp(min, max, i / subs);
+  for (let i = 0; i < subs + 1; i++) {
+    const n = lerp(min, max, i / (subs - 1));
     points.push(n);
     cb(n, i);
   }
@@ -269,7 +269,7 @@ export default class Math2D {
 }
 
 function testLineIntersection() {
-  const assertTruthy = (b) => {
+  const assertTruthy = b => {
     if (!b) {
       throw new Error("Assertion failed.");
     }

@@ -1,14 +1,14 @@
 import { YarnBall } from "../entities/YarnBall";
 import { star } from "../utils/CanvasUtils";
 import { Point } from "../utils/MathUtils";
-import palette from "./color";
+import palette, { hsl, HSLColor } from "./color";
 import { drawText } from "./font";
 import Game from "./GameState";
 import { Stage } from "./Stage";
 
 export function drawLives() {
   Stage.setActiveLayer("game-info");
-  Stage.clearLayer("game-info");
+  Stage.clearLayer();
   const { ctx, cw } = Stage;
 
   const sectionSize = 55;
@@ -18,31 +18,25 @@ export function drawLives() {
 
   ctx.lineJoin = "round";
   ctx.lineCap = "round";
+
+  const cross = (lineWidth: number, color: HSLColor) => {
+    ctx.lineWidth = lineWidth;
+    star(pos.add(center), {
+      points: 4,
+      innerRadius: 0,
+      outerRadius: 18,
+      ctx,
+      stroke: color, // hsla(0, 100%, 50%, 1.00)
+      angle: Math.PI / 4,
+    });
+  };
+
   for (let i = 0; i < Game.TOTAL_LIVES - Game.lives; i++) {
-    ctx.strokeStyle = "white";
-    ctx.lineWidth = 8;
-    star(pos.add(center), {
-      points: 4,
-      innerRadius: 0,
-      outerRadius: 18,
-      angle: Math.PI / 4,
-    });
-    ctx.stroke();
-
-    ctx.strokeStyle = "red";
-    ctx.lineWidth = 4;
-    star(pos.add(center), {
-      points: 4,
-      innerRadius: 0,
-      outerRadius: 18,
-      angle: Math.PI / 4,
-    });
-    ctx.stroke();
-
+    cross(8, palette.white);
+    cross(4, hsl(0, 100, 50));
     pos.incrX(sectionSize);
   }
 
-  // const colors = ["fuchsia", "chartreuse", "coral"]
   for (let i = 0; i < Game.lives; i++) {
     YarnBall.drawYarnball(pos.add(center), {
       radius,
@@ -54,8 +48,9 @@ export function drawLives() {
     pos.incrX(sectionSize);
   }
 
-  drawText(`score ${Game.score}`, {
+  drawText(`${Game.score} basket${Game.score === 1 ? "" : "s"}`, {
     pos: new Point(cw * 0.5, 100),
+    fontSize: 18,
   });
 }
 

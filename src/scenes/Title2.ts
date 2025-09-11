@@ -1,13 +1,10 @@
 import palette from "../engine/color";
-import { drawText, engrave } from "../engine/font";
+import { Firework } from "../engine/Firework";
+import { engrave } from "../engine/font";
 import { Stage } from "../engine/Stage";
 import { Tween } from "../engine/tween";
-import { YarnBall } from "../entities/YarnBall";
-import { circle, star } from "../utils/CanvasUtils";
-import { distribute, Point } from "../utils/MathUtils";
+import { Point } from "../utils/MathUtils";
 import { Clock } from "../utils/TimeUtils";
-import { Firework } from "../engine/Firework";
-import { Ripple } from "../engine/Ripple";
 
 export class Title2 {
   static vignette: number = 0;
@@ -20,7 +17,20 @@ export class Title2 {
   static intro() {
     const { ctx, cw, ch } = Stage;
 
-    new Firework(new Point(cw * 0.5, ch * 0.5), {
+    new Firework(new Point(cw * 0.3, ch * 0.5), {
+      ctx: Stage.getLayer("game-info").ctx,
+      startRadius: 5,
+      finalRadius: 100,
+      speed: 1,
+    });
+    new Firework(new Point(cw * 0.5, ch * 0.3), {
+      ctx: Stage.getLayer("game-info").ctx,
+      startRadius: 5,
+      finalRadius: 100,
+      speed: 1,
+    });
+    new Firework(new Point(cw * 0.7, ch * 0.4), {
+      ctx: Stage.getLayer("game-info").ctx,
       startRadius: 5,
       finalRadius: 100,
       speed: 1,
@@ -57,6 +67,7 @@ export class Title2 {
 
   static draw() {
     Stage.setActiveLayer("game");
+
     const { ctx, cw, ch } = Stage;
     const { time } = Clock;
     const { white, blue0, blue1, blue2, blue3 } = palette;
