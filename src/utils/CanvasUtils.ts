@@ -21,7 +21,7 @@ export function star(
   ctx?.beginPath();
 
   for (let i = 0, phi = 0; i < points * 2; i++, phi += dphi) {
-    let p = new Point(Math.cos(phi), Math.sin(phi)).multiplyScalar(
+    let p = new Point(Math.cos(phi), Math.sin(phi)).scale(
       i % 2 === 0 ? outerRadius : innerRadius
     );
     p = p.rotate(angle);

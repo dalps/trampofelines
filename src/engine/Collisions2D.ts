@@ -184,13 +184,13 @@ export class SegmentCollider extends Collider {
 
   get a(): Point {
     return this.center.add(
-      new Point(1, 0).multiplyScalar(this.length * 0.5).rotate(this.dir)
+      new Point(1, 0).scale(this.length * 0.5).rotate(this.dir)
     );
   }
 
   get b(): Point {
     return this.center.add(
-      new Point(1, 0).multiplyScalar(this.length * -0.5).rotate(this.dir)
+      new Point(1, 0).scale(this.length * -0.5).rotate(this.dir)
     );
   }
 

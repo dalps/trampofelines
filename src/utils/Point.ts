@@ -63,7 +63,7 @@ export class Point {
     return this;
   }
 
-  multiplyScalarI(n: number) {
+  scaleI(n: number) {
     this.x *= n;
     this.y *= n;
     return this;
@@ -95,8 +95,8 @@ export class Point {
     return this.clone().subI(p);
   }
 
-  multiplyScalar(n: number): Point {
-    return this.clone().multiplyScalarI(n);
+  scale(n: number): Point {
+    return this.clone().scaleI(n);
   }
 
   /**

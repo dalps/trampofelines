@@ -11,8 +11,9 @@ import { DEG2RAD, distribute, lerp } from "../utils/MathUtils";
 import { Point } from "../utils/Point";
 import { Clock } from "../utils/TimeUtils";
 import { YarnBall } from "./YarnBall";
+import { Entity } from "./Entity";
 
-export class Basket extends DynamicBody {
+export class Basket extends DynamicBody implements Entity {
   id: string;
   content: YarnBall[] = [];
   filled = false;
@@ -74,9 +75,6 @@ export class Basket extends DynamicBody {
     ctx.rotate(c.dir);
     ctx.drawImage(Stage.getLayer(this.id), -100, -90);
     ctx.restore();
-
-    // this.drawForces();
-    this.drawCollider();
   }
 
   static drawCrissCrossPattern() {

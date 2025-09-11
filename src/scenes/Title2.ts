@@ -18,19 +18,16 @@ export class Title2 {
     const { ctx, cw, ch } = Stage;
 
     new Firework(new Point(cw * 0.3, ch * 0.5), {
-      ctx: Stage.getLayer("game-info").ctx,
       startRadius: 5,
       finalRadius: 100,
       speed: 1,
     });
     new Firework(new Point(cw * 0.5, ch * 0.3), {
-      ctx: Stage.getLayer("game-info").ctx,
       startRadius: 5,
       finalRadius: 100,
       speed: 1,
     });
     new Firework(new Point(cw * 0.7, ch * 0.4), {
-      ctx: Stage.getLayer("game-info").ctx,
       startRadius: 5,
       finalRadius: 100,
       speed: 1,

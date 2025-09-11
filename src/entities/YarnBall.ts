@@ -2,7 +2,7 @@ import { CircleCollider, CollisionManager } from "../engine/Collisions2D";
 import palette, { type Color } from "../engine/color";
 import * as Math2D from "../utils/MathUtils";
 import { Point } from "../utils/Point";
-import { DynamicBody, Gravity } from "../engine/Physics2D";
+import { DynamicBody, GRAVITY } from "../engine/Physics2D";
 import { Stage } from "../engine/Stage";
 import { Clock } from "../utils/TimeUtils";
 import Game from "../engine/GameState";
@@ -31,7 +31,7 @@ export class YarnBall extends DynamicBody {
 
     this.attachCollider(new CircleCollider(this.position, this.radius));
     this.velocity = startVelocity.clone();
-    this.addForce(Gravity);
+    this.addForce(GRAVITY);
 
     const points = [];
     const subs = 10;

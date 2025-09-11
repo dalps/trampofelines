@@ -62,7 +62,7 @@ export class Tube {
 
     const b = new YarnBall(
       startPos,
-      new Point(1, 0).multiplyScalar(this.shootVelocity).rotate(this.direction),
+      new Point(1, 0).scale(this.shootVelocity).rotate(this.direction),
       Game.settings.ballMass,
       Game.settings.ballRadius,
       color

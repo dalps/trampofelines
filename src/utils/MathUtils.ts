@@ -111,9 +111,9 @@ export function properInter(a: Point, b: Point, c: Point, d: Point) {
 
   if (oa * ob < 0 && oc * od < 0) {
     return a
-      .multiplyScalar(ob)
-      .sub(b.multiplyScalar(oa))
-      .multiplyScalar(1 / (ob - oa));
+      .scale(ob)
+      .sub(b.scale(oa))
+      .scale(1 / (ob - oa));
   }
 
   return undefined;

@@ -7,12 +7,12 @@ import PALETTE from "./color";
 
 class Joint extends DynamicBody {
   public neighbors: Joint[] = [];
+
   constructor(
     position: Point,
     mass = 0.1,
     damping = 1,
     public attraction = 100,
-    public repulsion = 50
   ) {
     super(position, { name: "Joint", mass, friction: damping });
   }
@@ -24,10 +24,6 @@ class Joint extends DynamicBody {
     this.addForce(new Pull(this.position, t.position, this.attraction));
     t.addForce(new Pull(t.position, this.position, this.attraction));
   }
-
-  update(): void {
-    super.update();
-  }
 }
 
 export class ElasticShape {
@@ -35,7 +31,6 @@ export class ElasticShape {
   mass: number;
   damping: number;
   jointsAttraction: number;
-  jointsRepulsion: number;
   closed: boolean;
 
   constructor(
@@ -44,7 +39,6 @@ export class ElasticShape {
       mass = 0.05,
       damping = 20,
       jointsAttraction = 100,
-      jointsRepulsion = 100,
       closed = false,
     } = {}
   ) {
@@ -53,7 +47,6 @@ export class ElasticShape {
     this.mass = mass;
     this.damping = damping;
     this.jointsAttraction = jointsAttraction;
-    this.jointsRepulsion = jointsRepulsion;
     this.closed = closed;
 
     this.joints = points.map(p => {
@@ -62,7 +55,6 @@ export class ElasticShape {
         mass,
         damping,
         jointsAttraction,
-        jointsRepulsion
       );
       prevJoint && joint.addNeighbor(prevJoint);
       prevJoint = joint;
@@ -72,45 +64,6 @@ export class ElasticShape {
     if (prevJoint && closed) {
       prevJoint.addNeighbor(this.joints[0]);
     }
-  }
-
-  draw({
-    fillColor = PALETTE.black,
-    strokeColor = PALETTE.black,
-    lineWidth = 1,
-    lineCap = "round" as CanvasLineCap,
-    stroke = true,
-    fill = true,
-  } = {}) {
-    const { ctx } = Stage;
-
-    ctx.fillStyle = fillColor;
-    ctx.strokeStyle = strokeColor;
-    ctx.lineWidth = lineWidth;
-    ctx.lineCap = lineCap;
-
-    ctx.beginPath();
-    ctx.moveTo(this.joints[0].position.x, this.joints[0].position.y);
-    this.joints.forEach(j => {
-      ctx.lineTo(j.position.x, j.position.y); // consider using bezier curves for a smooth line
-    });
-    this.closed && ctx.closePath();
-    stroke && ctx.stroke();
-    fill && ctx.fill();
-  }
-
-  drawJoints() {
-    const { ctx } = Stage;
-
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = "black";
-    this.joints.forEach((j, i) => {
-      ctx.fillStyle = PALETTE.white;
-      ctx.beginPath();
-      ctx.arc(j.position.x, j.position.y, 3, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.stroke();
-    });
   }
 
   update() {
@@ -132,10 +85,9 @@ export class ElasticLine extends ElasticShape {
       mass = 1,
       damping = 1,
       jointsAttraction = 100,
-      jointsRepulsion = 100,
     } = {}
   ) {
-    super([], { mass, damping, jointsAttraction, jointsRepulsion });
+    super([], { mass, damping, jointsAttraction });
 
     let prevJoint: Joint | undefined = undefined;
 
@@ -145,7 +97,6 @@ export class ElasticLine extends ElasticShape {
         mass,
         damping,
         jointsAttraction,
-        jointsRepulsion
       );
 
       prevJoint && joint.addNeighbor(prevJoint);

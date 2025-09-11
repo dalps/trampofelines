@@ -6,7 +6,7 @@ import {
 import palette, { hsl, setTransparency } from "../engine/color";
 import { ElasticLine } from "../engine/ElasticLine";
 import Game from "../engine/GameState";
-import { Gravity } from "../engine/Physics2D";
+import { GRAVITY } from "../engine/Physics2D";
 import { Ripple } from "../engine/Ripple";
 import sfx from "../engine/sfx";
 import { Stage } from "../engine/Stage";
@@ -169,7 +169,7 @@ export default class TrampofelineManager {
     this.entities.set(cat.id, cat);
 
     cat.joints.forEach(j => {
-      Game.settings.gravity && j.addForce(Gravity);
+      Game.settings.gravity && j.addForce(GRAVITY);
 
       j.attachCollider(
         new CircleCollider(j.position, Game.settings.colliderRadius)

@@ -1,10 +1,7 @@
-import { popsicle } from "../utils/CanvasUtils";
 import { damp } from "../utils/MathUtils";
 import { Point } from "../utils/Point";
 import { Clock } from "../utils/TimeUtils";
-import { type Collider } from "./Collisions2D";
-import { CollisionManager } from "./Collisions2D";
-import Game from "./GameState";
+import { CollisionManager, type Collider } from "./Collisions2D";
 
 /**
  * A permanent force that can be applied to a dynamic body
@@ -29,10 +26,6 @@ export class Force {
 
   get direction(): Point {
     return this._direction;
-  }
-
-  toString() {
-    return `[d=${this.direction} mag=${this.magnitude}]`;
   }
 }
 
@@ -97,7 +90,7 @@ export class DynamicBody {
   constructor(
     position: Point,
     {
-      name = "DynamicBody",
+      name = "DB",
       mass = 1,
       friction = 1,
       orientation = 0,
@@ -118,11 +111,6 @@ export class DynamicBody {
     CollisionManager.unregisterBody(this);
   }
 
-  translate(x: number, y: number) {
-    this.position.x += x;
-    this.position.y += y;
-  }
-
   addForce(force: Force) {
     !this._fixed && this._forces.push(force);
   }
@@ -137,16 +125,14 @@ export class DynamicBody {
 
   public get totalForce() {
     this._aux.set(0, 0);
-    this._forces.forEach(f =>
-      this._aux.addI(f.direction.multiplyScalar(f.magnitude))
-    );
+    this._forces.forEach(f => this._aux.addI(f.direction.scale(f.magnitude)));
     return this._aux;
   }
 
   public get acceleration(): Point {
     return this.totalForce
-      .multiplyScalarI(1 / this.mass)
-      .subI(this.velocity.multiplyScalar(this.friction));
+      .scaleI(1 / this.mass)
+      .subI(this.velocity.scale(this.friction));
   }
 
   toggleX() {
@@ -184,44 +170,7 @@ export class DynamicBody {
       this.position.y +=
         this.velocity.y * dt + this.acceleration.y * dt * dt * 0.5;
     }
-
-    Game.settings.showForces && (this.drawForces(), this.drawCollider());
-  }
-
-  drawForces() {
-    // draw each individual force
-    this._forces.forEach(f => {
-      popsicle(
-        this.position,
-        this.position.add(f.direction.multiplyScalar(f.magnitude)),
-        "green"
-      );
-    });
-
-    // draw the total force
-    popsicle(
-      this.position,
-      this.position.add(this.totalForce.multiplyScalar(1)),
-      "hotpink"
-    );
-
-    popsicle(this.position, this.position.add(this.velocity), "magenta");
-
-    // popsicle(
-    //   ctx,
-    //   this.position,
-    //   this.position.add(this.acceleration),
-    //   "hotpink"
-    // );
-  }
-
-  drawCollider() {
-    this.collider?.draw();
-  }
-
-  toString() {
-    return `[m=${this.mass} p=${this.position} v=${this.velocity} a=${this.acceleration} F=${this.totalForce} forces=[${this._forces}]]`;
   }
 }
 
-export const Gravity = new Force(new Point(0, 1), 9.81);
+export const GRAVITY = new Force(new Point(0, 1), 9.81);

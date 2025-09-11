@@ -7,7 +7,7 @@ import { drawLives } from "../engine/ui";
 import { Basket } from "../entities/Basket";
 import { Tube } from "../entities/Tube";
 import { circle, makeGradient, star } from "../utils/CanvasUtils";
-import Math2D, { distribute, lerp } from "../utils/MathUtils";
+import Math2D, { clamp, distribute, lerp } from "../utils/MathUtils";
 import { Point } from "../utils/Point";
 import { Alert } from "../engine/Alert";
 
@@ -36,8 +36,8 @@ export class City {
       const threadEndPos = b.thread.at(-1).position;
       if (threadEndPos.y > ch) {
         new Alert(
-          new Point(b.position.x, ch),
-          `Missed ${Game.TOTAL_LIVES - Game.lives + 1}`,
+          new Point(clamp(70, cw - 70, b.position.x), ch),
+          `missed ${Game.TOTAL_LIVES - Game.lives + 1}`,
           {
             startRadius: 0,
             finalRadius: 50,

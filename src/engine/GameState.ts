@@ -1,14 +1,13 @@
-import sfx, { zzfxP } from "./sfx";
 import { Basket } from "../entities/Basket";
 import TrampofelineManager from "../entities/Trampofeline";
 import type { Tube } from "../entities/Tube";
 import { YarnBall } from "../entities/YarnBall";
 import { City } from "../scenes/City";
-
+import sfx, { zzfxP } from "./sfx";
+import { Title2 } from "../scenes/Title2";
 import { CollisionManager } from "./Collisions2D";
 import { gameoverElements, Stage, titleElements } from "./Stage";
 import { drawGameoverUI, drawLives } from "./ui";
-import { Title2 } from "../scenes/Title2";
 
 export enum State {
   Title,
@@ -28,13 +27,10 @@ export default class Game {
   public static lives = this.TOTAL_LIVES;
   public static score = 0;
   public static settings = {
-    showJoints: false,
-    showForces: false,
     lineMass: 2,
     ballMass: 3,
     ballRadius: 20,
     colliderRadius: 20,
-    gravity: true,
     volume: 0,
   };
 
@@ -117,13 +113,6 @@ export default class Game {
 
         this.state = State.Title;
       // No transition
-    }
-  }
-
-  static quit() {
-    switch (this.state) {
-      case State.GameOver:
-        this.title();
     }
   }
 }
