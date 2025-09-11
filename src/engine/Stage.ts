@@ -81,26 +81,18 @@ export class Stage {
 
     Basket.drawCrissCrossPattern();
 
-    const BUTTONS = {
-      retry: { text: "Retry", onclick: () => Game.restart() },
-      play: { text: "Play!", onclick: () => Game.restart() },
-      quit: { text: "Quit", onclick: () => Game.title() },
-    };
-
-    // Create the buttons and draw their textures
-    Object.entries(BUTTONS).forEach(([name, data]) => {
-      const id = `${name}`;
+    // Create the buttons with their textures
+    ["retry", "start", "bye"].forEach(id => {
       const btn = document.getElementById(id);
-      data["ref"] = btn;
       const { x: w, y: h } = new Point(200, 48);
       this.newOffscreenLayer(id, w, h);
       btn.style.width = `${w}px`;
       btn.style.height = `${h}px`;
       this.setActiveLayer(id);
       const { cw, ch } = this;
-      drawText(data.text, { pos: new Point(cw * 0.5, ch * 0.5), fontSize: 24 });
+      drawText(id, { pos: new Point(cw * 0.5, ch * 0.5), fontSize: 24 });
       btn.appendChild(this.getLayer(id));
-      btn.onclick = data.onclick;
+      btn.onclick = () => Game.restart();
     });
 
     // Create the game's layers and add them to the DOM
