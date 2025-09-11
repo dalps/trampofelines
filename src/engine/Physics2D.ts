@@ -1,5 +1,6 @@
 import { popsicle } from "../utils/CanvasUtils";
-import { damp, Point } from "../utils/MathUtils";
+import { damp } from "../utils/MathUtils";
+import { Point } from "../utils/Point";
 import { Clock } from "../utils/TimeUtils";
 import { type Collider } from "./Collisions2D";
 import { CollisionManager } from "./Collisions2D";

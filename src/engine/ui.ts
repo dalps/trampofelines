@@ -1,6 +1,6 @@
 import { YarnBall } from "../entities/YarnBall";
 import { star } from "../utils/CanvasUtils";
-import { Point } from "../utils/MathUtils";
+import { Point } from "../utils/Point";
 import palette, { hsl, HSLColor } from "./color";
 import { drawText } from "./font";
 import Game from "./GameState";

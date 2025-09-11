@@ -7,7 +7,8 @@ import { DynamicBody } from "../engine/Physics2D";
 import { Stage } from "../engine/Stage";
 import { Tween } from "../engine/tween";
 import { popsicle } from "../utils/CanvasUtils";
-import { DEG2RAD, distribute, lerp, Point } from "../utils/MathUtils";
+import { DEG2RAD, distribute, lerp } from "../utils/MathUtils";
+import { Point } from "../utils/Point";
 import { Clock } from "../utils/TimeUtils";
 import { YarnBall } from "./YarnBall";
 

@@ -1,4 +1,4 @@
-import { Point } from "../utils/MathUtils";
+import { Point } from "../utils/Point";
 import PALETTE, { Color } from "./color";
 import { drawText } from "./font";
 import { Ripple, RippleParams } from "./Ripple";

@@ -10,10 +10,9 @@ function init() {
   Stage.init();
   TrampofelineManager.init();
   City.init();
-  City.draw()
-  Title2.intro();
-  
-  Game.title();
+  City.draw();
+
+  Game.restart();
 
   requestAnimationFrame(draw);
 }

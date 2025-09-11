@@ -1,4 +1,4 @@
-import { Point } from "../utils/MathUtils";
+import { Point } from "../utils/Point";
 
 export class MyCanvas extends HTMLCanvasElement {
   private _ctx: CanvasRenderingContext2D;

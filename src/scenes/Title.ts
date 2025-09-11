@@ -3,7 +3,8 @@ import { drawText, engrave } from "../engine/font";
 import { Stage } from "../engine/Stage";
 import { YarnBall } from "../entities/YarnBall";
 import { circle, star } from "../utils/CanvasUtils";
-import { distribute, Point } from "../utils/MathUtils";
+import { distribute } from "../utils/MathUtils";
+import { Point } from "../utils/Point";
 import { Clock } from "../utils/TimeUtils";
 
 export function toranporin(position: Point, { color = palette.blue0 }) {
@@ -24,10 +25,12 @@ export function toranporin(position: Point, { color = palette.blue0 }) {
 }
 
 export function help() {
-  drawText(`draw trampofelines by dragging your pointer across the screen!`)
-  drawText(`catch the flying yarn balls and fill up as many baskets as you can!`)
-  drawText(`you lose as soon as three yarn balls fall into the void`)
-  drawText(`good luck meow!`)
+  drawText(`draw trampofelines by dragging your pointer across the screen!`);
+  drawText(
+    `catch the flying yarn balls and fill up as many baskets as you can!`
+  );
+  drawText(`you lose as soon as three yarn balls fall into the void`);
+  drawText(`good luck meow!`);
 }
 
 export function drawTitle() {
@@ -108,7 +111,7 @@ export function drawTitle() {
   ctx.fill();
 
   const c = new Point(cw * 0.5, ch * 0.4);
-  YarnBall.drawYarnball(c, {
+  YarnBall.drawTexture(c, {
     radius: 150,
     color: blue0.clone(),
     lineWidth: 15,
@@ -160,7 +163,7 @@ export function drawTitle() {
     color: blue1,
   });
 
-  distribute(min, max, subs, (n) => {
+  distribute(min, max, subs, n => {
     const x = min + ((n + time * 3) % (max - min));
     const y = h * 0.4;
     ctx.drawImage(Stage.getLayer("catFace"), x + 25, y);
@@ -174,7 +177,7 @@ export function drawTitle() {
   toranporin(new Point(min + ((time * 10) % (max - min)), h * 0.5), {
     color: blue1,
   });
-  distribute(min, max, subs, (n) => {
+  distribute(min, max, subs, n => {
     const x = min + ((n + time * 3) % (max - min));
     const y = h * 0.4;
     ctx.drawImage(Stage.getLayer("catFace"), x + 25, y);

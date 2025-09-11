@@ -1,5 +1,5 @@
 import { circle } from "../utils/CanvasUtils";
-import { type Point } from "../utils/MathUtils";
+import { type Point } from "../utils/Point";
 import PALETTE, { Color, HSLColor } from "./color";
 import { Stage } from "./Stage";
 import { Tween } from "./tween";

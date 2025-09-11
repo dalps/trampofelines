@@ -1,4 +1,5 @@
-import Math2D, { Point } from "../utils/MathUtils";
+import * as Math2D from "../utils/MathUtils";
+import { Point } from "../utils/Point";
 import { Pull, DynamicBody, Repulsion } from "./Physics2D";
 import { Stage } from "./Stage";
 import { instant } from "../utils/TimeUtils";
@@ -55,7 +56,7 @@ export class ElasticShape {
     this.jointsRepulsion = jointsRepulsion;
     this.closed = closed;
 
-    this.joints = points.map((p) => {
+    this.joints = points.map(p => {
       const joint = new Joint(
         p,
         mass,
@@ -90,7 +91,7 @@ export class ElasticShape {
 
     ctx.beginPath();
     ctx.moveTo(this.joints[0].position.x, this.joints[0].position.y);
-    this.joints.forEach((j) => {
+    this.joints.forEach(j => {
       ctx.lineTo(j.position.x, j.position.y); // consider using bezier curves for a smooth line
     });
     this.closed && ctx.closePath();
@@ -113,7 +114,7 @@ export class ElasticShape {
   }
 
   update() {
-    this.joints.forEach((joint) => {
+    this.joints.forEach(joint => {
       joint.update();
     });
   }

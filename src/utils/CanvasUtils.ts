@@ -1,4 +1,5 @@
-import { DEG2RAD, lerp, Point } from "../utils/MathUtils";
+import { DEG2RAD, lerp } from "../utils/MathUtils";
+import { Point } from "./Point";
 import { Stage } from "../engine/Stage";
 import { hsl } from "../engine/color";
 

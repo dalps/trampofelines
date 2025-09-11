@@ -1,6 +1,6 @@
 import { circle } from "../utils/CanvasUtils";
-import { Point } from "../utils/MathUtils";
-import PALETTE from "./color";
+import { Point } from "../utils/Point";
+import PALETTE, { Color } from "./color";
 import { Stage } from "./Stage";
 
 interface Glyph {
@@ -181,6 +181,12 @@ const lineHeight = 70;
 const defaultKerning = 12;
 const frameSize = 100;
 
+export interface TextParams {
+  fontSize?: number;
+  fill?: Color;
+  stroke?: Color;
+}
+
 export function drawText(
   text: string,
   {
@@ -188,7 +194,7 @@ export function drawText(
     fontSize = 16,
     fill = PALETTE.white,
     stroke = undefined,
-  } = {}
+  }: TextParams = {}
 ) {
   const { ctx } = Stage;
   const scale = fontSize / frameSize;

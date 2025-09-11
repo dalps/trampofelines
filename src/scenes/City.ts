@@ -7,7 +7,8 @@ import { drawLives } from "../engine/ui";
 import { Basket } from "../entities/Basket";
 import { Tube } from "../entities/Tube";
 import { circle, makeGradient, star } from "../utils/CanvasUtils";
-import Math2D, { distribute, lerp, Point } from "../utils/MathUtils";
+import Math2D, { distribute, lerp } from "../utils/MathUtils";
+import { Point } from "../utils/Point";
 import { Alert } from "../engine/Alert";
 
 export class City {
@@ -45,7 +46,7 @@ export class City {
         );
 
         b.die();
-        
+
         // Game.state === State.Playing && zzfxP(sfx.drop);
         Game.lives = Math.max(0, Game.lives - 1);
         Game.state === State.Playing && drawLives();

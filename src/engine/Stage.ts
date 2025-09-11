@@ -1,7 +1,7 @@
 import { drawTitle } from "../scenes/Title";
 import { City } from "../scenes/City";
 import { drawCatFace, drawCatRear } from "../entities/Trampofeline";
-import { Point } from "../utils/MathUtils";
+import { Point } from "../utils/Point";
 import PALETTE from "./color";
 import { drawText, engrave } from "./font";
 import Game, { State } from "./GameState";

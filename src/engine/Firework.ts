@@ -1,5 +1,5 @@
 import { star } from "../utils/CanvasUtils";
-import { Point } from "../utils/MathUtils";
+import { Point } from "../utils/Point";
 import { Clock } from "../utils/TimeUtils";
 import PALETTE, { Color, HSLColor } from "./color";
 import { Ripple, RippleParams } from "./Ripple";

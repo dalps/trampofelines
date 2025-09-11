@@ -1,6 +1,7 @@
 import { CircleCollider, CollisionManager } from "../engine/Collisions2D";
 import palette, { type Color } from "../engine/color";
-import Math2D, { Point } from "../utils/MathUtils";
+import * as Math2D from "../utils/MathUtils";
+import { Point } from "../utils/Point";
 import { DynamicBody, Gravity } from "../engine/Physics2D";
 import { Stage } from "../engine/Stage";
 import { Clock } from "../utils/TimeUtils";

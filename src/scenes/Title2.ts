@@ -3,7 +3,7 @@ import { Firework } from "../engine/Firework";
 import { engrave } from "../engine/font";
 import { Stage } from "../engine/Stage";
 import { Tween } from "../engine/tween";
-import { Point } from "../utils/MathUtils";
+import { Point } from "../utils/Point";
 import { Clock } from "../utils/TimeUtils";
 
 export class Title2 {

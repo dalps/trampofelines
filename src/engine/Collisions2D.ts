@@ -1,5 +1,6 @@
 import { circle, popsicle } from "../utils/CanvasUtils";
-import Math2D, { Point } from "../utils/MathUtils";
+import * as Math2D from "../utils/MathUtils";
+import { Point } from "../utils/Point";
 import PALETTE from "./color";
 import { drawText } from "./font";
 import { ContactForce, State, type DynamicBody } from "./Physics2D";
@@ -114,8 +115,8 @@ function segSeg(c1: SegmentCollider, c2: SegmentCollider) {
 function circleSegment(c1: CircleCollider, c2: SegmentCollider) {
   const d = Math2D.segPointDistance(c2.a, c2.b, c1.center);
 
-  popsicle(c2.center, c1.center, PALETTE.fuchsia);
-  drawText(`${d.toFixed(0)}`, { pos: Math2D.lerp2(c1.center, c2.center, 0.5) });
+  // popsicle(c2.center, c1.center, PALETTE.fuchsia);
+  // drawText(`${d.toFixed(0)}`, { pos: Math2D.lerp2(c1.center, c2.center, 0.5) });
 
   return d <= c1.radius;
 }
@@ -124,8 +125,8 @@ function circleCircle(c1: CircleCollider, c2: CircleCollider) {
   const sep = c2.center.sub(c1.center);
   const d = sep.abs();
 
-  popsicle(c2.center, c1.center, PALETTE.chartreuse);
-  drawText(`${d.toFixed(0)}`, { pos: Math2D.lerp2(c1.center, c2.center, 0.5) });
+  // popsicle(c2.center, c1.center, PALETTE.chartreuse);
+  // drawText(`${d.toFixed(0)}`, { pos: Math2D.lerp2(c1.center, c2.center, 0.5) });
 
   return d <= c1.radius + c2.radius;
 }

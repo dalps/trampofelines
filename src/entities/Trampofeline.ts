@@ -1,17 +1,21 @@
-import Game from "../engine/GameState";
-import { circle, popsicle } from "../utils/CanvasUtils";
-import { CircleCollider, downwardFilter } from "../engine/Collisions2D";
-import { CollisionManager } from "../engine/Collisions2D";
-import palette, { hsl, HSLColor, setTransparency } from "../engine/color";
+import {
+  CircleCollider,
+  CollisionManager,
+  downwardFilter,
+} from "../engine/Collisions2D";
+import palette, { hsl, setTransparency } from "../engine/color";
 import { ElasticLine } from "../engine/ElasticLine";
-import Math2D, { damp, lerp, Point, RAD2DEG } from "../utils/MathUtils";
-import { Gravity, State } from "../engine/Physics2D";
+import Game from "../engine/GameState";
+import { Gravity } from "../engine/Physics2D";
 import { Ripple } from "../engine/Ripple";
-import { Stage } from "../engine/Stage";
-import { Clock } from "../utils/TimeUtils";
-import { zzfxP } from "../engine/zzfx";
 import sfx from "../engine/sfx";
+import { Stage } from "../engine/Stage";
 import { Tween } from "../engine/tween";
+import { zzfxP } from "../engine/zzfx";
+import { circle } from "../utils/CanvasUtils";
+import * as Math2D from "../utils/MathUtils";
+import { Point } from "../utils/Point";
+import { Clock } from "../utils/TimeUtils";
 import { YarnBall } from "./YarnBall";
 
 let p1: Point | undefined;
@@ -205,7 +209,7 @@ export default class TrampofelineManager {
     ctx.setLineDash([5, 15]);
 
     guideColor.l = this.testPlacement() ? 0 : 50;
-    guideColor.alpha = lerp(0.6, 0.8, Math.sin(time));
+    guideColor.alpha = Math2D.lerp(0.6, 0.8, Math.sin(time));
 
     ctx.strokeStyle = guideColor;
 
@@ -479,7 +483,7 @@ export function drawCatRear() {
   // tail
   const tailSegmentSize = 40;
   const t = Math.sin(time * 0.1) * 0.5 + 0.5;
-  const tailSwerve = lerp(-15, 15, t);
+  const tailSwerve = Math2D.lerp(-15, 15, t);
   const tailSegments = 2;
   const startY = -7;
   ctx.strokeStyle = coatColor.toString();
