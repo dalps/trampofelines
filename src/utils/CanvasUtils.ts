@@ -1,5 +1,6 @@
 import { DEG2RAD, lerp, Point } from "../utils/MathUtils";
 import { Stage } from "../engine/Stage";
+import { hsl } from "../engine/color";
 
 export function star(
   pos: Point,
@@ -8,16 +9,15 @@ export function star(
     outerRadius = 10,
     points = 5,
     angle = 0,
+    fill = undefined,
+    stroke = undefined,
+    ctx = undefined,
     cb = undefined,
   } = {}
 ) {
-  const { ctx } = Stage;
   const dphi = (Math.PI * 2) / (points * 2);
 
-  if (!cb) {
-    !cb && ctx.beginPath();
-    cb = (p: Point) => Stage.ctx.lineTo(p.x, p.y);
-  }
+  ctx?.beginPath();
 
   for (let i = 0, phi = 0; i < points * 2; i++, phi += dphi) {
     let p = new Point(Math.cos(phi), Math.sin(phi)).multiplyScalar(
@@ -25,7 +25,23 @@ export function star(
     );
     p = p.rotate(angle);
     p = p.add(pos);
-    cb(p, i);
+
+    ctx?.lineTo(p.x, p.y);
+    cb && cb(p, i);
+  }
+
+  ctx?.closePath();
+
+  if (ctx) {
+    if (fill) {
+      ctx.fillStyle = fill;
+      ctx.fill();
+    }
+
+    if (stroke) {
+      ctx.strokeStyle = stroke;
+      ctx.stroke();
+    }
   }
 }
 
@@ -33,9 +49,9 @@ export function makeGradient(
   cp1: Point,
   cp2: Point,
   {
-    color1 = "#00ff00",
-    color2 = "#009c00",
-    shineColor = "#c4ffc4",
+    color1 = hsl(120, 100, 50), // hsla(120, 100%, 50%, 1.00),
+    color2 = hsl(120, 100, 31), // hsla(120, 100%, 31%, 1.00)
+    shineColor = hsl(120, 100, 88), // hsla(120, 100%, 88%, 1.00),
     shinePos = 0.1,
     shineSize = 0.2,
     shineSmoothness = 0.5,

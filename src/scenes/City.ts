@@ -1,12 +1,13 @@
 import { CollisionManager } from "../engine/Collisions2D";
+import PALETTE from "../engine/color";
 import palette, { hsl } from "../engine/color";
 import Game, { State } from "../engine/GameState";
 import { Stage } from "../engine/Stage";
 import { drawLives } from "../engine/ui";
 import { Basket } from "../entities/Basket";
 import { Tube } from "../entities/Tube";
-import { circle, makeGradient } from "../utils/CanvasUtils";
-import { distribute, Point } from "../utils/MathUtils";
+import { circle, makeGradient, star } from "../utils/CanvasUtils";
+import Math2D, { distribute, lerp, Point } from "../utils/MathUtils";
 
 export class City {
   static init() {
@@ -17,7 +18,7 @@ export class City {
       new Basket(new Point(cw * 0.8, 100))
     );
 
-    Game.baskets.forEach((b) => b.drawTexture());
+    Game.baskets.forEach(b => b.drawTexture());
 
     Game.tubes.push(new Tube(new Point(0, 100)));
   }
@@ -25,8 +26,8 @@ export class City {
   static update() {
     const { cw, ch } = Stage;
 
-    Game.tubes.forEach((tube) => tube.draw());
-    Game.baskets.forEach((basket) => basket.update());
+    Game.tubes.forEach(tube => tube.draw());
+    Game.baskets.forEach(basket => basket.update());
 
     Game.yarnballs.forEach((b, i) => {
       const threadEndPos = b.thread.at(-1).position;
@@ -66,39 +67,68 @@ export class City {
     ctx.fillStyle = nightSky;
     ctx.fillRect(0, 0, cw, ch);
 
+    // stars
+    ctx.fillStyle = makeGradient(new Point(0, 0), new Point(0, ch), {
+      color1: PALETTE.white.toAlpha(0.5),
+      color2: PALETTE.white.toAlpha(0),
+      shineSize: 0,
+    });
+    for (let i = 0; i < 100; i++) {
+      const x = lerp(0, cw, Math.random());
+      const y = lerp(0, ch, Math.random());
+      ctx.fillRect(x, y, 2, 2);
+    }
+
+    distribute(50, cw - 50, 10, (x, i) => {
+      const y = lerp(0, ch * 0.6, Math.random());
+      const even = i % 2 === 0;
+      star(new Point(x, y), {
+        points: 4,
+        outerRadius: even ? 8 : 1,
+        innerRadius: even ? 2 : 5,
+        ctx,
+        fill: even
+          ? PALETTE.brightYellow.toAlpha(0.5)
+          : PALETTE.blue3.toAlpha(0.5),
+      });
+      ctx.closePath();
+    });
+
     // skyline
     ctx.fillStyle = makeGradient(new Point(0, ch * 0.5), new Point(0, ch), {
-      color1: hsl(0, 0, 80, 0.33), // hsla(0, 0%, 80%, 0.33)
-      color2: hsl(0, 0, 50, 0.33), // hsla(0, 0%, 51%, 0.33)
+      color1: hsl(245, 33, 44), // hsla(246, 33%, 44%, 1.00) hsla(0, 0%, 80%, 0.33)
+      color2: hsl(245, 41, 42), // hsla(245, 41%, 42%, 1.00) hsla(0, 0%, 51%, 0.33)
       shineSize: 0,
     });
     ctx.moveTo(0, ch * 0.5);
     const startHeight = ch * 0.9;
     const subs = Math.floor(cw / 70);
-    distribute(0, cw, subs, (x) => {
+    const heights = [];
+
+    distribute(0, cw, subs, x => {
       const h1 = Math.floor(Math.random() * 10) * 15;
+      heights.push(h1);
       ctx.lineTo(x, startHeight);
       ctx.lineTo(x, startHeight - h1);
-      ctx.lineTo(x + cw / subs, startHeight - h1);
-
-      const dice = Math.floor(Math.random() * 10);
-      const window = dice < 5;
-      if (window) {
-        ctx.save();
-        ctx.fillStyle = hsl(59, 100, 84, 0.2); // hsla(59, 100%, 84%, 0.20)
-        ctx.fillRect(
-          x + 10 + dice * 10,
-          startHeight - h1 + 10 + dice * 10,
-          10,
-          10
-        );
-        ctx.restore();
-      }
+      ctx.lineTo(x + cw / (subs - 1), startHeight - h1);
     });
 
     ctx.lineTo(cw, ch);
     ctx.lineTo(0, ch);
     ctx.fill();
+
+    ctx.fillStyle = hsl(245, 21, 51); // hsla(246, 21%, 51%, 1.00) hsla(59, 100%, 84%, 0.20)
+    distribute(0, cw, subs, (x, i) => {
+      const dice = Math.floor(Math.random() * 10);
+      if (dice < 5) {
+        ctx.fillRect(
+          x + 10 + dice * 10,
+          startHeight - heights[i] + 10 + dice * 10,
+          10,
+          10
+        );
+      }
+    });
 
     // beams
     {
@@ -107,7 +137,7 @@ export class City {
       ctx.lineWidth = 3;
       const wallWidth = 20;
 
-      [0, cw - wallWidth].forEach((x) => {
+      [0, cw - wallWidth].forEach(x => {
         ctx.fillRect(x, 200, wallWidth, ch);
         ctx.strokeRect(x, 200, wallWidth, ch);
 
@@ -124,7 +154,7 @@ export class City {
       const text = "トランポリン";
       const textSize = 36;
       const padding = 5;
-      [padding * 3, textSize * text.length - padding * 2].forEach((y) => {
+      [padding * 3, textSize * text.length - padding * 2].forEach(y => {
         ctx.lineWidth = 4;
         ctx.strokeStyle = palette.blue0;
         ctx.beginPath();
@@ -157,7 +187,7 @@ export class City {
       ctx.textAlign = "left";
 
       pos.incrX(padding).incrY(padding);
-      Array.from(text).forEach((m) => {
+      Array.from(text).forEach(m => {
         pos.incrY(textSize);
         ctx.strokeStyle = palette.blue3;
         ctx.strokeText(m, pos.x, pos.y);
@@ -175,7 +205,7 @@ export class City {
       const padding = 5;
       const totalSize = size + padding * 2;
       const pos = new Point(cw - totalSize - 30, 500);
-      [padding * 3, size - padding * 2].forEach((y) => {
+      [padding * 3, size - padding * 2].forEach(y => {
         ctx.lineWidth = 4;
         ctx.strokeStyle = palette.blue0;
         ctx.beginPath();
