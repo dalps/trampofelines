@@ -7,28 +7,29 @@ serve:
 watch:
     esbuild --bundle --loader:.html=copy --entry-names='[name]' --outdir=dist --format=esm --watch=forever --sourcemap index.html src/main.ts
 
-build:
-    esbuild --minify --bundle --entry-names='[name]' --outdir=dist --format=esm src/main.ts
-    just minify-html
+build: minify-html
+    esbuild --bundle --entry-names='[name]' --outdir=dist --format=esm --sourcemap src/main.ts
 
-zip: clean build
+closure: build
+    mkdir -p tmp
+    google-closure-compiler --js=dist/main.js -W QUIET -O ADVANCED --js_output_file=tmp/main.js
+    cp tmp/main.js dist
+
+zip: clean closure
     mkdir -p tmp
     roadroller dist/main.js -o tmp/main.js
     advzip pack.zip -a tmp/main.js dist/index.html
-    rm -rf tmp/
     stat pack.zip
 
-closure:
-    google-closure-compiler --js=dist/main.js --compilation_level ADVANCED --js_output_file=dist/out.js
-
 minify-html:
+    mkdir -p dist
     html-minifier --collapse-whitespace --remove-comments --remove-optional-tags --remove-redundant-attributes --remove-script-type-attributes --remove-tag-whitespace --use-short-doctype --minify-css true --minify-js true index.html -o dist/index.html
 
 unzip:
     unzip pack.zip -d game
 
 clean:
-    rm -rf ./dist ./pack.zip ./game
+    rm -rf ./tmp ./dist ./pack.zip ./game
 
 linecount:
     find src/ -name '*.ts' | xargs wc -lc

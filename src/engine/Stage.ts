@@ -111,7 +111,7 @@ export class Stage {
       layer.id = name;
       layer.style.zIndex = `${i}`;
       this._layers.set(name, layer as MyCanvas);
-      stage.appendChild(layer);
+      this.stage.appendChild(layer);
     });
 
     this.setActiveLayer("game");
