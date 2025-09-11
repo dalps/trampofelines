@@ -8,6 +8,7 @@ import { Basket } from "../entities/Basket";
 import { Tube } from "../entities/Tube";
 import { circle, makeGradient, star } from "../utils/CanvasUtils";
 import Math2D, { distribute, lerp, Point } from "../utils/MathUtils";
+import { Alert } from "../engine/Alert";
 
 export class City {
   static init() {
@@ -24,6 +25,7 @@ export class City {
   }
 
   static update() {
+    Stage.setActiveLayer("game");
     const { cw, ch } = Stage;
 
     Game.tubes.forEach(tube => tube.draw());
@@ -32,6 +34,15 @@ export class City {
     Game.yarnballs.forEach((b, i) => {
       const threadEndPos = b.thread.at(-1).position;
       if (threadEndPos.y > ch) {
+        new Alert(
+          new Point(b.position.x, ch),
+          `Missed ${Game.TOTAL_LIVES - Game.lives + 1}`,
+          {
+            startRadius: 0,
+            finalRadius: 50,
+            finalTransparency: 1,
+          }
+        );
         CollisionManager.unregisterBody(b);
         // Game.state === State.Playing && zzfxP(sfx.drop);
         Game.yarnballs.delete(b.id);
@@ -44,7 +55,7 @@ export class City {
 
       const threshold = b.radius * 0.5;
       if (b.position.x - threshold < 0 || b.position.x + threshold > cw) {
-        b.velocity.x *= -1;
+        b.velocity.x *= -1.1;
       }
 
       Stage.setActiveLayer("game");

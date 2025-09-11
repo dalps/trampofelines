@@ -1,8 +1,8 @@
+import { Alert } from "../engine/Alert";
 import { SegmentCollider } from "../engine/Collisions2D";
 import palette from "../engine/color";
 import { Firework } from "../engine/Firework";
 import { drawText } from "../engine/font";
-import { game } from "../engine/GameState";
 import { DynamicBody } from "../engine/Physics2D";
 import { Stage } from "../engine/Stage";
 import { Tween } from "../engine/tween";
@@ -32,9 +32,12 @@ export class Basket extends DynamicBody {
 
   update() {
     const { time, dt } = Clock;
+    const { cw, ch } = Stage;
     const c = this.collider as SegmentCollider;
 
-    const da = Math.cos(time * 0.1) * 1 * DEG2RAD * dt;
+    // this.position.x = lerp(100, cw - 100, Math.cos(time * 0.05) * 0.5 + 0.5);
+
+    const da = Math.cos(time * 0.05) * -1 * DEG2RAD * dt;
     c.dir += da;
     c.center.rotate(da);
 
@@ -46,6 +49,11 @@ export class Basket extends DynamicBody {
         speed: 3,
         color: palette.brightYellow,
         color2: palette.white,
+      });
+      new Alert(this.position, `nice!`, {
+        startRadius: 0,
+        finalRadius: 50,
+        finalTransparency: 1,
       });
       new Tween(this.position, "y", {
         startValue: this.position.y,
@@ -60,12 +68,12 @@ export class Basket extends DynamicBody {
 
     ctx.save();
     ctx.translate(this.position.x, this.position.y);
-    ctx.rotate(this.collider.dir);
+    ctx.rotate(c.dir);
     ctx.drawImage(Stage.getLayer(this.name), -100, -90);
     ctx.restore();
 
     // this.drawForces();
-    // this.drawCollider();
+    this.drawCollider();
   }
 
   static drawCrissCrossPattern() {
