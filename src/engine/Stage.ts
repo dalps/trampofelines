@@ -3,7 +3,7 @@ import { drawCatFace, drawCatRear } from "../entities/Trampofeline";
 import { City } from "../scenes/City";
 import { Title2 } from "../scenes/Title2";
 import { Point } from "../utils/Point";
-import PALETTE from "./color";
+import PALETTE, { HSLColor } from "./color";
 import { drawText } from "./font";
 import Game, { State } from "./GameState";
 import { MyCanvas } from "./MyCanvas";
@@ -15,6 +15,7 @@ export const titleElements = document.getElementById("title");
 export const gameoverElements = document.getElementById("gameover");
 
 const CANVASES = ["bg", "game", "info", "ui"];
+let BUTTONS: HTMLButtonElement[];
 
 export class Stage {
   private static _layers: Map<LayerName, MyCanvas> = new Map();
@@ -77,23 +78,26 @@ export class Stage {
     Basket.drawCrissCrossPattern();
 
     // Create the buttons with their textures
-    [
-      ["retry", () => Game.restart()],
-      ["start", () => Game.restart()],
-      ["bye", () => Game.title()],
-    ].forEach(([id, action]: [string, () => void]) => {
-      const btn = document.getElementById(id);
+    BUTTONS = [
+      ["retry", () => Game.restart(), PALETTE.coral],
+      ["bye", () => Game.title(), PALETTE.blue2],
+      ["start", () => Game.restart(), PALETTE.blue2],
+    ].map(([id, action, color]: [string, () => void, HSLColor]) => {
+      const btn = document.getElementById(id) as HTMLButtonElement;
       const { x: w, y: h } = new Point(200, 48);
 
       this.newOffscreenLayer(id, w, h);
       btn.style.width = `${w}px`;
       btn.style.height = `${h}px`;
+      btn.style.background = color;
 
       this.setActiveLayer(id);
 
       drawText(id, { pos: new Point(w * 0.5, h * 0.5), fontSize: 24 });
       btn.appendChild(this.getLayer(id));
       btn.onclick = action;
+
+      return btn;
     });
 
     // Create the game's layers and add them to the DOM
@@ -120,11 +124,6 @@ export class Stage {
       drawPaws: false,
     });
 
-    Stage.newOffscreenLayer("catRear", 50, 100);
-    Stage.setActiveLayer("catRear");
-    Stage.ctx.translate(25, 50);
-    drawCatRear();
-
     this.fitLayersToStage();
 
     window.addEventListener("resize", this.fitLayersToStage.bind(this));
@@ -136,12 +135,21 @@ export class Stage {
   }
 
   static fitLayersToStage() {
+    const [cw, ch] = [this.stage.clientWidth, this.stage.clientHeight];
+
     CANVASES.forEach(layer => {
-      this.getLayer(layer).setSize(
-        this.stage.clientWidth,
-        this.stage.clientHeight
-      );
+      this.getLayer(layer).setSize(cw, ch);
     });
+
+    if (ch / cw < 0.65) {
+      BUTTONS[0].style.bottom = BUTTONS[1].style.bottom;
+      BUTTONS[0].style.left = `${cw * 0.5 - 220}px`;
+      BUTTONS[1].style.left = `${cw * 0.5 + 20}px`;
+    } else {
+      BUTTONS[0].style.bottom = "30%";
+      BUTTONS[0].style.left = `${cw * 0.5 - 100}px`;
+      BUTTONS[1].style.left = `${cw * 0.5 - 100}px`;
+    }
 
     // Redraw backgrounds
     City.draw();
