@@ -19,7 +19,7 @@ export enum State {
 }
 
 export const TOTAL_LIVES = 3;
-export const MAX_BASKETS = 2;
+export const MAX_BASKETS = 3;
 export const MAX_BALLS = 3;
 export const MAX_CATS = 3;
 export const SPAWN_RATE = 20;
@@ -27,6 +27,7 @@ export const MIN_CAT_LENGTH = 100;
 export const BALL_RADIUS = 20;
 export const BALL_MASS = 3;
 export const LINE_MASS = 2;
+export const BASKET_COLLIDER_LENGTH = 120;
 export let TRAMPOFELINES: TrampofelineManager;
 export let BASKETS: BasketManager;
 export let YARNBALLS: YarnBallManager;

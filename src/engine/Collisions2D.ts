@@ -204,7 +204,7 @@ export class SegmentCollider extends Collider {
  * and strictly above the second body
  */
 export function downwardFilter(b1: DynamicBody, b2: DynamicBody) {
-  const isDescending = b2.velocity.y >= 0;
-  const aboveJoint = b2.position.y < b1.position.y;
-  return isDescending && aboveJoint;
+  const descending = b2.velocity.y >= 0;
+  const above = b2.position.y < b1.position.y;
+  return descending && above;
 }

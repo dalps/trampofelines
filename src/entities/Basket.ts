@@ -9,6 +9,7 @@ import { EntityManager } from "../engine/EntityManager";
 import { Firework } from "../engine/Firework";
 import { drawText } from "../engine/font";
 import Game, {
+  BASKET_COLLIDER_LENGTH,
   BASKETS,
   MAX_BASKETS,
   State,
@@ -25,10 +26,8 @@ import { DEG2RAD, distribute, pickRandom } from "../utils/MathUtils";
 import { Point } from "../utils/Point";
 import { Clock } from "../utils/TimeUtils";
 import { YarnBall } from "./YarnBall";
-import { State } from "../engine/GameState";
 
 export class BasketManager extends EntityManager<Basket> {
-
   outro() {
     this.list.forEach(b => b.outro());
   }
@@ -75,8 +74,7 @@ export class Basket extends DynamicBody {
     this.toggleX();
     this.toggleY();
 
-    const colliderWidth = 100;
-    this.attachCollider(new SegmentCollider(pos, colliderWidth));
+    this.attachCollider(new SegmentCollider(pos, BASKET_COLLIDER_LENGTH));
 
     Stage.newOffscreenLayer(this.id, 200, 200);
 
@@ -151,10 +149,11 @@ export class Basket extends DynamicBody {
         startRadius: 5,
         finalRadius: 100,
         speed: 3,
+        finalTransparency: 1,
         color: palette.brightYellow,
-        color2: palette.white,
+        color2: palette.brightYellow,
       });
-      new Alert(this.position, `nice!`, {
+      new Alert(this.position, pickRandom(["nice!", "go!", "ok!"]), {
         startRadius: 0,
         finalRadius: 50,
         finalTransparency: 1,

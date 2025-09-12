@@ -2,6 +2,7 @@ import { CollisionManager, downwardFilter } from "../engine/Collisions2D";
 import palette, { hsl, setTransparency } from "../engine/color";
 import { ElasticLine } from "../engine/ElasticLine";
 import { EntityManager } from "../engine/EntityManager";
+import { Firework } from "../engine/Firework";
 import Game, {
   MAX_CATS,
   MIN_CAT_LENGTH,
@@ -218,19 +219,22 @@ export default class TrampofelineManager extends EntityManager<Trampofeline> {
 }
 
 export class Trampofeline extends ElasticLine {
-  transparency = 1;
+  alpha = 1;
   dead = false;
   public id: string;
 
   catch(b: YarnBall) {
     this.joints.forEach(j =>
       CollisionManager.register(j, b, {
-        filter: downwardFilter,
+        // filter: downwardFilter,
         cb: () => {
-          new Ripple(j.position, {
+          new Firework(b.position, {
+            points: 2,
             startRadius: 15,
-            finalRadius: 30,
-            startTransparency: 0.3,
+            finalRadius: 50,
+            startTransparency: 1,
+            color: palette.brightYellow,
+            color2: palette.brightYellow,
           });
           zzfxP(sfx.bounce);
           this.die();
@@ -243,7 +247,7 @@ export class Trampofeline extends ElasticLine {
     this.dead = true;
     this.joints.forEach(j => j.die());
 
-    new Tween(this, "transparency", {
+    new Tween(this, "alpha", {
       finalValue: 0,
       onComplete: () => TRAMPOFELINES.delete(this),
     });
@@ -251,7 +255,7 @@ export class Trampofeline extends ElasticLine {
 
   draw() {
     const { ctx } = Stage;
-    setTransparency(this.transparency);
+    setTransparency(this.alpha);
 
     ctx.lineWidth = 25;
     ctx.strokeStyle = coatColor;
