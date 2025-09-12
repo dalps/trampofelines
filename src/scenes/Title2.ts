@@ -3,6 +3,7 @@ import { Firework } from "../engine/Firework";
 import { engrave } from "../engine/font";
 import { Stage } from "../engine/Stage";
 import { Tween } from "../engine/tween";
+import { clamp, lerp } from "../utils/MathUtils";
 import { Point } from "../utils/Point";
 import { Clock } from "../utils/TimeUtils";
 
@@ -78,12 +79,7 @@ export class Title2 {
     ctx.fillStyle = palette.white;
     ctx.strokeStyle = palette.blue2;
     ctx.lineWidth = 2;
-    const textScale = 1;
-    const originalTextSize = 100;
-    const pos = new Point(
-      this.trampoPos.x - originalTextSize * (textScale * 0.5),
-      this.trampoPos.y - 65
-    );
+    const textScale = lerp(0.5, 1, clamp(0, 1, cw / ch));
 
     [
       ["trampo", this.trampoPos, -40],
@@ -98,8 +94,8 @@ export class Title2 {
           this.skew,
           this.skew,
           textScale,
-          pos.x - length * 0.5,
-          pos.y + dy,
+          pos.x - length * textScale * 0.5,
+          pos.y + dy * textScale,
         ])
       );
       ctx.fill(p);

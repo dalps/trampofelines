@@ -1,5 +1,6 @@
 import { YarnBall } from "../entities/YarnBall";
 import { star } from "../utils/CanvasUtils";
+import { lerp } from "../utils/MathUtils";
 import { Point } from "../utils/Point";
 import palette, { hsl, HSLColor } from "./color";
 import { drawText } from "./font";
@@ -62,15 +63,17 @@ export function drawGameoverUI() {
   ctx.fillRect(0, 0, cw, ch);
 
   ctx.lineWidth = 3;
+  let fontSize = 36; // lerp(20, 80, ...);
   drawText(`game over!`, {
-    pos: new Point(cw * 0.5, ch * 0.5 - 80),
+    pos: new Point(cw * 0.5, ch * 0.5 - fontSize),
     fill: palette.blue3,
     stroke: palette.blue0,
-    fontSize: 80,
+    fontSize,
   });
 
+  fontSize = 24; // lerp(20, 28, ...);
   drawText(`you stocked ${Game.stock} basket${Game.stock === 1 ? "" : "s"}`, {
     pos: new Point(cw * 0.5, ch * 0.5),
-    fontSize: 28,
+    fontSize,
   });
 }
