@@ -13,17 +13,17 @@
       }
 
       canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
         user-select: none;
         touch-action: none;
-        position: absolute;
         image-rendering: pixelated;
       }
 
       #stage {
         width: 100vw;
         height: 100svh;
-        overflow: hidden;
-        position: relative;
       }
 
       button {
@@ -39,10 +39,6 @@
         border-radius: 5px;
         cursor: pointer;
         animation: a1 2s ease-in-out alternate infinite;
-
-        canvas {
-          position: relative;
-        }
 
         &:hover {
           animation: a2 1s ease-in-out alternate infinite;
