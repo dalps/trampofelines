@@ -72,7 +72,7 @@ export function drawGameoverUI() {
   });
 
   fontSize = 24; // lerp(20, 28, ...);
-  drawText(`you stocked ${Game.stock} basket${Game.stock === 1 ? "" : "s"}`, {
+  drawText(`you filled ${Game.stock} basket${Game.stock === 1 ? "" : "s"}`, {
     pos: new Point(cw * 0.5, ch * 0.5),
     fontSize,
   });

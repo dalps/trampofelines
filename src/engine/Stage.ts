@@ -79,9 +79,9 @@ export class Stage {
 
     // Create the buttons with their textures
     BUTTONS = [
-      ["retry", () => Game.restart(), PALETTE.coral],
+      ["again", () => Game.restart(), PALETTE.coral],
       ["bye", () => Game.title(), PALETTE.blue2],
-      ["start", () => Game.restart(), PALETTE.blue2],
+      ["go!", () => Game.restart(), PALETTE.blue2],
     ].map(([id, action, color]: [string, () => void, HSLColor]) => {
       const btn = document.getElementById(id) as HTMLButtonElement;
       const { x: w, y: h } = new Point(200, 48);

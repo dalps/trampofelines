@@ -39,7 +39,7 @@ export class BasketManager extends EntityManager<Basket> {
       spawnPosOptionsY.filter(y => !this.list.find(b => b.position.y === y))
     );
     const posX = pickRandom(spawnPosOptionsX);
-    const wanted = 1; // Math.floor(1 + Math.random() * 5);
+    const wanted = Math.floor(1 + Math.random() * 5);
     const basket = new Basket(new Point(posX, posY), wanted);
     basket.drawTexture();
 
