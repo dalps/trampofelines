@@ -39,7 +39,7 @@ export default class TrampofelineManager {
   private static entities: Map<string, Trampofeline> = new Map();
 
   public static get trampolines() {
-    return Array.from(this.entities.values());
+    return [...this.entities.values()];
   }
 
   static clearEntities() {

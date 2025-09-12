@@ -1,5 +1,9 @@
 import { Alert } from "../engine/Alert";
-import { SegmentCollider } from "../engine/Collisions2D";
+import {
+  CollisionManager,
+  downwardFilter,
+  SegmentCollider,
+} from "../engine/Collisions2D";
 import palette from "../engine/color";
 import { Firework } from "../engine/Firework";
 import { drawText } from "../engine/font";
@@ -7,13 +11,50 @@ import { DynamicBody } from "../engine/Physics2D";
 import { Stage } from "../engine/Stage";
 import { Tween } from "../engine/tween";
 import { popsicle } from "../utils/CanvasUtils";
-import { DEG2RAD, distribute, lerp } from "../utils/MathUtils";
+import { DEG2RAD, distribute, lerp, pickRandom } from "../utils/MathUtils";
 import { Point } from "../utils/Point";
 import { Clock } from "../utils/TimeUtils";
 import { YarnBall } from "./YarnBall";
 import { Entity } from "./Entity";
-import Game from "../engine/GameState";
+import Game, { MAX_BASKETS, State } from "../engine/GameState";
 import { drawLives } from "../engine/ui";
+import { zzfxP } from "../engine/zzfx";
+import { Ripple } from "../engine/Ripple";
+import sfx from "../engine/sfx";
+
+export class BasketManager {
+  private static entities = new Map<string, Basket>();
+
+  public static get baskets() {
+    return [...this.entities.values()];
+  }
+
+  static init() {}
+
+  static spawnBasket() {
+    const spawnPosOptionsX = distribute(100, Stage.cw - 100, 4);
+    const spawnPosOptionsY = distribute(280, Stage.ch - 100, 4);
+    console.log(Stage.cw, spawnPosOptionsX);
+    const posY = pickRandom(
+      spawnPosOptionsY.filter(y => !this.baskets.find(b => b.position.y === y))
+    );
+    const posX = pickRandom(spawnPosOptionsX);
+    const wanted = Math.floor(1 + Math.random() * 5);
+    const basket = new Basket(new Point(posX, posY), wanted);
+    basket.drawTexture();
+    this.entities.set(basket.id, basket);
+
+    Game.yarnballs.forEach(b => basket.catch(b));
+  }
+
+  static update() {
+    if (this.entities.size < MAX_BASKETS) {
+      this.spawnBasket();
+    }
+
+    this.baskets.forEach(b => b.update());
+  }
+}
 
 export class Basket extends DynamicBody implements Entity {
   id: string;
@@ -22,13 +63,47 @@ export class Basket extends DynamicBody implements Entity {
 
   constructor(pos: Point, public wanted = 5) {
     super(pos);
-    this.name = "Basket";
+
+    this.name = "bkt";
     this.id = crypto.randomUUID();
-    const colliderWidth = 100;
+
     this.toggleX();
     this.toggleY();
+
+    const colliderWidth = 100;
     this.attachCollider(new SegmentCollider(pos, colliderWidth));
+
     Stage.newOffscreenLayer(this.id, 200, 200);
+
+    console.log(pos.x);
+    new Tween(this.position, "x", {
+      startValue: pos.x <= Stage.cw * 0.5 ? -300 : Stage.cw + 300,
+      finalValue: pos.x,
+    });
+  }
+
+  catch(b: YarnBall) {
+    CollisionManager.register(this, b, {
+      sensor: true,
+      filter: downwardFilter,
+      cb: () => {
+        if (Game.state !== State.Playing) return;
+
+        new Firework(b.position, {
+          startRadius: 5,
+          finalRadius: 50,
+          points: 3,
+          speed: 4,
+          color: b.color,
+          color2: palette.white,
+        });
+
+        b.die();
+        this.addYarnball(b);
+        drawLives();
+        zzfxP(sfx.score);
+      },
+    });
   }
 
   addYarnball(b: YarnBall) {
@@ -65,6 +140,7 @@ export class Basket extends DynamicBody implements Entity {
         startValue: this.position.y,
         finalValue: -200,
         speed: 1,
+        onComplete: () => BasketManager.entities.delete(this.id),
       });
       this.filled = true;
       Game.stock += 1;

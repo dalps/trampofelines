@@ -23,6 +23,7 @@ export class YarnBall extends DynamicBody {
   ) {
     super(startPos, { friction: 0.1, angularVelocity: 0.5 });
 
+    this.name = "yb";
     this.id = crypto.randomUUID();
 
     this.mass = mass;

@@ -3,7 +3,7 @@ import { makeGradient } from "../utils/CanvasUtils";
 import { downwardFilter } from "../engine/Collisions2D";
 import { CollisionManager } from "../engine/Collisions2D";
 import palette, { HSLColor } from "../engine/color";
-import { lerp } from "../utils/MathUtils";
+import { lerp, pickRandom } from "../utils/MathUtils";
 import { Point } from "../utils/Point";
 import { State } from "../engine/Physics2D";
 import { Ripple } from "../engine/Ripple";
@@ -14,6 +14,7 @@ import TrampofelineManager from "./Trampofeline";
 import { YarnBall } from "./YarnBall";
 import { drawLives } from "../engine/ui";
 import { Firework } from "../engine/Firework";
+import { BasketManager } from "./Basket";
 
 export class Tube {
   public position: Point;
@@ -31,7 +32,7 @@ export class Tube {
     Stage.newOffscreenLayer("tube", size.x * 1.5, size.y);
     Tube.drawTube(this.size.x, this.size.y);
 
-    Clock.every(30, () => {
+    Clock.every(20, () => {
       if (Game.state === GameState.Playing && Game.yarnballs.size < 2) {
         zzfxP(sfx.spawn);
         const ball = this.spawnYarnBall();
@@ -47,11 +48,12 @@ export class Tube {
 
     const headLength = Math.max(sx * 0.1, 20);
 
-    const colorOptions = ["coral", "fuchsia", "chartreuse", "hotPink"];
-    const color = palette[
-      colorOptions[Math.floor(Math.random() * colorOptions.length)]
-    ] as HSLColor;
-
+    const color = pickRandom([
+      palette.coral,
+      palette.fuchsia,
+      palette.chartreuse,
+      palette.hotPink,
+    ]);
     const startPos = this.position
       .clone()
       .addX(this.size.x + headLength)
@@ -67,7 +69,6 @@ export class Tube {
       Game.settings.ballRadius,
       color
     );
-    b.name = "YarnBall";
 
     const nRipples = 5;
     for (let i = 0; i < nRipples; i++) {
@@ -79,40 +80,8 @@ export class Tube {
     }
 
     Game.yarnballs.set(b.id, b);
-
     TrampofelineManager.trampolines.forEach(cat => cat.catch(b));
-
-    Game.baskets.forEach(basket =>
-      CollisionManager.register(basket, b, {
-        sensor: true,
-        filter: downwardFilter,
-        cb: () => {
-          if (Game.state !== GameState.Playing) return;
-
-          new Firework(b.position, {
-            startRadius: 5,
-            finalRadius: 50,
-            points: 3,
-            speed: 4,
-            color: b.color,
-            color2: palette.white,
-          });
-
-          b.die();
-          basket.addYarnball(b);
-          drawLives();
-          zzfxP(sfx.score);
-          Stage.setActiveLayer("game");
-          new Ripple(b.position.clone(), {
-            startRadius: 25,
-            finalRadius: 50,
-            startTransparency: 0.3,
-            finalTransparency: 0,
-            color: b.color,
-          });
-        },
-      })
-    );
+    BasketManager.baskets.forEach(bkt => bkt.catch(b));
 
     return b;
   }

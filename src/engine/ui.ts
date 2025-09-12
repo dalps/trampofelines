@@ -3,7 +3,7 @@ import { star } from "../utils/CanvasUtils";
 import { Point } from "../utils/Point";
 import palette, { hsl, HSLColor } from "./color";
 import { drawText } from "./font";
-import Game from "./GameState";
+import Game, { TOTAL_LIVES } from "./GameState";
 import { Stage } from "./Stage";
 
 export function drawLives() {
@@ -31,7 +31,7 @@ export function drawLives() {
     });
   };
 
-  for (let i = 0; i < Game.TOTAL_LIVES - Game.lives; i++) {
+  for (let i = 0; i < TOTAL_LIVES - Game.lives; i++) {
     cross(8, palette.white);
     cross(4, hsl(0, 100, 50));
     pos.incrX(sectionSize);

@@ -3,6 +3,10 @@ import { Point } from "./Point";
 export const DEG2RAD = Math.PI / 180;
 export const RAD2DEG = 180 / Math.PI;
 
+export function pickRandom(options: any[]): any {
+  return options[Math.floor(Math.random() * options.length)];
+}
+
 export function clamp(min: number, max: number, n: number) {
   return Math.max(min, Math.min(n, max));
 }
@@ -18,7 +22,7 @@ export function distribute(
   cb: (n: number, i: number) => void = () => {}
 ) {
   const points: number[] = [];
-  for (let i = 0; i < subs + 1; i++) {
+  for (let i = 0; i < subs; i++) {
     const n = lerp(min, max, i / (subs - 1));
     points.push(n);
     cb(n, i);

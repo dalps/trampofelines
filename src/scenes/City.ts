@@ -1,70 +1,14 @@
-import { CollisionManager } from "../engine/Collisions2D";
-import PALETTE from "../engine/color";
-import palette, { hsl } from "../engine/color";
-import Game, { State } from "../engine/GameState";
+import { hsl, default as PALETTE, default as palette } from "../engine/color";
+import Game from "../engine/GameState";
 import { Stage } from "../engine/Stage";
-import { drawLives } from "../engine/ui";
-import { Basket } from "../entities/Basket";
 import { Tube } from "../entities/Tube";
-import { circle, makeGradient, star } from "../utils/CanvasUtils";
-import Math2D, { clamp, distribute, lerp } from "../utils/MathUtils";
+import { makeGradient, star } from "../utils/CanvasUtils";
+import { distribute, lerp } from "../utils/MathUtils";
 import { Point } from "../utils/Point";
-import { Alert } from "../engine/Alert";
 
 export class City {
   static init() {
-    const { cw, ch } = Stage;
-
-    Game.baskets.push(
-      new Basket(new Point(cw * 0.8, ch - 100)),
-      new Basket(new Point(cw * 0.8, 100))
-    );
-
-    Game.baskets.forEach(b => b.drawTexture());
-
     Game.tubes.push(new Tube(new Point(0, 100)));
-  }
-
-  static update() {
-    Stage.setActiveLayer("game");
-    const { cw, ch } = Stage;
-
-    Game.tubes.forEach(tube => tube.draw());
-    Game.baskets.forEach(basket => basket.update());
-
-    Game.yarnballs.forEach((b, i) => {
-      const threadEndPos = b.thread.at(-1).position;
-      if (threadEndPos.y > ch) {
-        new Alert(
-          new Point(clamp(70, cw - 70, b.position.x), ch),
-          `missed ${Game.TOTAL_LIVES - Game.lives + 1}`,
-          {
-            startRadius: 0,
-            finalRadius: 50,
-            finalTransparency: 1,
-          }
-        );
-
-        b.die();
-
-        // Game.state === State.Playing && zzfxP(sfx.drop);
-        Game.lives = Math.max(0, Game.lives - 1);
-        Game.state === State.Playing && drawLives();
-        Game.lives <= 0 && Game.gameOver();
-
-        return;
-      }
-
-      const threshold = b.radius * 0.5;
-      if (b.position.x - threshold < 0 || b.position.x + threshold > cw) {
-        b.velocity.x *= -1.1;
-      }
-
-      Stage.setActiveLayer("game");
-
-      b.update();
-      b.draw();
-    });
   }
 
   static draw() {
