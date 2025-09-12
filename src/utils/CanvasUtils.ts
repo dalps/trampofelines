@@ -82,7 +82,6 @@ export function makeGradient(
 export function popsicle(from: Point, to: Point, color = "black") {
   const { ctx } = Stage;
 
-  ctx.lineCap = "round";
   ctx.strokeStyle = color;
   ctx.fillStyle = color;
   ctx.lineWidth = 2;

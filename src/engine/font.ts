@@ -170,6 +170,7 @@ const defaultKerning = 12;
 const frameSize = 100;
 
 export interface TextParams {
+  pos?: Point;
   fontSize?: number;
   fill?: Color;
   stroke?: Color;

@@ -38,7 +38,6 @@ export class Firework extends Ripple {
     const { time } = Clock;
 
     this.ctx.lineWidth = 2;
-    this.ctx.lineJoin = "round";
 
     star(this.center, {
       outerRadius: this.radius,

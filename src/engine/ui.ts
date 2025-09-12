@@ -7,7 +7,7 @@ import Game, { TOTAL_LIVES } from "./GameState";
 import { Stage } from "./Stage";
 
 export function drawLives() {
-  Stage.setActiveLayer("game-info");
+  Stage.setActiveLayer("info");
   Stage.clearLayer();
   const { ctx, cw } = Stage;
 
@@ -16,8 +16,7 @@ export function drawLives() {
   const pos = new Point(cw * 0.5 - 1.5 * sectionSize, 20);
   const center = new Point(sectionSize * 0.5, sectionSize * 0.5);
 
-  ctx.lineJoin = "round";
-  ctx.lineCap = "round";
+  ctx.lineCap = ctx.lineJoin = "round";
 
   const cross = (lineWidth: number, color: HSLColor) => {
     ctx.lineWidth = lineWidth;
@@ -55,7 +54,7 @@ export function drawLives() {
 }
 
 export function drawGameoverUI() {
-  Stage.setActiveLayer("game-info");
+  Stage.setActiveLayer("info");
   const { ctx, cw, ch } = Stage;
 
   ctx.fillStyle = palette.black.toAlpha(0.5);
@@ -63,7 +62,7 @@ export function drawGameoverUI() {
 
   ctx.lineWidth = 3;
   drawText(`game over!`, {
-    pos: new Point(cw * 0.5, ch * 0.5 - 200),
+    pos: new Point(cw * 0.5, ch * 0.5 - 180),
     fill: palette.blue3,
     stroke: palette.blue0,
     fontSize: 80,
@@ -71,5 +70,6 @@ export function drawGameoverUI() {
 
   drawText(`you stocked ${Game.stock} basket${Game.stock === 1 ? "" : "s"}`, {
     pos: new Point(cw * 0.5, ch * 0.5 - 100),
+    fontSize: 36,
   });
 }

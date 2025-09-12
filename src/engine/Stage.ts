@@ -1,25 +1,20 @@
-import { drawTitle } from "../scenes/Title";
-import { City } from "../scenes/City";
+import { Basket } from "../entities/Basket";
 import { drawCatFace, drawCatRear } from "../entities/Trampofeline";
+import { City } from "../scenes/City";
+import { Title2 } from "../scenes/Title2";
 import { Point } from "../utils/Point";
 import PALETTE from "./color";
-import { drawText, engrave } from "./font";
+import { drawText } from "./font";
 import Game, { State } from "./GameState";
-import { drawGameoverUI, drawLives } from "./ui";
-import { Basket } from "../entities/Basket";
-import { Title2 } from "../scenes/Title2";
 import { MyCanvas } from "./MyCanvas";
+import { drawGameoverUI, drawLives } from "./ui";
+
+export type LayerName = string;
 
 export const titleElements = document.getElementById("title");
 export const gameoverElements = document.getElementById("gameover");
 
-const CANVASES = ["bg-static", "bg", "game", "game-info", "ui"];
-
-customElements.define("my-canvas", MyCanvas, {
-  extends: "canvas",
-});
-
-export type LayerName = "bg" | "game" | "ui" | string;
+const CANVASES = ["bg", "game", "info", "ui"];
 
 export class Stage {
   private static _layers: Map<LayerName, MyCanvas> = new Map();
@@ -82,33 +77,37 @@ export class Stage {
     Basket.drawCrissCrossPattern();
 
     // Create the buttons with their textures
-    ["retry", "start", "bye"].forEach(id => {
+    [
+      ["retry", () => Game.restart()],
+      ["start", () => Game.restart()],
+      ["bye", () => Game.title()],
+    ].forEach(([id, action]: [string, () => void]) => {
       const btn = document.getElementById(id);
       const { x: w, y: h } = new Point(200, 48);
+
       this.newOffscreenLayer(id, w, h);
       btn.style.width = `${w}px`;
       btn.style.height = `${h}px`;
+
       this.setActiveLayer(id);
-      const { cw, ch } = this;
-      drawText(id, { pos: new Point(cw * 0.5, ch * 0.5), fontSize: 24 });
+
+      drawText(id, { pos: new Point(w * 0.5, h * 0.5), fontSize: 24 });
       btn.appendChild(this.getLayer(id));
-      btn.onclick = () => Game.restart();
+      btn.onclick = action;
     });
 
     // Create the game's layers and add them to the DOM
     CANVASES.forEach((name, i) => {
-      const layer = document.createElement("canvas", {
-        is: "my-canvas",
-      });
+      const layer = new MyCanvas(name);
+
       layer.id = name;
       layer.style.zIndex = `${i}`;
-      this._layers.set(name, layer as MyCanvas);
+
+      this._layers.set(name, layer);
       this.stage.appendChild(layer);
     });
 
-    this.setActiveLayer("game");
-
-    const { white, blue0, blue1, blue2, blue3 } = PALETTE;
+    const { blue0, blue1, blue3 } = PALETTE;
     Stage.newOffscreenLayer("catFace", 50, 100);
     Stage.setActiveLayer("catFace");
     Stage.ctx.translate(25, 50);
@@ -132,13 +131,10 @@ export class Stage {
   }
 
   static newOffscreenLayer(name: string, width: number, height: number) {
-    const newLayer = document.createElement("canvas", { is: "my-canvas" });
-    newLayer.width = width;
-    newLayer.height = height;
-    this._layers.set(name, newLayer as MyCanvas);
+    const newLayer = new MyCanvas(name, width, height);
+    this._layers.set(name, newLayer);
   }
 
-  // I should probably stop resizing: it results in the game breaking, more code, wanky experience
   static fitLayersToStage() {
     CANVASES.forEach(layer => {
       this.getLayer(layer).setSize(
@@ -148,25 +144,25 @@ export class Stage {
     });
 
     // Redraw backgrounds
+    City.draw();
+
     switch (Game.state) {
       case State.Title:
         Title2.draw();
         break;
       case State.Playing:
-        City.draw();
         drawLives();
         break;
       case State.GameOver:
-        City.draw();
         drawGameoverUI();
         break;
     }
   }
 
-  static debugOffscreenLayer(name: string) {
-    const canvas = Stage.getLayer(name);
-    Stage.stage.appendChild(canvas);
-    canvas.style.border = "1px solid blue";
-    canvas.style.zIndex = "9999";
-  }
+  // static debugOffscreenLayer(name: string) {
+  //   const canvas = Stage.getLayer(name);
+  //   Stage.stage.appendChild(canvas);
+  //   canvas.style.border = "1px solid blue";
+  //   canvas.style.zIndex = "9999";
+  // }
 }

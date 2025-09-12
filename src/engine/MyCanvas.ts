@@ -37,3 +37,7 @@ export class MyCanvas extends HTMLCanvasElement {
     return new Point(e.clientX - this.rect.x, e.clientY - this.rect.y);
   }
 }
+
+customElements.define("my-canvas", MyCanvas, {
+  extends: "canvas",
+});

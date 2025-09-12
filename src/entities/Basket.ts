@@ -187,7 +187,6 @@ export class Basket extends DynamicBody implements Entity {
     ctx.save();
     ctx.translate(100, 100);
     ctx.lineWidth = 2;
-    ctx.lineJoin = "round";
 
     const basket = new Path2D(
       `m -69,-12.5 c -37.6,75.2 175.6,75.2 137.9,0 0,16.5 -137.9,16.3 -137.9,0 z`

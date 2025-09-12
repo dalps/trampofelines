@@ -73,8 +73,6 @@ export class YarnBall extends DynamicBody {
 
     ctx.beginPath();
     ctx.lineWidth = 4;
-    ctx.lineCap = "butt";
-    ctx.lineJoin = "bevel";
     ctx.strokeStyle = this.color.toString();
     ctx.moveTo(this.position.x, this.position.y);
     this.thread.forEach((joint, i) => {
@@ -129,7 +127,6 @@ export class YarnBall extends DynamicBody {
     ctx.fillStyle = color.lighten(1.1);
     ctx.fill(bg);
 
-    ctx.lineCap = "butt";
     ctx.lineWidth = lineWidth;
     ctx.strokeStyle = color;
     ctx.stroke(p);

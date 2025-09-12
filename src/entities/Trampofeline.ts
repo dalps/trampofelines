@@ -145,7 +145,7 @@ export default class TrampofelineManager {
         return;
       }
 
-      valid && TrampofelineManager.makeCat();
+      valid && TrampofelineManager.spawnCat();
       valid && zzfxP(sfx.meow);
       !valid && zzfxP(sfx.badPlacement);
 
@@ -153,7 +153,16 @@ export default class TrampofelineManager {
     }
   }
 
-  static makeCat() {
+  static update() {
+    TrampofelineManager.trampolines.forEach(l => {
+      l.update();
+      l.draw();
+    });
+
+    TrampofelineManager.drawGuides();
+  }
+
+  static spawnCat() {
     if (!p1 || !p2 || p1.equals(p2)) return;
 
     const cat = new Trampofeline(p2, p1, 10, {
@@ -201,8 +210,8 @@ export default class TrampofelineManager {
     guideColor.alpha = Math2D.lerp(0.6, 0.8, Math.sin(time));
 
     ctx.strokeStyle = guideColor;
+    ctx.lineCap = ctx.lineJoin = "round";
 
-    ctx.lineCap = "round";
     ctx.beginPath();
     ctx.moveTo(p1.x, p1.y);
     ctx.lineTo(p2.x, p2.y);
@@ -254,8 +263,6 @@ export class Trampofeline extends ElasticLine {
 
     ctx.lineWidth = 25;
     ctx.strokeStyle = coatColor;
-    ctx.lineJoin = "round";
-    ctx.lineCap = "round";
 
     ctx.beginPath();
     ctx.moveTo(this.joints[0].position.x, this.joints[0].position.y);
@@ -309,7 +316,6 @@ export function drawCatFace({
   if (drawPaws) {
     // arms & paws
     ctx.strokeStyle = coatColor;
-    ctx.lineCap = "round";
     ctx.lineWidth = 10;
     const pawDistance = 10;
     [pawDistance, -pawDistance].forEach(x => {
