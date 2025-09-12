@@ -1,7 +1,7 @@
 import { CircleCollider, CollisionManager } from "../engine/Collisions2D";
 import palette, { type Color } from "../engine/color";
 import { EntityManager } from "../engine/EntityManager";
-import Game, { YARNBALLS } from "../engine/GameState";
+import Game, { BALL_MIN_RADIUS, YARNBALLS } from "../engine/GameState";
 import { DynamicBody, GRAVITY } from "../engine/Physics2D";
 import { Stage } from "../engine/Stage";
 import * as Math2D from "../utils/MathUtils";
@@ -35,7 +35,7 @@ export class YarnBallManager extends EntityManager<YarnBall> {
 export class YarnBall extends DynamicBody {
   public id: string;
   public thread: DynamicBody[];
-  public threadLength: number = 100;
+  public threadLength: number = 0;
   public radius: number = 10;
   public color: Color;
 
@@ -48,7 +48,7 @@ export class YarnBall extends DynamicBody {
   ) {
     super(startPos, { friction: 0.1, angularVelocity: 0.5 });
 
-    this.name = "yb";
+    this.name = "YB";
     this.id = crypto.randomUUID();
 
     this.mass = mass;
@@ -59,7 +59,7 @@ export class YarnBall extends DynamicBody {
     this.velocity = startVelocity.clone();
     this.addForce(GRAVITY);
 
-    const points = [];
+    const points: Point[] = [];
     const subs = 10;
 
     for (let i = 0; i < subs; i++) {
@@ -67,6 +67,11 @@ export class YarnBall extends DynamicBody {
     }
 
     this.thread = points.map(p => new DynamicBody(p));
+
+    Clock.every(2, () => {
+      console.log(this.thread.length);
+      this.thread.push(new DynamicBody(this.thread.at(-1).position.clone()));
+    });
   }
 
   die() {
@@ -84,10 +89,14 @@ export class YarnBall extends DynamicBody {
       .rotateAbout(this.position, this.orientation);
 
     let prevJoint: DynamicBody = this.thread[0];
-    let lambda = 1;
+    this.radius = Math.max(BALL_MIN_RADIUS, this.radius - 0.05 * dt);
+
+    if (this.radius <= BALL_MIN_RADIUS) {
+      CollisionManager.unregisterBody(this);
+    }
 
     this.thread.forEach(joint => {
-      Math2D.damp2I(joint.position, prevJoint.position, lambda, dt);
+      Math2D.damp2I(joint.position, prevJoint.position, 2, dt);
       // Math2D.lerp2I(joint.position, prevJoint.position, dt);
       prevJoint = joint;
     });
@@ -115,7 +124,7 @@ export class YarnBall extends DynamicBody {
     ctx.translate(x, y);
     ctx.rotate(this.orientation);
     YarnBall.drawTexture(new Point(0, 0), {
-      radius: this.radius,
+      radius: Math.max(10, this.radius),
       color: this.color,
       lineWidth: 2,
     });
