@@ -25,6 +25,7 @@ export const MAX_CATS = 3;
 export const SPAWN_RATE = 20;
 export const MIN_CAT_LENGTH = 100;
 export const BALL_RADIUS = 20;
+export const BALL_MIN_RADIUS = 3;
 export const BALL_MASS = 3;
 export const LINE_MASS = 2;
 export const BASKET_COLLIDER_LENGTH = 120;

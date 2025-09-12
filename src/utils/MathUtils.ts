@@ -21,6 +21,8 @@ export function distribute(
   subs: number,
   cb: (n: number, i: number) => void = () => {}
 ) {
+  if (subs <= 1) return [lerp(min, max, 0.5)];
+
   const points: number[] = [];
   for (let i = 0; i < subs; i++) {
     const n = lerp(min, max, i / (subs - 1));

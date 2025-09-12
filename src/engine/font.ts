@@ -87,10 +87,6 @@ const kurokaneFont: Record<string, Glyph> = {
     path: "m35.8 71.2-4.2-2.5-6.4-7.0-5.9-11.2-2.6-14.9 2.9-17.4 6.7-11.0 7.8-5.6 6.1-1.6h37.0v14.3h-35.5v42.7h21.3v-21.4h19.5c0.5 2.1 0.5 4.2 0.6 6.3l-0.3 5.6-1.4 7.0-2.9 8.0-4.8 8.7h-37.9",
     size: 66,
   },
-  "H": {
-    path: "m64.7 71.2v-30.4h-29.4v30.4h-19.0v-71.2h19.0v26.5h29.4v-26.5h19.0v71.2h-19.0",
-    size: 67,
-  },
   "I": {
     path: "m40.5 71.2v-71.2h19.0v71.2h-19.0",
     size: 19,
@@ -142,14 +138,6 @@ const kurokaneFont: Record<string, Glyph> = {
   "V": {
     path: "m21.5 71.2v-71.2h18.0v56.7h20.9v-56.7h18.0v44.9l-1.3 5.6-4.6 8.9-9.6 8.3-15.8 3.6z",
     size: 57,
-  },
-  "W": {
-    path: "m40.7 71.2v-4.2l-6.2 2.9-7.6 1.3h-19.6v-71.2h19.0v56.7h14.5v-56.7h18.0v56.7h14.9v-56.7h19.1v44.9l-1.4 5.6-4.9 8.9-10.0 8.3-16.0 3.6h-19.6",
-    size: 85,
-  },
-  "X": {
-    path: "m60.5 71.2-0.4-28.6h-20.0l-0.5 28.6h-20.0v-12.0l0.3-3.0 1.3-5.9 2.9-7.1 5.2-7.0-5.2-5.7-2.9-5.9-1.3-5.0-0.2-1.9-0.1-1.3v-16.4h19.1l0.5 28.0h21.8l0.6-28.0h19.0v16.4l-0.3 2.7-1.3 4.8-2.9 6.0-5.1 5.9 5.1 6.8 2.9 7.1 1.3 5.9 0.3 3.5v12.0h-20.0",
-    size: 61,
   },
   "Y": {
     path: "m40.5 71.2v-29.7l-11.3-5.3-6.1-7.5-2.5-7.4-0.4-2.9-0.1-1.0v-17.4h19.0v28.2h21.9v-28.2h19.0v16.6l-0.3 2.7-0.3 1.4-2.5 7.4-6.1 7.8-11.3 5.6v29.7h-19.1",
@@ -211,6 +199,7 @@ export function engrave(text: string): { path: Path2D; length: number } {
 
   Array.from(text).forEach(c => {
     const C = c.toUpperCase();
+    if (!kurokaneFont[C]) throw new Error(`${C} is not available as a glyph.`)
     const { size = 0, path = "", kernings = {} } = kurokaneFont[C];
     const space = (frameSize - size) * 0.5;
     const p = new Path2D(path);

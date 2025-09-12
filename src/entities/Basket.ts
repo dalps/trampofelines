@@ -39,7 +39,7 @@ export class BasketManager extends EntityManager<Basket> {
       spawnPosOptionsY.filter(y => !this.list.find(b => b.position.y === y))
     );
     const posX = pickRandom(spawnPosOptionsX);
-    const wanted = Math.floor(1 + Math.random() * 5);
+    const wanted = 1; // Math.floor(1 + Math.random() * 5);
     const basket = new Basket(new Point(posX, posY), wanted);
     basket.drawTexture();
 
@@ -132,7 +132,7 @@ export class Basket extends DynamicBody {
     const { cw, ch } = Stage;
     const c = this.collider as SegmentCollider;
 
-    // this.position.x = lerp(100, cw - 100, Math.cos(time * 0.05) * 0.5 + 0.5);
+    // this.position.x = lerp(100, cw- 100, Math.cos(time * 0.05) * 0.5 + 0.5);
 
     const da = Math.cos(time * 0.05) * -1 * DEG2RAD * dt;
     c.dir += da;
@@ -153,7 +153,7 @@ export class Basket extends DynamicBody {
         color: palette.brightYellow,
         color2: palette.brightYellow,
       });
-      new Alert(this.position, pickRandom(["nice!", "go!", "ok!"]), {
+      new Alert(this.position, pickRandom(["nice!", "super!", "ok!"]), {
         startRadius: 0,
         finalRadius: 50,
         finalTransparency: 1,
@@ -200,14 +200,14 @@ export class Basket extends DynamicBody {
     ctx.lineWidth = 2;
 
     const basket = new Path2D(
-      `m -69,-12.5 c -37.6,75.2 175.6,75.2 137.9,0 0,16.5 -137.9,16.3 -137.9,0 z`
+      `m-69,-12.5c-37.6,75.2 175.6,75.2 137.9,0 0,16.5-137.9,16.3-137.9,0z`
     );
-    const empty =
-      new Path2D(`m 0,0 c -38.2,0 -69,-5.7 -69,-12.5 -0,-6.9 30.7,-12.5 68.7,-12.5 38.3,-0 69.3,5.6 69.3,12.5 C 69,-5.7 38.2,0 0,0
-Z`);
-    const emptyDown = new Path2D(`m -69,-12.5 c -0,16.4 137.9,16.4 137.9,0`);
+    const empty = new Path2D(
+      `m0,0c-38.2,0-69,-5.7-69,-12.5-0,-6.9 30.7,-12.5 68.7,-12.5 38.3,-0 69.3,5.6 69.3,12.5C69,-5.7 38.2,0 0,0Z`
+    );
+    const emptyDown = new Path2D(`m-69,-12.5c-0,16.4 137.9,16.4 137.9,0`);
     const handle = new Path2D(
-      `M 21.9 -0.9 C 21.9 -0.9 25.1 -50.2 0 -50.2 C -25.1 -50.2 -21.9 -25.1 -21.9 -25.1 L -28.2 -25.1 C -28.2 -25.1 -31.3 -56.4 0 -56.4 C 31.3 -56.4 28.2 -0.9 28.2 -0.9 Z`
+      `M21.9-0.9C21.9-0.9 25.1-50.2 0-50.2C-25.1-50.2-21.9-25.1-21.9-25.1L-28.2-25.1C-28.2-25.1-31.3-56.4 0-56.4C31.3-56.4 28.2-0.9 28.2-0.9Z`
     );
 
     const pattern = ctx.createPattern(Stage.getLayer("pattern"), "repeat");
@@ -227,7 +227,7 @@ Z`);
     }
 
     const slots = distribute(-40, 40, this.wanted);
-    this.content.slice(0, 5).forEach((b, i) =>
+    this.content.forEach((b, i) =>
       YarnBall.drawTexture(new Point(slots[i], i % 2 === 0 ? -10 : -5), {
         color: b.color,
         radius: b.radius,
