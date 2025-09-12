@@ -1,11 +1,11 @@
 import { CircleCollider, CollisionManager } from "../engine/Collisions2D";
 import palette, { type Color } from "../engine/color";
-import * as Math2D from "../utils/MathUtils";
-import { Point } from "../utils/Point";
+import Game from "../engine/GameState";
 import { DynamicBody, GRAVITY } from "../engine/Physics2D";
 import { Stage } from "../engine/Stage";
+import * as Math2D from "../utils/MathUtils";
+import { Point } from "../utils/Point";
 import { Clock } from "../utils/TimeUtils";
-import Game from "../engine/GameState";
 
 export class YarnBall extends DynamicBody {
   public id: string;
@@ -46,7 +46,7 @@ export class YarnBall extends DynamicBody {
 
   die() {
     CollisionManager.unregisterBody(this);
-    Game.yarnballs.delete(this.id);
+    Game.tubes.forEach(t => t.delete(this));
   }
 
   update(): void {

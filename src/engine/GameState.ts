@@ -20,22 +20,30 @@ export enum State {
 
 export const TOTAL_LIVES = 3;
 export const MAX_BASKETS = 2;
+export const MAX_BALLS = 3;
 export const MAX_CATS = 3;
+export const SPAWN_RATE = 20;
 export const MIN_CAT_LENGTH = 100;
 export const BALL_RADIUS = 20;
 export const BALL_MASS = 3;
 export const LINE_MASS = 2;
+export let TRAMPOFELINES: TrampofelineManager;
+export let BASKETS: BasketManager;
 
 /**
  * Functions to manage the game state
  */
 export default class Game {
   public static state = State.Title;
-  public static yarnballs: Map<string, YarnBall> = new Map();
   public static tubes: Tube[] = [];
   public static lives = TOTAL_LIVES;
   public static stock = 0;
   public static settings = {};
+
+  static init() {
+    TRAMPOFELINES = new TrampofelineManager();
+    BASKETS = new BasketManager();
+  }
 
   static update() {
     Stage.setActiveLayer("game");
@@ -47,54 +55,13 @@ export default class Game {
         break;
       case State.GameOver:
       case State.Playing:
-        const { cw, ch } = Stage;
-
-        Game.tubes.forEach(tube => tube.draw());
-        BasketManager.update();
-
-        Game.yarnballs.forEach((b, i) => {
-          const threadEndPos = b.thread.at(-1).position;
-          if (threadEndPos.y > ch) {
-            new Alert(
-              new Point(clamp(70, cw - 70, b.position.x), ch),
-              `missed ${TOTAL_LIVES - Game.lives + 1}`,
-              {
-                startRadius: 0,
-                finalRadius: 50,
-                finalTransparency: 1,
-              }
-            );
-
-            b.die();
-
-            if (Game.state === State.Playing) {
-              zzfxP(sfx.drop);
-              drawLives();
-            }
-
-            Game.lives = Math.max(0, Game.lives - 1);
-            Game.lives <= 0 && Game.gameOver();
-
-            return;
-          }
-
-          const threshold = b.radius * 0.5;
-          if (b.position.x - threshold < 0 || b.position.x + threshold > cw) {
-            b.velocity.x *= -1.1;
-          }
-
-          b.update();
-          b.draw();
-        });
-
         CollisionManager.update();
 
-        TrampofelineManager.trampolines.forEach(l => {
-          l.update();
-          l.draw();
+        Game.tubes.forEach(tube => {
+          tube.update();
         });
-
-        TrampofelineManager.drawGuides();
+        BASKETS.update();
+        TRAMPOFELINES.update();
 
         break;
     }
@@ -108,7 +75,7 @@ export default class Game {
         zzfxP(sfx.gameover);
         gameoverElements.style.display = "block";
         titleElements.style.display = "none";
-        TrampofelineManager.disableUI();
+        TRAMPOFELINES.disableUI();
 
         this.state = State.GameOver;
     }
@@ -119,11 +86,9 @@ export default class Game {
       case State.Title:
       case State.GameOver:
         this.lives = TOTAL_LIVES;
-        this.yarnballs.forEach(v => v.die());
-        this.yarnballs.clear();
-
-        TrampofelineManager.clearEntities();
-        TrampofelineManager.enableUI();
+        this.tubes.forEach(t => t.clearEntities());
+        TRAMPOFELINES.clearEntities();
+        TRAMPOFELINES.enableUI();
 
         gameoverElements.style.display = "none";
         titleElements.style.display = "none";
@@ -140,9 +105,9 @@ export default class Game {
       case State.GameOver:
       case State.Title:
         this.lives = TOTAL_LIVES;
-        this.yarnballs.clear();
-        TrampofelineManager.clearEntities();
-        TrampofelineManager.disableUI();
+        this.tubes.forEach(t => t.clearEntities());
+        TRAMPOFELINES.clearEntities();
+        TRAMPOFELINES.disableUI();
         gameoverElements.style.display = "none";
         titleElements.style.display = "block";
 

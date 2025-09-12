@@ -1,12 +1,12 @@
-import {
-  CircleCollider,
-  CollisionManager,
-  downwardFilter,
-} from "../engine/Collisions2D";
+import { CollisionManager, downwardFilter } from "../engine/Collisions2D";
 import palette, { hsl, setTransparency } from "../engine/color";
 import { ElasticLine } from "../engine/ElasticLine";
-import Game, { MAX_CATS, MIN_CAT_LENGTH } from "../engine/GameState";
-import { GRAVITY } from "../engine/Physics2D";
+import { EntityManager } from "../engine/EntityManager";
+import Game, {
+  MAX_CATS,
+  MIN_CAT_LENGTH,
+  TRAMPOFELINES,
+} from "../engine/GameState";
 import { Ripple } from "../engine/Ripple";
 import sfx from "../engine/sfx";
 import { Stage } from "../engine/Stage";
@@ -33,22 +33,12 @@ let guideColor = hsl(0, 100, 0); // hsla(0, 100%, 0%, 1.00)
 
 const { nightBlue: coatColor, blueGray: detailColor } = palette;
 
-export default class TrampofelineManager {
-  private static entities: Map<string, Trampofeline> = new Map();
-
-  public static get trampolines() {
-    return [...this.entities.values()];
-  }
-
-  static clearEntities() {
-    this.entities.clear();
-  }
-
-  static enableUI() {
+export default class TrampofelineManager extends EntityManager<Trampofeline> {
+  enableUI() {
     Stage.stage.appendChild(Stage.getLayer("ui"));
   }
 
-  static disableUI() {
+  disableUI() {
     p1 = p2 = undefined;
     soundInterval && clearInterval(soundInterval);
 
@@ -58,8 +48,8 @@ export default class TrampofelineManager {
     }
   }
 
-  static init() {
-    Stage.setActiveLayer("game");
+  constructor() {
+    super();
 
     const ui = Stage.getLayer("ui");
 
@@ -145,7 +135,7 @@ export default class TrampofelineManager {
         return;
       }
 
-      valid && TrampofelineManager.spawnCat();
+      valid && TRAMPOFELINES.spawn();
       valid && zzfxP(sfx.meow);
       !valid && zzfxP(sfx.badPlacement);
 
@@ -153,16 +143,16 @@ export default class TrampofelineManager {
     }
   }
 
-  static update() {
-    TrampofelineManager.trampolines.forEach(l => {
+  update() {
+    this.list.forEach(l => {
       l.update();
       l.draw();
     });
 
-    TrampofelineManager.drawGuides();
+    this.drawGuides();
   }
 
-  static spawnCat() {
+  spawn() {
     if (!p1 || !p2 || p1.equals(p2)) return;
 
     const cat = new Trampofeline(p2, p1, 10, {
@@ -171,17 +161,18 @@ export default class TrampofelineManager {
       jointsAttraction: 220,
     });
 
-    cat.id = crypto.randomUUID();
-    this.entities.set(cat.id, cat);
+    this.add(cat);
 
-    Game.yarnballs.forEach(b => cat.catch(b));
+    Game.tubes.forEach(t => t.list.forEach(b => cat.catch(b)));
+
+    return cat;
   }
 
-  static testPlacement(): boolean {
+  testPlacement(): boolean {
     valid =
       distance >= MIN_CAT_LENGTH &&
-      TrampofelineManager.entities.size < MAX_CATS &&
-      TrampofelineManager.trampolines.filter(({ joints, dead }) => {
+      this.count < MAX_CATS &&
+      this.list.filter(({ joints, dead }) => {
         if (dead) return false;
 
         p3 = joints.at(0).position;
@@ -193,7 +184,7 @@ export default class TrampofelineManager {
     return valid;
   }
 
-  static drawGuides() {
+  drawGuides() {
     const { time } = Clock;
     Stage.setActiveLayer("ui");
     Stage.clearLayer();
@@ -253,7 +244,7 @@ export class Trampofeline extends ElasticLine {
 
     new Tween(this, "transparency", {
       finalValue: 0,
-      onComplete: () => TrampofelineManager.entities.delete(this.id),
+      onComplete: () => TRAMPOFELINES.delete(this),
     });
   }
 

@@ -1,27 +1,28 @@
+import { Alert } from "../engine/Alert";
+import palette from "../engine/color";
+import { EntityManager } from "../engine/EntityManager";
 import Game, {
   BALL_MASS,
   BALL_RADIUS,
-  game,
+  BASKETS,
   State as GameState,
+  MAX_BALLS,
+  SPAWN_RATE,
+  State,
+  TOTAL_LIVES,
+  TRAMPOFELINES,
 } from "../engine/GameState";
-import { makeGradient } from "../utils/CanvasUtils";
-import { downwardFilter } from "../engine/Collisions2D";
-import { CollisionManager } from "../engine/Collisions2D";
-import palette, { HSLColor } from "../engine/color";
-import { lerp, pickRandom } from "../utils/MathUtils";
-import { Point } from "../utils/Point";
-import { State } from "../engine/Physics2D";
 import { Ripple } from "../engine/Ripple";
-import { MyCanvas, Stage } from "../engine/Stage";
-import { Clock } from "../utils/TimeUtils";
 import sfx, { zzfxP } from "../engine/sfx";
-import TrampofelineManager from "./Trampofeline";
-import { YarnBall } from "./YarnBall";
+import { Stage } from "../engine/Stage";
 import { drawLives } from "../engine/ui";
-import { Firework } from "../engine/Firework";
-import { BasketManager } from "./Basket";
+import { makeGradient } from "../utils/CanvasUtils";
+import { clamp, lerp, pickRandom } from "../utils/MathUtils";
+import { Point } from "../utils/Point";
+import { Clock } from "../utils/TimeUtils";
+import { YarnBall } from "./YarnBall";
 
-export class Tube {
+export class Tube extends EntityManager<YarnBall> {
   public position: Point;
   public size: Point;
   public direction = 0;
@@ -31,22 +32,30 @@ export class Tube {
     position: Point,
     { size = new Point(100, 100), cb = (b: YarnBall) => {} } = {}
   ) {
+    super();
+
     this.position = position;
     this.size = size;
 
     Stage.newOffscreenLayer("tube", size.x * 1.5, size.y);
     Tube.drawTube(this.size.x, this.size.y);
 
-    Clock.every(20, () => {
-      if (Game.state === GameState.Playing && Game.yarnballs.size < 2) {
+    Clock.every(SPAWN_RATE, () => {
+      if (Game.state === GameState.Playing && this.count < MAX_BALLS) {
         zzfxP(sfx.spawn);
-        const ball = this.spawnYarnBall();
+        const ball = this.spawn();
         cb(ball);
       }
     });
   }
 
-  spawnYarnBall() {
+  public clearEntities(): void {
+    this.list.forEach(b => b.die());
+
+    super.clearEntities();
+  }
+
+  spawn() {
     let {
       size: { x: sx },
     } = this;
@@ -84,14 +93,49 @@ export class Tube {
       });
     }
 
-    Game.yarnballs.set(b.id, b);
-    TrampofelineManager.trampolines.forEach(cat => cat.catch(b));
-    BasketManager.baskets.forEach(bkt => bkt.catch(b));
+    this.entities.set(b.id, b);
+    TRAMPOFELINES.list.forEach(cat => cat.catch(b));
+    BASKETS.list.forEach(bkt => bkt.catch(b));
 
     return b;
   }
 
-  draw() {
+  public update(): void {
+    const { cw, ch } = Stage;
+
+    this.list.forEach((b, i) => {
+      const threadEndPos = b.thread.at(-1).position;
+      if (threadEndPos.y > ch && Game.state === State.Playing) {
+        zzfxP(sfx.drop);
+        drawLives();
+        b.die();
+
+        Game.lives = Math.max(0, Game.lives - 1);
+        Game.lives <= 0 && Game.gameOver();
+
+        new Alert(
+          new Point(clamp(70, cw - 70, b.position.x), ch),
+          `missed ${TOTAL_LIVES - Game.lives}`,
+          {
+            startRadius: 0,
+            finalRadius: 50,
+            finalTransparency: 1,
+          }
+        );
+
+        return;
+      }
+
+      const threshold = b.radius * 0.5;
+      if (b.position.x - threshold < 0 || b.position.x + threshold > cw) {
+        b.velocity.x *= -1.1;
+      }
+
+      b.update();
+      b.draw();
+    });
+
+    // draw
     const { ctx } = Stage;
 
     ctx.save();

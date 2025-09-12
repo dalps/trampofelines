@@ -9,8 +9,7 @@ import { BasketManager } from "./entities/Basket";
 
 function init() {
   Stage.init();
-  TrampofelineManager.init();
-  BasketManager.init();
+  Game.init();
   City.init();
 
   City.draw();

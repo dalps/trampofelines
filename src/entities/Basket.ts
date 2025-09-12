@@ -5,9 +5,10 @@ import {
   SegmentCollider,
 } from "../engine/Collisions2D";
 import palette from "../engine/color";
+import { EntityManager } from "../engine/EntityManager";
 import { Firework } from "../engine/Firework";
 import { drawText } from "../engine/font";
-import Game, { MAX_BASKETS, State } from "../engine/GameState";
+import Game, { BASKETS, MAX_BASKETS, State } from "../engine/GameState";
 import { DynamicBody } from "../engine/Physics2D";
 import sfx from "../engine/sfx";
 import { Stage } from "../engine/Stage";
@@ -18,43 +19,37 @@ import { popsicle, star } from "../utils/CanvasUtils";
 import { DEG2RAD, distribute, pickRandom } from "../utils/MathUtils";
 import { Point } from "../utils/Point";
 import { Clock } from "../utils/TimeUtils";
-import { Entity } from "./Entity";
 import { YarnBall } from "./YarnBall";
 
-export class BasketManager {
-  private static entities = new Map<string, Basket>();
-
-  public static get baskets() {
-    return [...this.entities.values()];
-  }
-
-  static init() {}
-
-  static spawnBasket() {
+export class BasketManager extends EntityManager<Basket> {
+  spawn() {
     const spawnPosOptionsX = distribute(100, Stage.cw - 100, 4);
     const spawnPosOptionsY = distribute(280, Stage.ch - 100, 4);
     const posY = pickRandom(
-      spawnPosOptionsY.filter(y => !this.baskets.find(b => b.position.y === y))
+      spawnPosOptionsY.filter(y => !this.list.find(b => b.position.y === y))
     );
     const posX = pickRandom(spawnPosOptionsX);
     const wanted = Math.floor(1 + Math.random() * 5);
     const basket = new Basket(new Point(posX, posY), wanted);
     basket.drawTexture();
-    this.entities.set(basket.id, basket);
 
-    Game.yarnballs.forEach(b => basket.catch(b));
+    this.add(basket);
+
+    Game.tubes.forEach(t => t.list.forEach(b => basket.catch(b)));
+
+    return basket;
   }
 
-  static update() {
-    if (this.entities.size < MAX_BASKETS) {
-      this.spawnBasket();
+  update() {
+    if (this.count < MAX_BASKETS) {
+      this.spawn();
     }
 
-    this.baskets.forEach(b => b.update());
+    this.list.forEach(b => b.update());
   }
 }
 
-export class Basket extends DynamicBody implements Entity {
+export class Basket extends DynamicBody {
   id: string;
   filledFlag = false;
   content: YarnBall[] = [];
@@ -146,7 +141,7 @@ export class Basket extends DynamicBody implements Entity {
         startValue: this.position.y,
         finalValue: -200,
         speed: 1,
-        onComplete: () => BasketManager.entities.delete(this.id),
+        onComplete: () => BASKETS.delete(this),
       });
 
       drawLives();
