@@ -8,8 +8,8 @@ import { Clock } from "../utils/TimeUtils";
 
 export class Title2 {
   static vignette: number = 0;
-  static trampoPos: Point = new Point(-5000, 300);
-  static felinesPos: Point = new Point(5000, 300);
+  static trampoPos: Point = new Point(-1000, 300);
+  static felinesPos: Point = new Point(1000, 300);
   static skew: number;
 
   static init() {}
@@ -38,9 +38,11 @@ export class Title2 {
     });
     new Tween(this.trampoPos, "x", {
       finalValue: cw * 0.5,
+      epsilon: 1,
     });
     new Tween(this.felinesPos, "x", {
       finalValue: cw * 0.5,
+      epsilon: 1,
     });
     new Tween(this, "skew", {
       startValue: 50,
@@ -56,27 +58,22 @@ export class Title2 {
     });
     new Tween(this.trampoPos, "x", {
       finalValue: cw * 2,
+      epsilon: 1,
     });
     new Tween(this.felinesPos, "x", {
       finalValue: -cw * 2,
+      epsilon: 1,
     });
   }
 
   static draw() {
     Stage.setActiveLayer("game");
-
     const { ctx, cw, ch } = Stage;
     const { time } = Clock;
     const { white, blue0, blue1, blue2, blue3 } = palette;
 
     ctx.fillStyle = palette.black.toAlpha(this.vignette);
     ctx.fillRect(0, 0, cw, ch);
-
-    // rotating stars
-    {
-      const c1 = new Point(cw * 0.5 - 150, ch * 0.35);
-      const c2 = new Point(cw * 0.5 + 150, ch * 0.45);
-    }
 
     ctx.fillStyle = palette.white;
     ctx.strokeStyle = palette.blue2;

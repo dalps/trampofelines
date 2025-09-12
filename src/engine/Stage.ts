@@ -148,7 +148,6 @@ export class Stage {
 
     switch (Game.state) {
       case State.Title:
-        Title2.draw();
         break;
       case State.Playing:
         drawLives();

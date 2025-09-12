@@ -123,6 +123,7 @@ export default class Game {
         this.lives = TOTAL_LIVES;
         YARNBALLS.clearEntities();
         TRAMPOFELINES.clearEntities();
+        BASKETS.outro();
         TRAMPOFELINES.enableUI();
 
         gameoverElements.style.display = "none";
@@ -140,12 +141,15 @@ export default class Game {
       case State.GameOver:
       case State.Title:
         this.lives = TOTAL_LIVES;
+
         YARNBALLS.clearEntities();
         TRAMPOFELINES.clearEntities();
         TRAMPOFELINES.disableUI();
+        BASKETS.outro();
         gameoverElements.style.display = "none";
         titleElements.style.display = "block";
 
+        Stage.clearLayer("info");
         City.draw();
         Title2.intro();
         Title2.draw();

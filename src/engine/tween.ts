@@ -43,6 +43,7 @@ export class Tween<T> {
   public speed: number;
   private onUpdate?: Function;
   private onComplete?: Function;
+  private epsilon: number;
 
   constructor(
     public obj: T,
@@ -53,6 +54,7 @@ export class Tween<T> {
       speed = 7,
       onUpdate = obj.draw?.bind(obj) ?? undefined,
       onComplete = undefined,
+      epsilon = EPSILON,
     } = {}
   ) {
     this.startValue = startValue ?? this.obj[property];
@@ -61,9 +63,9 @@ export class Tween<T> {
     this.speed = speed;
     this.onUpdate = onUpdate;
     this.onComplete = onComplete;
-    TweenManager.add(this);
+    this.epsilon = epsilon;
 
-    console.log(this.id)
+    TweenManager.add(this);
   }
 
   update() {
@@ -78,7 +80,7 @@ export class Tween<T> {
 
     this.onUpdate && this.onUpdate();
 
-    if (Math.abs(this.value - this.targetValue) < EPSILON) {
+    if (Math.abs(this.value - this.targetValue) < this.epsilon) {
       this.obj[this.property] = this.targetValue;
       this.onComplete && this.onComplete();
       TweenManager.delete(this);

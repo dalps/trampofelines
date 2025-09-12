@@ -25,8 +25,14 @@ import { DEG2RAD, distribute, pickRandom } from "../utils/MathUtils";
 import { Point } from "../utils/Point";
 import { Clock } from "../utils/TimeUtils";
 import { YarnBall } from "./YarnBall";
+import { State } from "../engine/GameState";
 
 export class BasketManager extends EntityManager<Basket> {
+
+  outro() {
+    this.list.forEach(b => b.outro());
+  }
+
   spawn() {
     const spawnPosOptionsX = distribute(100, Stage.cw - 100, 4);
     const spawnPosOptionsY = distribute(280, Stage.ch - 100, 4);
@@ -46,7 +52,7 @@ export class BasketManager extends EntityManager<Basket> {
   }
 
   update() {
-    if (this.count < MAX_BASKETS) {
+    if (Game.state === State.Playing && this.count < MAX_BASKETS) {
       this.spawn();
     }
 
@@ -76,11 +82,22 @@ export class Basket extends DynamicBody {
 
     new Tween(this.position, "x", {
       finalValue: pos.x,
+      epsilon: 1,
     });
   }
 
   get filled(): boolean {
     return this.content.length >= this.wanted;
+  }
+
+  outro() {
+    new Tween(this.position, "y", {
+      startValue: this.position.y,
+      finalValue: -200,
+      speed: 1,
+      epsilon: 1,
+      onComplete: () => BASKETS.delete(this),
+    });
   }
 
   catch(b: YarnBall) {
@@ -142,12 +159,7 @@ export class Basket extends DynamicBody {
         finalRadius: 50,
         finalTransparency: 1,
       });
-      new Tween(this.position, "y", {
-        startValue: this.position.y,
-        finalValue: -200,
-        speed: 1,
-        onComplete: () => BASKETS.delete(this),
-      });
+      this.outro();
 
       drawLives();
     }
