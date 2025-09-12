@@ -2,11 +2,8 @@ import { circle, popsicle } from "../utils/CanvasUtils";
 import * as Math2D from "../utils/MathUtils";
 import { Point } from "../utils/Point";
 import PALETTE from "./color";
-import { drawText } from "./font";
 import { ContactForce, State, type DynamicBody } from "./Physics2D";
 import { Stage } from "./Stage";
-
-const debugColor = PALETTE.chartreuse;
 
 interface CollisionOptions {
   sensor?: boolean;
@@ -139,7 +136,6 @@ enum ColliderType {
 export abstract class Collider {
   public abstract center: Point;
   constructor(public type: ColliderType) {}
-  abstract draw(): void;
   abstract checkContact(c2: Collider): boolean;
 }
 
@@ -160,8 +156,7 @@ export class CircleCollider extends Collider {
   draw() {
     const { ctx } = Stage;
     ctx.lineWidth = 1;
-    ctx.strokeStyle = debugColor;
-
+    ctx.strokeStyle = PALETTE.chartreuse;
     circle(this.center, this.radius);
     ctx.stroke();
   }
@@ -194,18 +189,13 @@ export class SegmentCollider extends Collider {
     );
   }
 
-  checkContact(that: Collider) {
-    switch (that.type) {
-      case ColliderType.Circle:
-        return circleSegment(that as CircleCollider, this);
-      case ColliderType.Segment:
-        return segSeg(this, that as SegmentCollider);
-    }
+  checkContact(that: CircleCollider) {
+    return circleSegment(that, this);
   }
 
   draw() {
-    popsicle(this.center, this.a, debugColor);
-    popsicle(this.center, this.b, debugColor);
+    popsicle(this.center, this.a, PALETTE.chartreuse);
+    popsicle(this.center, this.b, PALETTE.chartreuse);
   }
 }
 
