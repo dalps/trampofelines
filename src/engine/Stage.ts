@@ -157,6 +157,7 @@ export class Stage {
         drawLives();
         break;
       case State.GameOver:
+        City.draw();
         drawGameoverUI();
         break;
     }

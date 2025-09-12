@@ -5,7 +5,7 @@ import {
 } from "../engine/Collisions2D";
 import palette, { hsl, setTransparency } from "../engine/color";
 import { ElasticLine } from "../engine/ElasticLine";
-import Game from "../engine/GameState";
+import Game, { MAX_CATS, MIN_CAT_LENGTH } from "../engine/GameState";
 import { GRAVITY } from "../engine/Physics2D";
 import { Ripple } from "../engine/Ripple";
 import sfx from "../engine/sfx";
@@ -32,8 +32,6 @@ let mouseSpeed = 0;
 let guideColor = hsl(0, 100, 0); // hsla(0, 100%, 0%, 1.00)
 
 const { nightBlue: coatColor, blueGray: detailColor } = palette;
-const MAX_CATS = 3;
-const MIN_LENGTH = 100;
 
 export default class TrampofelineManager {
   private static entities: Map<string, Trampofeline> = new Map();
@@ -162,26 +160,17 @@ export default class TrampofelineManager {
       damping: 2,
       mass: 2,
       jointsAttraction: 220,
-      jointsRepulsion: 50,
     });
 
     cat.id = crypto.randomUUID();
     this.entities.set(cat.id, cat);
 
-    cat.joints.forEach(j => {
-      Game.settings.gravity && j.addForce(GRAVITY);
-
-      j.attachCollider(
-        new CircleCollider(j.position, Game.settings.colliderRadius)
-      );
-
-      Game.yarnballs.forEach(b => cat.catch(b));
-    });
+    Game.yarnballs.forEach(b => cat.catch(b));
   }
 
   static testPlacement(): boolean {
     valid =
-      distance >= MIN_LENGTH &&
+      distance >= MIN_CAT_LENGTH &&
       TrampofelineManager.entities.size < MAX_CATS &&
       TrampofelineManager.trampolines.filter(({ joints, dead }) => {
         if (dead) return false;

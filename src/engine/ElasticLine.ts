@@ -1,9 +1,11 @@
 import * as Math2D from "../utils/MathUtils";
 import { Point } from "../utils/Point";
-import { DynamicBody, Pull } from "./Physics2D";
+import { CircleCollider } from "./Collisions2D";
+import { BALL_RADIUS } from "./GameState";
+import { DynamicBody, GRAVITY, Pull } from "./Physics2D";
 
 class Joint extends DynamicBody {
-  public neighbors: Joint[] = [];
+  // public neighbors: Joint[] = [];
 
   constructor(
     position: Point,
@@ -11,15 +13,15 @@ class Joint extends DynamicBody {
     damping = 1,
     public attraction = 100
   ) {
-    super(position, { name: "Joint", mass, friction: damping });
+    super(position, { name: "J", mass, friction: damping });
   }
 
-  addNeighbor(t: Joint) {
-    this.neighbors.push(t);
-    t.neighbors.push(this);
+  addNeighbor(that: Joint) {
+    // this.neighbors.push(t);
+    // t.neighbors.push(this);
 
-    this.addForce(new Pull(this.position, t.position, this.attraction));
-    t.addForce(new Pull(t.position, this.position, this.attraction));
+    this.addForce(new Pull(this.position, that.position, this.attraction));
+    that.addForce(new Pull(that.position, this.position, this.attraction));
   }
 }
 
@@ -54,6 +56,9 @@ export class ElasticLine {
 
       prevJoint && joint.addNeighbor(prevJoint);
       this.joints.push(joint);
+
+      joint.addForce(GRAVITY);
+      joint.attachCollider(new CircleCollider(joint.position, BALL_RADIUS));
 
       prevJoint = joint;
     }

@@ -1,16 +1,16 @@
-import { Basket, BasketManager } from "../entities/Basket";
+import { BasketManager } from "../entities/Basket";
 import TrampofelineManager from "../entities/Trampofeline";
 import type { Tube } from "../entities/Tube";
 import { YarnBall } from "../entities/YarnBall";
 import { City } from "../scenes/City";
-import sfx, { zzfxP } from "./sfx";
 import { Title2 } from "../scenes/Title2";
+import { clamp } from "../utils/MathUtils";
+import { Point } from "../utils/Point";
+import { Alert } from "./Alert";
 import { CollisionManager } from "./Collisions2D";
+import sfx, { zzfxP } from "./sfx";
 import { gameoverElements, Stage, titleElements } from "./Stage";
 import { drawGameoverUI, drawLives } from "./ui";
-import { Alert } from "./Alert";
-import { Point } from "../utils/Point";
-import { clamp } from "../utils/MathUtils";
 
 export enum State {
   Title,
@@ -20,6 +20,11 @@ export enum State {
 
 export const TOTAL_LIVES = 3;
 export const MAX_BASKETS = 2;
+export const MAX_CATS = 3;
+export const MIN_CAT_LENGTH = 100;
+export const BALL_RADIUS = 20;
+export const BALL_MASS = 3;
+export const LINE_MASS = 2;
 
 /**
  * Functions to manage the game state
@@ -30,26 +35,18 @@ export default class Game {
   public static tubes: Tube[] = [];
   public static lives = TOTAL_LIVES;
   public static stock = 0;
-  public static settings = {
-    lineMass: 2,
-    ballMass: 3,
-    ballRadius: 20,
-    colliderRadius: 20,
-    volume: 0,
-  };
+  public static settings = {};
 
   static update() {
+    Stage.setActiveLayer("game");
+    Stage.clearLayer();
+
     switch (this.state) {
       case State.Title:
-        Stage.setActiveLayer("game");
-        Stage.clearLayer();
         Title2.draw();
         break;
       case State.GameOver:
       case State.Playing:
-        Stage.setActiveLayer("game");
-        Stage.clearLayer();
-
         const { cw, ch } = Stage;
 
         Game.tubes.forEach(tube => tube.draw());

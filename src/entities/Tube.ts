@@ -1,4 +1,9 @@
-import Game, { game, State as GameState } from "../engine/GameState";
+import Game, {
+  BALL_MASS,
+  BALL_RADIUS,
+  game,
+  State as GameState,
+} from "../engine/GameState";
 import { makeGradient } from "../utils/CanvasUtils";
 import { downwardFilter } from "../engine/Collisions2D";
 import { CollisionManager } from "../engine/Collisions2D";
@@ -65,8 +70,8 @@ export class Tube {
     const b = new YarnBall(
       startPos,
       new Point(1, 0).scale(this.shootVelocity).rotate(this.direction),
-      Game.settings.ballMass,
-      Game.settings.ballRadius,
+      BALL_MASS,
+      BALL_RADIUS,
       color
     );
 

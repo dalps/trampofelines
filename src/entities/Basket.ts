@@ -7,20 +7,19 @@ import {
 import palette from "../engine/color";
 import { Firework } from "../engine/Firework";
 import { drawText } from "../engine/font";
+import Game, { MAX_BASKETS, State } from "../engine/GameState";
 import { DynamicBody } from "../engine/Physics2D";
+import sfx from "../engine/sfx";
 import { Stage } from "../engine/Stage";
 import { Tween } from "../engine/tween";
-import { popsicle } from "../utils/CanvasUtils";
-import { DEG2RAD, distribute, lerp, pickRandom } from "../utils/MathUtils";
-import { Point } from "../utils/Point";
-import { Clock } from "../utils/TimeUtils";
-import { YarnBall } from "./YarnBall";
-import { Entity } from "./Entity";
-import Game, { MAX_BASKETS, State } from "../engine/GameState";
 import { drawLives } from "../engine/ui";
 import { zzfxP } from "../engine/zzfx";
-import { Ripple } from "../engine/Ripple";
-import sfx from "../engine/sfx";
+import { popsicle, star } from "../utils/CanvasUtils";
+import { DEG2RAD, distribute, pickRandom } from "../utils/MathUtils";
+import { Point } from "../utils/Point";
+import { Clock } from "../utils/TimeUtils";
+import { Entity } from "./Entity";
+import { YarnBall } from "./YarnBall";
 
 export class BasketManager {
   private static entities = new Map<string, Basket>();
@@ -34,7 +33,6 @@ export class BasketManager {
   static spawnBasket() {
     const spawnPosOptionsX = distribute(100, Stage.cw - 100, 4);
     const spawnPosOptionsY = distribute(280, Stage.ch - 100, 4);
-    console.log(Stage.cw, spawnPosOptionsX);
     const posY = pickRandom(
       spawnPosOptionsY.filter(y => !this.baskets.find(b => b.position.y === y))
     );
@@ -58,13 +56,14 @@ export class BasketManager {
 
 export class Basket extends DynamicBody implements Entity {
   id: string;
+  filledFlag = false;
   content: YarnBall[] = [];
-  filled = false;
 
   constructor(pos: Point, public wanted = 5) {
-    super(pos);
+    const offScreenX = pos.x <= Stage.cw * 0.5 ? -300 : Stage.cw + 300;
+    super(new Point(offScreenX, pos.y));
 
-    this.name = "bkt";
+    this.name = "BK";
     this.id = crypto.randomUUID();
 
     this.toggleX();
@@ -75,11 +74,13 @@ export class Basket extends DynamicBody implements Entity {
 
     Stage.newOffscreenLayer(this.id, 200, 200);
 
-    console.log(pos.x);
     new Tween(this.position, "x", {
-      startValue: pos.x <= Stage.cw * 0.5 ? -300 : Stage.cw + 300,
       finalValue: pos.x,
     });
+  }
+
+  get filled(): boolean {
+    return this.content.length >= this.wanted;
   }
 
   catch(b: YarnBall) {
@@ -123,7 +124,12 @@ export class Basket extends DynamicBody implements Entity {
     c.center.rotate(da);
 
     // Is it filled up?
-    if (!this.filled && this.content.length >= this.wanted) {
+    if (!this.filledFlag && this.filled) {
+      this.filledFlag = true;
+      Game.stock += 1;
+      CollisionManager.unregisterBody(this);
+
+      // gfx
       new Firework(this.position, {
         startRadius: 5,
         finalRadius: 100,
@@ -142,8 +148,7 @@ export class Basket extends DynamicBody implements Entity {
         speed: 1,
         onComplete: () => BasketManager.entities.delete(this.id),
       });
-      this.filled = true;
-      Game.stock += 1;
+
       drawLives();
     }
 
@@ -183,6 +188,7 @@ export class Basket extends DynamicBody implements Entity {
     ctx.translate(100, 100);
     ctx.lineWidth = 2;
     ctx.lineJoin = "round";
+
     const basket = new Path2D(
       `m -69,-12.5 c -37.6,75.2 175.6,75.2 137.9,0 0,16.5 -137.9,16.3 -137.9,0 z`
     );
@@ -205,7 +211,7 @@ Z`);
     ctx.fillStyle = palette.black.toAlpha(0.7);
     ctx.fill(empty);
 
-    if (this.content.length === 5) {
+    if (this.filled) {
       popsicle(new Point(45, 0), new Point(60, -50), palette.gray);
       popsicle(new Point(40, 0), new Point(45, -60), palette.gray);
     }
@@ -234,10 +240,16 @@ Z`);
     ctx.fill(handle);
     ctx.stroke(handle);
 
-    drawText(`${Math.max(0, this.wanted - this.content.length)}`, {
-      pos: new Point(0, 20),
-      fontSize: 36,
-    });
+    const needed = Math.max(0, this.wanted - this.content.length);
+    const pos = new Point(0, 20);
+    if (needed > 0) {
+      drawText(`${needed}`, {
+        pos,
+        fontSize: 36,
+      });
+    } else {
+      star(pos);
+    }
 
     ctx.restore();
   }
