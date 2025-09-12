@@ -1,5 +1,6 @@
 import { damp } from "../utils/MathUtils";
 import { Clock } from "../utils/TimeUtils";
+import { EntityManager } from "./EntityManager";
 
 const EPSILON = 0.001;
 
@@ -8,34 +9,26 @@ interface Drawable {
 }
 
 export class TweenManager {
-  private static activeTweens: Set<WeakRef<any>> = new Set();
+  private static activeTweens: Map<string, Tween<any>> = new Map();
 
-  static add(tween) {
+  static add(t: Tween<any>) {
     // Cancel any existing tweens running on the same object and property
-    Array.from(this.activeTweens.values()).forEach((tref) => {
-      const otherTween = tref.deref() as Tween<any>;
-      if (
-        otherTween &&
-        otherTween.obj === tween.obj &&
-        otherTween.property === tween.property
-      ) {
-        this.activeTweens.delete(tref);
+    [...this.activeTweens.values()].forEach(otherTween => {
+      if (otherTween.obj === t.obj && otherTween.property === t.property) {
+        this.activeTweens.delete(otherTween.id);
       }
     });
 
-    const ref = new WeakRef(tween);
-    this.activeTweens.add(ref);
-    return ref;
+    t.id = crypto.randomUUID();
+    this.activeTweens.set(t.id, t);
   }
 
-  static delete(ref: WeakRef<any>) {
-    this.activeTweens.delete(ref);
+  static delete(t: Tween<any>) {
+    this.activeTweens.delete(t.id);
   }
 
   static update() {
-    for (let ref of this.activeTweens.values()) {
-      ref.deref()?.update();
-    }
+    this.activeTweens.forEach(t => t.update());
   }
 }
 
@@ -43,11 +36,11 @@ export class TweenManager {
  * A tween over a one-dimensional property of an object.
  */
 export class Tween<T> {
+  public id: string;
   private value: number;
   private startValue: number;
   private targetValue: number;
   public speed: number;
-  private ref: WeakRef<this>;
   private onUpdate?: Function;
   private onComplete?: Function;
 
@@ -66,9 +59,11 @@ export class Tween<T> {
     this.value = this.startValue;
     this.targetValue = finalValue;
     this.speed = speed;
-    this.ref = TweenManager.add(this);
     this.onUpdate = onUpdate;
     this.onComplete = onComplete;
+    TweenManager.add(this);
+
+    console.log(this.id)
   }
 
   update() {
@@ -86,7 +81,7 @@ export class Tween<T> {
     if (Math.abs(this.value - this.targetValue) < EPSILON) {
       this.obj[this.property] = this.targetValue;
       this.onComplete && this.onComplete();
-      TweenManager.delete(this.ref);
+      TweenManager.delete(this);
       return;
     }
   }
