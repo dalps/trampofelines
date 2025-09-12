@@ -121,6 +121,7 @@ export default class Game {
       case State.Title:
       case State.GameOver:
         this.lives = TOTAL_LIVES;
+        this.stock = 0;
         YARNBALLS.clearEntities();
         TRAMPOFELINES.clearEntities();
         BASKETS.outro();
