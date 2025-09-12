@@ -55,6 +55,7 @@ export function drawLives() {
 
 export function drawGameoverUI() {
   Stage.setActiveLayer("info");
+  // no clear, draw on top of the old UI
   const { ctx, cw, ch } = Stage;
 
   ctx.fillStyle = palette.black.toAlpha(0.5);
@@ -62,14 +63,14 @@ export function drawGameoverUI() {
 
   ctx.lineWidth = 3;
   drawText(`game over!`, {
-    pos: new Point(cw * 0.5, ch * 0.5 - 180),
+    pos: new Point(cw * 0.5, ch * 0.5 - 80),
     fill: palette.blue3,
     stroke: palette.blue0,
     fontSize: 80,
   });
 
   drawText(`you stocked ${Game.stock} basket${Game.stock === 1 ? "" : "s"}`, {
-    pos: new Point(cw * 0.5, ch * 0.5 - 100),
-    fontSize: 36,
+    pos: new Point(cw * 0.5, ch * 0.5),
+    fontSize: 28,
   });
 }

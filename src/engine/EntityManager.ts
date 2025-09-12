@@ -21,12 +21,13 @@ export abstract class EntityManager<T extends Entity> {
     this.entities.delete(t.id);
   }
 
-  public add(t: T) {
+  protected add(t: T) {
     t.id ||= crypto.randomUUID();
     this.entities.set(t.id, t);
   }
 
-  public abstract spawn(): T;
+  /** Dispenses a new entity */
+  public abstract spawn(...args: any): T;
 
   public abstract update(): void;
 }

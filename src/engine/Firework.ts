@@ -22,22 +22,22 @@ export class Firework extends Ripple {
   constructor(
     public center: Point,
     {
-      ctx = Stage.activeLayer.ctx,
       color2 = PALETTE.blue3,
       points = 5,
       ...options
     }: FireworkParams & RippleParams = {}
   ) {
     super(center, options);
-    this.ctx = ctx;
     this.color2 = color2.clone();
     this.points = points;
   }
 
   override draw() {
+    Stage.setActiveLayer("game");
+    const { ctx } = Stage;
     const { time } = Clock;
 
-    this.ctx.lineWidth = 2;
+    ctx.lineWidth = 2;
 
     star(this.center, {
       outerRadius: this.radius,
@@ -47,7 +47,7 @@ export class Firework extends Ripple {
       cb: (p: Point, j: number) => {
         star(p, {
           angle: 0.3 * time,
-          ctx: this.ctx,
+          ctx,
           fill: this.color.setAlpha(this.alpha),
           stroke: this.color2.setAlpha(this.alpha),
         });

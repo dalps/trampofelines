@@ -8,7 +8,12 @@ import palette from "../engine/color";
 import { EntityManager } from "../engine/EntityManager";
 import { Firework } from "../engine/Firework";
 import { drawText } from "../engine/font";
-import Game, { BASKETS, MAX_BASKETS, State } from "../engine/GameState";
+import Game, {
+  BASKETS,
+  MAX_BASKETS,
+  State,
+  YARNBALLS,
+} from "../engine/GameState";
 import { DynamicBody } from "../engine/Physics2D";
 import sfx from "../engine/sfx";
 import { Stage } from "../engine/Stage";
@@ -35,7 +40,7 @@ export class BasketManager extends EntityManager<Basket> {
 
     this.add(basket);
 
-    Game.tubes.forEach(t => t.list.forEach(b => basket.catch(b)));
+    YARNBALLS.list.forEach(b => basket.catch(b));
 
     return basket;
   }

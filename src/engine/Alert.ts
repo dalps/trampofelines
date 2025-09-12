@@ -17,6 +17,7 @@ export class Alert extends Ripple {
   }
 
   override draw() {
+    Stage.setActiveLayer("game");
     drawText(this.text, {
       fontSize: this.fontSize,
       pos: this.center.addY(-this.radius),

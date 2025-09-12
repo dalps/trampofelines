@@ -6,6 +6,7 @@ import Game, {
   MAX_CATS,
   MIN_CAT_LENGTH,
   TRAMPOFELINES,
+  YARNBALLS,
 } from "../engine/GameState";
 import { Ripple } from "../engine/Ripple";
 import sfx from "../engine/sfx";
@@ -163,7 +164,7 @@ export default class TrampofelineManager extends EntityManager<Trampofeline> {
 
     this.add(cat);
 
-    Game.tubes.forEach(t => t.list.forEach(b => cat.catch(b)));
+    YARNBALLS.list.forEach(b => cat.catch(b));
 
     return cat;
   }

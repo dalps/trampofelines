@@ -1,7 +1,7 @@
 import { BasketManager } from "../entities/Basket";
 import TrampofelineManager from "../entities/Trampofeline";
 import type { Tube } from "../entities/Tube";
-import { YarnBall } from "../entities/YarnBall";
+import { YarnBall, YarnBallManager } from "../entities/YarnBall";
 import { City } from "../scenes/City";
 import { Title2 } from "../scenes/Title2";
 import { clamp } from "../utils/MathUtils";
@@ -29,6 +29,7 @@ export const BALL_MASS = 3;
 export const LINE_MASS = 2;
 export let TRAMPOFELINES: TrampofelineManager;
 export let BASKETS: BasketManager;
+export let YARNBALLS: YarnBallManager;
 
 /**
  * Functions to manage the game state
@@ -43,6 +44,7 @@ export default class Game {
   static init() {
     TRAMPOFELINES = new TrampofelineManager();
     BASKETS = new BasketManager();
+    YARNBALLS = new YarnBallManager();
   }
 
   static update() {
@@ -52,9 +54,10 @@ export default class Game {
     switch (this.state) {
       case State.Title:
         Title2.draw();
-        break;
       case State.GameOver:
       case State.Playing:
+        const { cw, ch } = Stage;
+
         CollisionManager.update();
 
         Game.tubes.forEach(tube => {
@@ -62,6 +65,38 @@ export default class Game {
         });
         BASKETS.update();
         TRAMPOFELINES.update();
+
+        YARNBALLS.list.forEach(b => {
+          const threadEndPos = b.thread.at(-1).position;
+
+          if (threadEndPos.y > ch) {
+            if (Game.state === State.Playing) {
+              zzfxP(sfx.drop);
+              b.die();
+
+              Game.lives = Math.max(0, Game.lives - 1);
+              drawLives();
+              Game.lives <= 0 && Game.gameOver();
+
+              new Alert(
+                new Point(clamp(70, cw - 70, b.position.x), ch),
+                `missed ${TOTAL_LIVES - Game.lives}`,
+                {
+                  startRadius: 0,
+                  finalRadius: 50,
+                  finalTransparency: 1,
+                }
+              );
+            }
+          }
+
+          const threshold = b.radius * 0.5;
+          if (b.position.x - threshold < 0 || b.position.x + threshold > cw) {
+            b.velocity.x *= -1.1;
+          }
+
+          b.update();
+        });
 
         break;
     }
@@ -86,7 +121,7 @@ export default class Game {
       case State.Title:
       case State.GameOver:
         this.lives = TOTAL_LIVES;
-        this.tubes.forEach(t => t.clearEntities());
+        YARNBALLS.clearEntities();
         TRAMPOFELINES.clearEntities();
         TRAMPOFELINES.enableUI();
 
@@ -105,7 +140,7 @@ export default class Game {
       case State.GameOver:
       case State.Title:
         this.lives = TOTAL_LIVES;
-        this.tubes.forEach(t => t.clearEntities());
+        YARNBALLS.clearEntities();
         TRAMPOFELINES.clearEntities();
         TRAMPOFELINES.disableUI();
         gameoverElements.style.display = "none";
@@ -116,7 +151,6 @@ export default class Game {
         Title2.draw();
 
         this.state = State.Title;
-      // No transition
     }
   }
 }

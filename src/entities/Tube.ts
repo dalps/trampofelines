@@ -1,28 +1,24 @@
-import { Alert } from "../engine/Alert";
 import palette from "../engine/color";
-import { EntityManager } from "../engine/EntityManager";
 import Game, {
   BALL_MASS,
   BALL_RADIUS,
   BASKETS,
   State as GameState,
+  SPAWN_RATE as LAUNCH_RATE,
   MAX_BALLS,
-  SPAWN_RATE,
-  State,
-  TOTAL_LIVES,
   TRAMPOFELINES,
+  YARNBALLS
 } from "../engine/GameState";
 import { Ripple } from "../engine/Ripple";
 import sfx, { zzfxP } from "../engine/sfx";
 import { Stage } from "../engine/Stage";
-import { drawLives } from "../engine/ui";
 import { makeGradient } from "../utils/CanvasUtils";
-import { clamp, lerp, pickRandom } from "../utils/MathUtils";
+import { lerp, pickRandom } from "../utils/MathUtils";
 import { Point } from "../utils/Point";
 import { Clock } from "../utils/TimeUtils";
 import { YarnBall } from "./YarnBall";
 
-export class Tube extends EntityManager<YarnBall> {
+export class Tube {
   public position: Point;
   public size: Point;
   public direction = 0;
@@ -32,30 +28,22 @@ export class Tube extends EntityManager<YarnBall> {
     position: Point,
     { size = new Point(100, 100), cb = (b: YarnBall) => {} } = {}
   ) {
-    super();
-
     this.position = position;
     this.size = size;
 
     Stage.newOffscreenLayer("tube", size.x * 1.5, size.y);
     Tube.drawTube(this.size.x, this.size.y);
 
-    Clock.every(SPAWN_RATE, () => {
-      if (Game.state === GameState.Playing && this.count < MAX_BALLS) {
+    Clock.every(LAUNCH_RATE, () => {
+      if (Game.state === GameState.Playing && YARNBALLS.count < MAX_BALLS) {
         zzfxP(sfx.spawn);
-        const ball = this.spawn();
+        const ball = this.launch();
         cb(ball);
       }
     });
   }
 
-  public clearEntities(): void {
-    this.list.forEach(b => b.die());
-
-    super.clearEntities();
-  }
-
-  spawn() {
+  launch() {
     let {
       size: { x: sx },
     } = this;
@@ -76,7 +64,7 @@ export class Tube extends EntityManager<YarnBall> {
     const p1 = startPos.addY(-30);
     const p2 = startPos.addY(30).addX(20);
 
-    const b = new YarnBall(
+    const b = YARNBALLS.spawn(
       startPos,
       new Point(1, 0).scale(this.shootVelocity).rotate(this.direction),
       BALL_MASS,
@@ -84,6 +72,8 @@ export class Tube extends EntityManager<YarnBall> {
       color
     );
 
+    TRAMPOFELINES.list.forEach(cat => cat.catch(b));
+    BASKETS.list.forEach(bkt => bkt.catch(b));
     const nRipples = 5;
     for (let i = 0; i < nRipples; i++) {
       const startRadius = lerp(10, 20, i / nRipples);
@@ -93,48 +83,10 @@ export class Tube extends EntityManager<YarnBall> {
       });
     }
 
-    this.entities.set(b.id, b);
-    TRAMPOFELINES.list.forEach(cat => cat.catch(b));
-    BASKETS.list.forEach(bkt => bkt.catch(b));
-
     return b;
   }
 
   public update(): void {
-    const { cw, ch } = Stage;
-
-    this.list.forEach((b, i) => {
-      const threadEndPos = b.thread.at(-1).position;
-      if (threadEndPos.y > ch && Game.state === State.Playing) {
-        zzfxP(sfx.drop);
-        drawLives();
-        b.die();
-
-        Game.lives = Math.max(0, Game.lives - 1);
-        Game.lives <= 0 && Game.gameOver();
-
-        new Alert(
-          new Point(clamp(70, cw - 70, b.position.x), ch),
-          `missed ${TOTAL_LIVES - Game.lives}`,
-          {
-            startRadius: 0,
-            finalRadius: 50,
-            finalTransparency: 1,
-          }
-        );
-
-        return;
-      }
-
-      const threshold = b.radius * 0.5;
-      if (b.position.x - threshold < 0 || b.position.x + threshold > cw) {
-        b.velocity.x *= -1.1;
-      }
-
-      b.update();
-      b.draw();
-    });
-
     // draw
     const { ctx } = Stage;
 

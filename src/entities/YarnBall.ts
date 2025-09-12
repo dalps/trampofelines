@@ -1,11 +1,36 @@
 import { CircleCollider, CollisionManager } from "../engine/Collisions2D";
 import palette, { type Color } from "../engine/color";
-import Game from "../engine/GameState";
+import { EntityManager } from "../engine/EntityManager";
+import Game, { YARNBALLS } from "../engine/GameState";
 import { DynamicBody, GRAVITY } from "../engine/Physics2D";
 import { Stage } from "../engine/Stage";
 import * as Math2D from "../utils/MathUtils";
 import { Point } from "../utils/Point";
 import { Clock } from "../utils/TimeUtils";
+
+export class YarnBallManager extends EntityManager<YarnBall> {
+  public update(): void {}
+
+  public spawn(
+    startPos: Point,
+    startVelocity: Point,
+    mass: number,
+    radius: number = 10,
+    color: Color
+  ): YarnBall {
+    const b = new YarnBall(startPos, startVelocity, mass, radius, color);
+
+    this.add(b);
+
+    return b;
+  }
+
+  clearEntities(): void {
+    this.list.forEach(b => b.die());
+
+    super.clearEntities();
+  }
+}
 
 export class YarnBall extends DynamicBody {
   public id: string;
@@ -46,7 +71,7 @@ export class YarnBall extends DynamicBody {
 
   die() {
     CollisionManager.unregisterBody(this);
-    Game.tubes.forEach(t => t.delete(this));
+    YARNBALLS.delete(this);
   }
 
   update(): void {
@@ -66,10 +91,15 @@ export class YarnBall extends DynamicBody {
       // Math2D.lerp2I(joint.position, prevJoint.position, dt);
       prevJoint = joint;
     });
+
+    this.draw();
   }
 
   draw() {
+    Stage.setActiveLayer("game");
     const { ctx } = Stage;
+
+    ctx.lineCap = ctx.lineJoin = "round";
 
     ctx.beginPath();
     ctx.lineWidth = 4;
