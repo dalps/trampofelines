@@ -12,6 +12,8 @@ import { Point } from "../utils/Point";
 import { Clock } from "../utils/TimeUtils";
 import { YarnBall } from "./YarnBall";
 import { Entity } from "./Entity";
+import Game from "../engine/GameState";
+import { drawLives } from "../engine/ui";
 
 export class Basket extends DynamicBody implements Entity {
   id: string;
@@ -65,9 +67,12 @@ export class Basket extends DynamicBody implements Entity {
         speed: 1,
       });
       this.filled = true;
+      Game.stock += 1;
+      drawLives();
     }
 
     // draw
+    Stage.setActiveLayer("game");
     const { ctx } = Stage;
 
     ctx.save();

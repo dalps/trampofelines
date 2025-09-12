@@ -25,7 +25,7 @@ export default class Game {
   public static tubes: Tube[] = [];
   public static baskets: Basket[] = [];
   public static lives = this.TOTAL_LIVES;
-  public static score = 0;
+  public static stock = 0;
   public static settings = {
     lineMass: 2,
     ballMass: 3,

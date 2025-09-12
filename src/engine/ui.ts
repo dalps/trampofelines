@@ -48,7 +48,7 @@ export function drawLives() {
     pos.incrX(sectionSize);
   }
 
-  drawText(`${Game.score} basket${Game.score === 1 ? "" : "s"}`, {
+  drawText(`${Game.stock} basket${Game.stock === 1 ? "" : "s"}`, {
     pos: new Point(cw * 0.5, 100),
     fontSize: 18,
   });
@@ -69,7 +69,7 @@ export function drawGameoverUI() {
     fontSize: 80,
   });
 
-  drawText(`you rescued ${Game.score} yarn balls`, {
+  drawText(`you stocked ${Game.stock} basket${Game.stock === 1 ? "" : "s"}`, {
     pos: new Point(cw * 0.5, ch * 0.5 - 100),
   });
 }

@@ -12,7 +12,7 @@ function init() {
   City.init();
   City.draw();
 
-  Game.restart();
+  Game.title();
 
   requestAnimationFrame(draw);
 }
