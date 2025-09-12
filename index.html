@@ -23,18 +23,15 @@
 
       #stage {
         width: 100vw;
-        height: 100svh;
+        height: 100lvh;
       }
 
       button {
-        --w: 200px;
         z-index: 4;
         position: absolute;
-        width: var(--w);
-        left: calc(50% - var(--w) * 0.5);
+        left: calc(50% - 100px);
         bottom: 20%;
         outline: none;
-        background: #5073fd;
         border: none;
         border-radius: 5px;
         cursor: pointer;
@@ -67,11 +64,11 @@
   </head>
   <body>
     <div id="stage">
-      <div id="title" style="display: none">
-        <button id="start" style="bottom: 30%"></button>
+      <div id="title">
+        <button id="start"></button>
       </div>
-      <div id="gameover" style="display: none">
-        <button id="retry" style="background: #fd5050; bottom: 30%"></button>
+      <div id="gameover">
+        <button id="retry"></button>
         <button id="bye"></button>
       </div>
     </div>
