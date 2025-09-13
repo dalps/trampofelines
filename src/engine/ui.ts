@@ -63,7 +63,7 @@ export function drawGameoverUI() {
   ctx.fillRect(0, 0, cw, ch);
 
   ctx.lineWidth = 3;
-  let fontSize = 36; // lerp(20, 80, ...);
+  let fontSize = 56; // lerp(20, 80, ...);
   drawText(`game over`, {
     pos: new Point(cw * 0.5, ch * 0.5 - fontSize),
     fill: palette.blue3,

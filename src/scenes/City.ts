@@ -107,8 +107,8 @@ export class City {
         ctx.fillStyle = color2;
         ctx.beginPath();
         const x1 = (right ? cw : 0) + (right ? -1 : 1) * wallWidth;
-        ctx.moveTo(x1, height);
         const x2 = (right ? cw : 0) + (right ? -1 : 1) * (wallWidth + persp);
+        ctx.moveTo(x1, height);
         ctx.lineTo(x2, height + persp);
         ctx.lineTo(x2, ch);
         ctx.lineTo(x1, ch);
@@ -122,6 +122,34 @@ export class City {
       building(wallWidth, 200, 50);
       building(wallWidth * 6, 400, 40, true);
       building(wallWidth, 200, 60, true);
+
+      ctx.fillStyle = colorWindow;
+      const window = (x, y, width, height, persp = 0) => {
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + width, y + persp);
+        ctx.lineTo(x + width, y + height + persp);
+        ctx.lineTo(x, y + height);
+        ctx.fill();
+      };
+
+      window(0, 260, 10, 80);
+      window(0, 480, 10, 80);
+      window(45, 260, 20, 80, 20);
+      window(25, 580, 20, 80, 10);
+
+      window(0, 260, 10, 80);
+      window(0, 480, 10, 80);
+
+      window(110, 400, 20, 60, 15);
+      window(cw - 150, 450, 20, 50, -20);
+      window(cw - 100, 620, 20, 50, 0);
+      window(cw - 50, 280, 20, 60, -20);
+      window(cw - 70, 540, 20, 60, -20);
+      window(cw - 10, 480, 10, 60, 0);
+      // window(45, 260, 20, 80, 20);
+      // window(45, 360, 20, 80, 16);
+      // window(45, 560, 20, 80, 10);
 
       // const h = ch * 0.5;
       // const middle = cw * 0.5;
