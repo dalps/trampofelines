@@ -1,7 +1,7 @@
 import { DEG2RAD, lerp } from "../utils/MathUtils";
 import { Point } from "./Point";
 import { Stage } from "../engine/Stage";
-import { hsl } from "../engine/color";
+import PALETTE, { hsl } from "../engine/color";
 
 export function star(
   pos: Point,
@@ -169,8 +169,62 @@ export function drawSector(
   }
 }
 
-// export function button(pos: Point, { onclick = () => {} } = {}) {
-//   const { ctx } = Stage;
+export function billBoard(
+  pos: Point,
+  {
+    padding = 5,
+    width = 50,
+    height = 200,
+    color1 = PALETTE.blue1,
+    color2 = PALETTE.blue3,
+    right = false,
+    beamLength = 30,
+    content = () => {},
+  }
+) {
+  const { ctx } = Stage;
 
-//   if (ctx.isPointInPath()) {}
-// }
+  ctx.lineWidth = 4;
+
+  ctx.strokeStyle = color2;
+  [pos.y + padding * 2, pos.y + height].forEach(y => {
+    ctx.beginPath();
+    ctx.moveTo(pos.x, y);
+    ctx.lineTo(
+      pos.x + (right ? width + padding * 2 + beamLength : -beamLength),
+      y
+    );
+    ctx.stroke();
+  });
+
+  const billboard = new Path2D();
+  const billboard2 = new Path2D();
+
+  billboard.roundRect(
+    pos.x,
+    pos.y,
+    width + padding * 2,
+    height + padding * 2,
+    10
+  );
+
+  billboard2.roundRect(
+    pos.x - padding,
+    pos.y - padding,
+    width + padding * 4,
+    height + padding * 4,
+    5
+  );
+
+  ctx.fillStyle = color1;
+  ctx.fill(billboard2);
+
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = color2;
+  ctx.stroke(billboard);
+
+  ctx.save();
+  ctx.translate(pos.x + padding, pos.y + padding);
+  content();
+  ctx.restore();
+}

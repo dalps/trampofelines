@@ -7,12 +7,13 @@ import Game, {
   SPAWN_RATE as LAUNCH_RATE,
   MAX_BALLS,
   TRAMPOFELINES,
-  YARNBALLS
+  YARNBALLS,
 } from "../engine/GameState";
 import { Ripple } from "../engine/Ripple";
 import sfx, { zzfxP } from "../engine/sfx";
 import { Stage } from "../engine/Stage";
-import { makeGradient } from "../utils/CanvasUtils";
+import { Tween } from "../engine/tween";
+import { makeGradient, star } from "../utils/CanvasUtils";
 import { lerp, pickRandom } from "../utils/MathUtils";
 import { Point } from "../utils/Point";
 import { Clock } from "../utils/TimeUtils";
@@ -21,25 +22,46 @@ import { YarnBall } from "./YarnBall";
 export class Tube {
   public position: Point;
   public size: Point;
-  public direction = 0;
+  public right = false;
   public shootVelocity = 50;
+  private timer: number;
 
   constructor(
     position: Point,
-    { size = new Point(100, 100), cb = (b: YarnBall) => {} } = {}
+    { size = new Point(100, 100), right = false, cb } = {}
   ) {
     this.position = position;
     this.size = size;
+    this.right = right;
 
     Stage.newOffscreenLayer("tube", size.x * 1.5, size.y);
     Tube.drawTube(this.size.x, this.size.y);
+  }
 
-    Clock.every(LAUNCH_RATE, () => {
-      if (Game.state === GameState.Playing && YARNBALLS.count < MAX_BALLS) {
-        zzfxP(sfx.spawn);
-        const ball = this.launch();
-        cb(ball);
-      }
+  intro() {
+    new Tween(this.position, "x", {
+      finalValue: this.right ? Stage.stage.clientWidth + 50 : -50,
+      speed: 2,
+      epsilon: 1,
+      onComplete: () => {
+        this.timer = Clock.every(LAUNCH_RATE, () => {
+          if (Game.state === GameState.Playing && YARNBALLS.count < MAX_BALLS) {
+            zzfxP(sfx.spawn);
+            const dice = Math.random() < 0.5;
+            dice && this.launch();
+            // cb(ball);
+          }
+        });
+      },
+    });
+  }
+
+  outro() {
+    new Tween(this.position, "x", {
+      finalValue: this.right ? Stage.stage.clientWidth + 200 : -200,
+      speed: 2,
+      epsilon: 1,
+      onComplete: () => Clock.cancelTimer(this.timer),
     });
   }
 
@@ -57,8 +79,7 @@ export class Tube {
       palette.hotPink,
     ]);
     const startPos = this.position
-      .clone()
-      .addX(this.size.x + headLength)
+      .addX((this.right ? -1 : 1) * (this.size.x + headLength))
       .addY(this.size.y * 0.5);
 
     const p1 = startPos.addY(-30);
@@ -66,7 +87,7 @@ export class Tube {
 
     const b = YARNBALLS.spawn(
       startPos,
-      new Point(1, 0).scale(this.shootVelocity).rotate(this.direction),
+      new Point(this.right ? -1 : 1, 0).scale(this.shootVelocity),
       BALL_MASS,
       BALL_RADIUS,
       color
@@ -87,11 +108,12 @@ export class Tube {
   }
 
   public update(): void {
-    // draw
     const { ctx } = Stage;
 
     ctx.save();
-    ctx.drawImage(Stage.getLayer("tube"), this.position.x, this.position.y);
+    ctx.translate(this.position.x, this.position.y);
+    this.right && ctx.transform(-1, 0, 0, 1, 0, 0);
+    ctx.drawImage(Stage.getLayer("tube"), 0, 0);
     ctx.restore();
   }
 

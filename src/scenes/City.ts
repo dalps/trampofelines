@@ -1,14 +1,22 @@
 import { hsl, default as PALETTE, default as palette } from "../engine/color";
+import { drawText, engrave, FONT } from "../engine/font";
 import Game from "../engine/GameState";
 import { Stage } from "../engine/Stage";
 import { Tube } from "../entities/Tube";
-import { makeGradient, star } from "../utils/CanvasUtils";
+import {
+  billBoard as billboard,
+  makeGradient,
+  star,
+} from "../utils/CanvasUtils";
 import { distribute, lerp } from "../utils/MathUtils";
 import { Point } from "../utils/Point";
 
 export class City {
   static init() {
-    Game.tubes.push(new Tube(new Point(0, 100)));
+    Game.tubes.push(
+      new Tube(new Point(-200, 100)),
+      new Tube(new Point(Stage.stage.clientWidth + 200, 100), { right: true })
+    );
   }
 
   static draw() {
@@ -74,7 +82,8 @@ export class City {
     ctx.lineTo(0, ch);
     ctx.fill();
 
-    ctx.fillStyle = hsl(245, 21, 51); // hsla(246, 21%, 51%, 1.00) hsla(59, 100%, 84%, 0.20)
+    const colorWindow = hsl(245, 21, 51);
+    ctx.fillStyle = colorWindow; // hsla(246, 21%, 51%, 1.00) hsla(59, 100%, 84%, 0.20)
     distribute(0, cw, subs, (x, i) => {
       const dice = Math.floor(Math.random() * 10);
       if (dice < 5) {
@@ -89,106 +98,120 @@ export class City {
 
     // beams
     {
-      ctx.strokeStyle = hsl(0, 68, 50); //hsla(0, 68%, 50%, 1.00);
-      ctx.fillStyle = hsl(0, 77, 59); //hsla(0, 77%, 59%, 1.00);
+      const color1 = hsl(245, 30, 51); // hsla(245, 29%, 51%, 1.00);
+      const color2 = hsl(245, 30, 45); // hsla(245, 30%, 39%, 1.00);
       ctx.lineWidth = 3;
       const wallWidth = 20;
 
       [0, cw - wallWidth].forEach(x => {
+        ctx.fillStyle = color2;
+        ctx.beginPath();
+        ctx.moveTo(x + wallWidth * 3, 300);
+        ctx.lineTo(x + wallWidth * 3 + 50, 300 + 45);
+        ctx.lineTo(x + wallWidth * 3 + 50, ch);
+        ctx.lineTo(x + wallWidth * 3, ch);
+        ctx.fill();
+
+        ctx.fillStyle = color1;
+        ctx.fillRect(x, 300, wallWidth * 3, ch);
+
+        ctx.fillStyle = color2;
+        ctx.beginPath();
+        ctx.moveTo(x + wallWidth, 200);
+        ctx.lineTo(x + wallWidth + 30, 200 + 45);
+        ctx.lineTo(x + wallWidth + 30, ch);
+        ctx.lineTo(x + wallWidth, ch);
+        ctx.fill();
+
+        ctx.fillStyle = color1;
         ctx.fillRect(x, 200, wallWidth, ch);
-        ctx.strokeRect(x, 200, wallWidth, ch);
-
-        ctx.fillRect(x, 200, wallWidth, wallWidth);
-        ctx.strokeRect(x, 200, wallWidth, wallWidth);
       });
+
+      // const h = ch * 0.5;
+      // const middle = cw * 0.5;
+      // ctx.moveTo(50, h);
+      // ctx.quadraticCurveTo(middle, h + 50, cw - 50, h);
+
+      // ctx.moveTo(50, h);
+      // ctx.quadraticCurveTo(middle, h + 70, cw - 50, h - 20);
+
+      // ctx.moveTo(70, h + 100);
+      // ctx.quadraticCurveTo(middle, h + 150, cw - 70, h - 20);
+
+      // ctx.strokeStyle = color2;
+      // ctx.stroke();
     }
 
-    // billboard 1
-    {
-      const pos = new Point(30, 300);
-      const billboard = new Path2D();
-      const billboard2 = new Path2D();
-      const text = "トランポリン";
-      const textSize = 36;
-      const padding = 5;
-      [padding * 3, textSize * text.length - padding * 2].forEach(y => {
-        ctx.lineWidth = 4;
-        ctx.strokeStyle = palette.blue0;
-        ctx.beginPath();
-        ctx.moveTo(0, pos.y + y);
-        ctx.lineTo(30, pos.y + y);
-        ctx.stroke();
-      });
-      billboard.roundRect(
-        pos.x,
-        pos.y,
-        textSize + padding * 2,
-        textSize * text.length + padding * 2,
-        10
-      );
-      billboard2.roundRect(
-        pos.x - padding,
-        pos.y - padding,
-        textSize + padding * 4,
-        textSize * text.length + padding * 4,
-        5
-      );
-      ctx.fillStyle = palette.blue1;
-      ctx.fill(billboard2);
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = palette.blue3;
-      ctx.stroke(billboard);
+    // billboards
+    let text = "トランポリン";
+    let textSize = 36;
+    ctx.font = `${textSize}px sans-serif`;
+    ctx.textBaseline = "ideographic";
+    ctx.textAlign = "left";
 
-      ctx.font = `${textSize}px sans-serif`;
-      ctx.textBaseline = "ideographic";
-      ctx.textAlign = "left";
+    billboard(new Point(60, 350), {
+      width: textSize,
+      height: textSize * text.length,
+      content() {
+        const pos = new Point(0, 0);
+        Array.from(text).forEach(m => {
+          pos.incrY(textSize);
+          ctx.strokeStyle = ctx.fillStyle = palette.blue3;
+          ctx.strokeText(m, pos.x, pos.y);
+          ctx.fillText(m, pos.x, pos.y);
+        });
+      },
+    });
 
-      pos.incrX(padding).incrY(padding);
-      Array.from(text).forEach(m => {
-        pos.incrY(textSize);
-        ctx.strokeStyle = palette.blue3;
-        ctx.strokeText(m, pos.x, pos.y);
+    textSize = 24;
+    ctx.font = `${textSize}px Consolas,sans-serif`;
+    ctx.textAlign = "left";
+
+    billboard(new Point(cw - 100, 300), {
+      right: true,
+      width: 48,
+      height: 24 * 6,
+      content() {
+        let pos = new Point(4, 0);
+
+        Array.from("JS13K").forEach(m => {
+          pos.incrY(textSize);
+          ctx.strokeStyle = ctx.fillStyle = palette.white.toAlpha(0.3);
+          ctx.strokeText(m, pos.x, pos.y);
+          ctx.fillText(m, pos.x, pos.y);
+        });
+
+        pos = new Point(30, 0);
+        Array.from("GAMES").forEach(m => {
+          pos.incrY(textSize);
+          ctx.strokeStyle = ctx.fillStyle = palette.hotPink.toAlpha(0.7);
+          ctx.strokeText(m, pos.x, pos.y);
+          ctx.fillText(m, pos.x, pos.y);
+        });
+
+        // drawText("js13k", { pos: new Point(50, 10), fontSize: 36, fill: palette.blue3 });
+        drawText("2025", {
+          pos: new Point(24, 24 * 5.5),
+          fontSize: 18,
+          fill: palette.blue3,
+        });
+      },
+    });
+
+    text = "弹性猫";
+    const size = 80;
+    ctx.font = "24px sans-serif";
+    ctx.textAlign = "center";
+    ``;
+    billboard(new Point(cw - size - 60, 500), {
+      width: size,
+      height: size,
+      right: true,
+      content() {
+        ctx.drawImage(Stage.getLayer("catFace"), 15, -15);
         ctx.fillStyle = palette.blue3;
-        ctx.fillText(m, pos.x, pos.y);
-      });
-    }
-
-    // right billboard
-    {
-      const billboard = new Path2D();
-      const billboard2 = new Path2D();
-      const text = "弹性猫";
-      const size = 80;
-      const padding = 5;
-      const totalSize = size + padding * 2;
-      const pos = new Point(cw - totalSize - 30, 500);
-      [padding * 3, size - padding * 2].forEach(y => {
-        ctx.lineWidth = 4;
-        ctx.strokeStyle = palette.blue0;
-        ctx.beginPath();
-        ctx.moveTo(pos.x + totalSize, pos.y + y);
-        ctx.lineTo(pos.x + totalSize + 30, pos.y + y);
-        ctx.stroke();
-      });
-      billboard.roundRect(pos.x, pos.y, totalSize, totalSize, 10);
-      billboard2.roundRect(
-        pos.x - padding,
-        pos.y - padding,
-        size + padding * 4,
-        size + padding * 4,
-        5
-      );
-      ctx.fillStyle = palette.blue1;
-      ctx.fill(billboard2);
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = palette.blue3;
-      ctx.stroke(billboard);
-
-      ctx.drawImage(Stage.getLayer("catFace"), pos.x + 20, pos.y - 14);
-      ctx.font = "24px sans-serif";
-      ctx.textAlign = "center";
-      ctx.fillStyle = palette.blue3;
-      ctx.fillText(text, pos.x + 44, pos.y + 84);
-    }
+        ctx.fillText(text, 40, 80);
+      },
+    });
   }
 }

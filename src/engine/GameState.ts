@@ -127,6 +127,7 @@ export default class Game {
         YARNBALLS.clearEntities();
         TRAMPOFELINES.clearEntities();
         BASKETS.outro();
+        this.tubes.forEach(t => t.intro());
         TRAMPOFELINES.enableUI();
 
         gameoverElements.style.display = "none";
@@ -149,6 +150,7 @@ export default class Game {
         TRAMPOFELINES.clearEntities();
         TRAMPOFELINES.disableUI();
         BASKETS.outro();
+        this.tubes.forEach(t => t.outro());
         gameoverElements.style.display = "none";
         titleElements.style.display = "block";
 
