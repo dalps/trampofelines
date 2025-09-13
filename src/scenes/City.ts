@@ -1,5 +1,5 @@
 import { hsl, default as PALETTE, default as palette } from "../engine/color";
-import { drawText, engrave, FONT } from "../engine/font";
+import { drawText } from "../engine/font";
 import Game from "../engine/GameState";
 import { Stage } from "../engine/Stage";
 import { Tube } from "../entities/Tube";
@@ -8,7 +8,7 @@ import {
   makeGradient,
   star,
 } from "../utils/CanvasUtils";
-import { distribute, lerp } from "../utils/MathUtils";
+import { DEG2RAD, distribute, lerp } from "../utils/MathUtils";
 import { Point } from "../utils/Point";
 
 export class City {
@@ -96,36 +96,32 @@ export class City {
       }
     });
 
-    // beams
+    // buildings
     {
       const color1 = hsl(245, 30, 51); // hsla(245, 29%, 51%, 1.00);
       const color2 = hsl(245, 30, 45); // hsla(245, 30%, 39%, 1.00);
       ctx.lineWidth = 3;
       const wallWidth = 20;
 
-      [0, cw - wallWidth].forEach(x => {
+      const building = (wallWidth, height, persp, right = false) => {
         ctx.fillStyle = color2;
         ctx.beginPath();
-        ctx.moveTo(x + wallWidth * 3, 300);
-        ctx.lineTo(x + wallWidth * 3 + 50, 300 + 45);
-        ctx.lineTo(x + wallWidth * 3 + 50, ch);
-        ctx.lineTo(x + wallWidth * 3, ch);
+        const x1 = (right ? cw : 0) + (right ? -1 : 1) * wallWidth;
+        ctx.moveTo(x1, height);
+        const x2 = (right ? cw : 0) + (right ? -1 : 1) * (wallWidth + persp);
+        ctx.lineTo(x2, height + persp);
+        ctx.lineTo(x2, ch);
+        ctx.lineTo(x1, ch);
         ctx.fill();
 
         ctx.fillStyle = color1;
-        ctx.fillRect(x, 300, wallWidth * 3, ch);
+        ctx.fillRect(right ? cw - wallWidth : 0, height, wallWidth, ch);
+      };
 
-        ctx.fillStyle = color2;
-        ctx.beginPath();
-        ctx.moveTo(x + wallWidth, 200);
-        ctx.lineTo(x + wallWidth + 30, 200 + 45);
-        ctx.lineTo(x + wallWidth + 30, ch);
-        ctx.lineTo(x + wallWidth, ch);
-        ctx.fill();
-
-        ctx.fillStyle = color1;
-        ctx.fillRect(x, 200, wallWidth, ch);
-      });
+      building(wallWidth * 5, 300, 50);
+      building(wallWidth, 200, 50);
+      building(wallWidth * 6, 400, 40, true);
+      building(wallWidth, 200, 60, true);
 
       // const h = ch * 0.5;
       // const middle = cw * 0.5;
@@ -143,75 +139,91 @@ export class City {
     }
 
     // billboards
-    let text = "トランポリン";
-    let textSize = 36;
-    ctx.font = `${textSize}px sans-serif`;
-    ctx.textBaseline = "ideographic";
-    ctx.textAlign = "left";
+    {
+      billboard(new Point(80, 590), {
+        width: 30,
+        height: 30,
+        content() {
+          star(new Point(15, 15), {
+            ctx,
+            innerRadius: 8,
+            outerRadius: 15,
+            angle: 55 * DEG2RAD,
+            fill: palette.blue3,
+          });
+        },
+      });
 
-    billboard(new Point(60, 350), {
-      width: textSize,
-      height: textSize * text.length,
-      content() {
-        const pos = new Point(0, 0);
-        Array.from(text).forEach(m => {
-          pos.incrY(textSize);
-          ctx.strokeStyle = ctx.fillStyle = palette.blue3;
-          ctx.strokeText(m, pos.x, pos.y);
-          ctx.fillText(m, pos.x, pos.y);
-        });
-      },
-    });
+      let text = "トランポリン";
+      let textSize = 36;
+      ctx.font = `${textSize}px sans-serif`;
+      ctx.textBaseline = "ideographic";
+      ctx.textAlign = "left";
 
-    textSize = 24;
-    ctx.font = `${textSize}px Consolas,sans-serif`;
-    ctx.textAlign = "left";
+      billboard(new Point(60, 350), {
+        width: textSize,
+        height: textSize * text.length,
+        content() {
+          const pos = new Point(0, 0);
+          Array.from(text).forEach(m => {
+            pos.incrY(textSize);
+            ctx.strokeStyle = ctx.fillStyle = palette.blue3;
+            ctx.strokeText(m, pos.x, pos.y);
+            ctx.fillText(m, pos.x, pos.y);
+          });
+        },
+      });
 
-    billboard(new Point(cw - 100, 300), {
-      right: true,
-      width: 48,
-      height: 24 * 6,
-      content() {
-        let pos = new Point(4, 0);
+      textSize = 24;
+      ctx.font = `${textSize}px Consolas,sans-serif`;
+      ctx.textAlign = "left";
 
-        Array.from("JS13K").forEach(m => {
-          pos.incrY(textSize);
-          ctx.strokeStyle = ctx.fillStyle = palette.white.toAlpha(0.3);
-          ctx.strokeText(m, pos.x, pos.y);
-          ctx.fillText(m, pos.x, pos.y);
-        });
+      billboard(new Point(cw - 120, 350), {
+        right: true,
+        width: 48,
+        height: 24 * 6,
+        content() {
+          let pos = new Point(4, 0);
 
-        pos = new Point(30, 0);
-        Array.from("GAMES").forEach(m => {
-          pos.incrY(textSize);
-          ctx.strokeStyle = ctx.fillStyle = palette.hotPink.toAlpha(0.7);
-          ctx.strokeText(m, pos.x, pos.y);
-          ctx.fillText(m, pos.x, pos.y);
-        });
+          Array.from("JS13K").forEach(m => {
+            pos.incrY(textSize);
+            ctx.strokeStyle = ctx.fillStyle = palette.white.toAlpha(0.3);
+            ctx.strokeText(m, pos.x, pos.y);
+            ctx.fillText(m, pos.x, pos.y);
+          });
 
-        // drawText("js13k", { pos: new Point(50, 10), fontSize: 36, fill: palette.blue3 });
-        drawText("2025", {
-          pos: new Point(24, 24 * 5.5),
-          fontSize: 18,
-          fill: palette.blue3,
-        });
-      },
-    });
+          pos = new Point(30, 0);
+          Array.from("GAMES").forEach(m => {
+            pos.incrY(textSize);
+            ctx.strokeStyle = ctx.fillStyle = palette.hotPink.toAlpha(0.7);
+            ctx.strokeText(m, pos.x, pos.y);
+            ctx.fillText(m, pos.x, pos.y);
+          });
 
-    text = "弹性猫";
-    const size = 80;
-    ctx.font = "24px sans-serif";
-    ctx.textAlign = "center";
-    ``;
-    billboard(new Point(cw - size - 60, 500), {
-      width: size,
-      height: size,
-      right: true,
-      content() {
-        ctx.drawImage(Stage.getLayer("catFace"), 15, -15);
-        ctx.fillStyle = palette.blue3;
-        ctx.fillText(text, 40, 80);
-      },
-    });
+          // drawText("js13k", { pos: new Point(50, 10), fontSize: 36, fill: palette.blue3 });
+          drawText("2025", {
+            pos: new Point(24, 24 * 5.5),
+            fontSize: 18,
+            fill: palette.blue3,
+          });
+        },
+      });
+
+      text = "弹性猫";
+      const size = 80;
+      ctx.font = "24px sans-serif";
+      ctx.textAlign = "center";
+      ``;
+      billboard(new Point(cw - size - 80, 550), {
+        width: size,
+        height: size,
+        right: true,
+        content() {
+          ctx.drawImage(Stage.getLayer("catFace"), 15, -15);
+          ctx.fillStyle = palette.blue3;
+          ctx.fillText(text, 40, 80);
+        },
+      });
+    }
   }
 }
