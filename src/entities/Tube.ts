@@ -47,8 +47,7 @@ export class Tube {
         this.timer = Clock.every(LAUNCH_RATE, () => {
           if (Game.state === GameState.Playing && YARNBALLS.count < MAX_BALLS) {
             zzfxP(sfx.spawn);
-            const dice = Math.random() < 0.5;
-            dice && this.launch();
+            this.launch();
             // cb(ball);
           }
         });

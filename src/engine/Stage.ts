@@ -158,6 +158,7 @@ export class Stage {
       case State.Title:
         break;
       case State.Playing:
+        Game.tubes.forEach(t => t.intro());
         drawLives();
         break;
       case State.GameOver:
