@@ -137,12 +137,12 @@ export class City {
       window(0, 480, 10, 80);
       window(45, 260, 20, 80, 20);
       window(25, 580, 20, 80, 10);
-
+      window(110, 380, 20, 60, 15);
+      window(120, 560, 20, 60, 10);
       window(0, 260, 10, 80);
       window(0, 480, 10, 80);
 
-      window(110, 400, 20, 60, 15);
-      window(cw - 150, 450, 20, 50, -20);
+      window(cw - 150, 520, 20, 50, -20);
       window(cw - 100, 620, 20, 50, 0);
       window(cw - 50, 280, 20, 60, -20);
       window(cw - 70, 540, 20, 60, -20);
@@ -171,13 +171,29 @@ export class City {
       billboard(new Point(80, 590), {
         width: 30,
         height: 30,
+        color1: palette.blue1,
+        color2: palette.brightYellow.toAlpha(0.7),
         content() {
           star(new Point(15, 15), {
             ctx,
             innerRadius: 8,
             outerRadius: 15,
             angle: 55 * DEG2RAD,
-            fill: palette.blue3,
+            fill: palette.brightYellow.toAlpha(0.7),
+          });
+        },
+      });
+
+      billboard(new Point(140, 630), {
+        width: 70,
+        height: 30,
+        color1: palette.blue0,
+        color2: palette.brightYellow.toAlpha(0.3),
+        content() {
+          drawText("dalps", {
+            pos: new Point(35, 15),
+            fontSize: 18,
+            fill: palette.brightYellow.toAlpha(0.3),
           });
         },
       });
