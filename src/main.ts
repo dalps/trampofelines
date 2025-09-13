@@ -7,9 +7,9 @@ import { Clock, type timestamp } from "./utils/TimeUtils";
 function init() {
   Stage.init();
   Game.init();
-  City.init();
 
   City.draw();
+  City.init();
 
   Game.title();
 

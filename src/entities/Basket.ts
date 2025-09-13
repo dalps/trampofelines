@@ -153,7 +153,7 @@ export class Basket extends DynamicBody {
         color: palette.brightYellow,
         color2: palette.brightYellow,
       });
-      new Alert(this.position, pickRandom(["nice!", "super!", "ok!"]), {
+      new Alert(this.position, "nice!", {
         startRadius: 0,
         finalRadius: 50,
         finalTransparency: 1,

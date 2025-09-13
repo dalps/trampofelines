@@ -186,7 +186,7 @@ export function billBoard(
 
   ctx.lineWidth = 4;
 
-  ctx.strokeStyle = color2;
+  ctx.strokeStyle = color1;
   [pos.y + padding * 2, pos.y + height].forEach(y => {
     ctx.beginPath();
     ctx.moveTo(pos.x, y);

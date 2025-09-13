@@ -69,7 +69,6 @@ export class YarnBall extends DynamicBody {
     this.thread = points.map(p => new DynamicBody(p));
 
     Clock.every(2, () => {
-      console.log(this.thread.length);
       this.thread.push(new DynamicBody(this.thread.at(-1).position.clone()));
     });
   }
