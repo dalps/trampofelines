@@ -144,6 +144,9 @@ export class Basket extends DynamicBody {
       Game.stock += 1;
       CollisionManager.unregisterBody(this);
 
+      zzfxP(sfx.filled)
+      zzfxP(sfx.score2)
+
       // gfx
       new Firework(this.position, {
         startRadius: 5,
