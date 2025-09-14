@@ -139,6 +139,10 @@ const kurokaneFont: Record<string, Glyph> = {
     path: "m21.5 71.2v-71.2h18.0v56.7h20.9v-56.7h18.0v44.9l-1.3 5.6-4.6 8.9-9.6 8.3-15.8 3.6z",
     size: 57,
   },
+  "W": {
+    path: "m40.7 71.2v-4.2l-6.2 2.9-7.6 1.3h-19.6v-71.2h19.0v56.7h14.5v-56.7h18.0v56.7h14.9v-56.7h19.1v44.9l-1.4 5.6-4.9 8.9-10.0 8.3-16.0 3.6h-19.6",
+    size: 85,
+  },
   "Y": {
     path: "m40.5 71.2v-29.7l-11.3-5.3-6.1-7.5-2.5-7.4-0.4-2.9-0.1-1.0v-17.4h19.0v28.2h21.9v-28.2h19.0v16.6l-0.3 2.7-0.3 1.4-2.5 7.4-6.1 7.8-11.3 5.6v29.7h-19.1",
     size: 60,
@@ -189,6 +193,8 @@ export function drawText(
     ctx.stroke(path);
   }
   ctx.restore();
+
+  return length * scale;
 }
 
 export function engrave(text: string): { path: Path2D; length: number } {
@@ -199,7 +205,7 @@ export function engrave(text: string): { path: Path2D; length: number } {
 
   Array.from(text).forEach(c => {
     const C = c.toUpperCase();
-    if (!kurokaneFont[C]) throw new Error(`${C} is not available as a glyph.`)
+    if (!kurokaneFont[C]) throw new Error(`${C} is not available as a glyph.`);
     const { size = 0, path = "", kernings = {} } = kurokaneFont[C];
     const space = (frameSize - size) * 0.5;
     const p = new Path2D(path);

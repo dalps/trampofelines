@@ -51,10 +51,11 @@ export function drawLives() {
   drawText(`${Game.stock} basket${Game.stock === 1 ? "" : "s"}`, {
     pos: new Point(cw * 0.5, 100),
     fontSize: 18,
+    fill: Game.stock > Game.prevRecord ? palette.brightYellow : palette.white,
   });
 }
 
-export function drawGameoverUI() {
+export function drawGameoverUI(newRecord = false) {
   Stage.setActiveLayer("info");
   // no clear, draw on top of the old UI
   const { ctx, cw, ch } = Stage;
@@ -76,4 +77,12 @@ export function drawGameoverUI() {
     pos: new Point(cw * 0.5, ch * 0.5),
     fontSize,
   });
+
+  if (newRecord) {
+    drawText(`new record!`, {
+      pos: new Point(cw * 0.5, ch * 0.5 + 28),
+      fontSize,
+      fill: palette.brightYellow,
+    });
+  }
 }
