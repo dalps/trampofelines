@@ -8,7 +8,7 @@ import { drawText } from "./font";
 import Game, { State } from "./GameState";
 import { MyCanvas } from "./MyCanvas";
 import sfx from "./sfx";
-import { drawGameoverUI, drawLives } from "./ui";
+import { drawGameoverUI, drawLives, getMessage } from "./ui";
 import { zzfxP } from "./zzfx";
 
 export type LayerName = string;
@@ -95,7 +95,7 @@ export class Stage {
 
       this.setActiveLayer(id);
 
-      drawText(id, { pos: new Point(w * 0.5, h * 0.5), fontSize: 24 });
+      drawText(getMessage(id), { pos: new Point(w * 0.5, h * 0.5), fontSize: 24 });
       btn.appendChild(this.getLayer(id));
       btn.onclick = () => {
         zzfxP(sfx.button);

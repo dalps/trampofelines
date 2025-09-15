@@ -13,7 +13,7 @@ import PALETTE from "./color";
 import { drawText } from "./font";
 import sfx, { zzfxP } from "./sfx";
 import { gameoverElements, Stage, titleElements } from "./Stage";
-import { drawGameoverUI, drawLives } from "./ui";
+import { drawGameoverUI, drawLives, getLanguage, getMessage } from "./ui";
 
 export enum State {
   Title,
@@ -46,6 +46,7 @@ export default class Game {
   public static stock = 0;
   public static settings = {};
   public static prevRecord: number;
+  public static language = getLanguage();
 
   static init() {
     TRAMPOFELINES = new TrampofelineManager();
@@ -87,7 +88,7 @@ export default class Game {
 
               new Alert(
                 new Point(clamp(70, cw - 70, b.position.x), ch),
-                `missed ${TOTAL_LIVES - Game.lives}`,
+                getMessage("missed")(TOTAL_LIVES - Game.lives),
                 {
                   startRadius: 0,
                   finalRadius: 50,
@@ -179,7 +180,7 @@ export default class Game {
           const pos = new Point(cw * 0.5, ch * 0.85);
 
           const starX =
-            drawText(`your record is ${Game.prevRecord}`, {
+            drawText(`record: ${Game.prevRecord}`, {
               pos,
               fontSize: 20,
             }) *

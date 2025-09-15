@@ -7,6 +7,49 @@ import { drawText } from "./font";
 import Game, { TOTAL_LIVES } from "./GameState";
 import { Stage } from "./Stage";
 
+const LANGUAGES = ["en", "it"];
+const MESSAGES = {
+  "go!": {
+    it: "via!",
+  },
+  "felines!": {
+    it: "felini!",
+  },
+  "again": {
+    it: "di nuovo",
+  },
+  "bye": {
+    it: "basta",
+  },
+  "score": {
+    en: stock => `${stock} basket${stock === 1 ? "" : "s"}`,
+    it: stock => `${stock} cestin${stock === 1 ? "o" : "i"}`,
+  },
+  "final-score": {
+    en: stock => `you filled ${stock} basket${stock === 1 ? "" : "s"}`,
+    it: stock => `hai riempito ${stock} cestin${stock === 1 ? "o" : "i"}`,
+  },
+  "new record!": {
+    it: `nuovo record!`,
+  },
+  "nice!": {
+    it: "bene!",
+  },
+  "missed": {
+    en: n => `missed ${n}`,
+    it: n => `perso ${n}`,
+  },
+};
+
+export function getLanguage() {
+  const browserLang = window.navigator.language.split("-").at(0);
+  return LANGUAGES.includes(browserLang) ? browserLang : "en";
+}
+
+export function getMessage(key: keyof typeof MESSAGES) {
+  return MESSAGES[key][Game.language] ?? key;
+}
+
 export function drawLives() {
   Stage.setActiveLayer("info");
   Stage.clearLayer();
@@ -48,7 +91,7 @@ export function drawLives() {
     pos.incrX(sectionSize);
   }
 
-  drawText(`${Game.stock} basket${Game.stock === 1 ? "" : "s"}`, {
+  drawText(getMessage("score")(Game.stock), {
     pos: new Point(cw * 0.5, 100),
     fontSize: 18,
     fill: Game.stock > Game.prevRecord ? palette.brightYellow : palette.white,
@@ -73,13 +116,13 @@ export function drawGameoverUI(newRecord = false) {
   });
 
   fontSize = 24; // lerp(20, 28, ...);
-  drawText(`you filled ${Game.stock} basket${Game.stock === 1 ? "" : "s"}`, {
+  drawText(getMessage("final-score")(Game.stock), {
     pos: new Point(cw * 0.5, ch * 0.5),
     fontSize,
   });
 
   if (newRecord) {
-    drawText(`new record!`, {
+    drawText(getMessage("new-record"), {
       pos: new Point(cw * 0.5, ch * 0.5 + 28),
       fontSize,
       fill: palette.brightYellow,

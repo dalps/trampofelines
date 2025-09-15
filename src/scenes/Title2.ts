@@ -3,6 +3,7 @@ import { Firework } from "../engine/Firework";
 import { engrave } from "../engine/font";
 import { Stage } from "../engine/Stage";
 import { Tween } from "../engine/tween";
+import { getMessage } from "../engine/ui";
 import { clamp, lerp } from "../utils/MathUtils";
 import { Point } from "../utils/Point";
 import { Clock } from "../utils/TimeUtils";
@@ -83,7 +84,7 @@ export class Title2 {
 
     [
       ["trampo", this.trampoPos, -40],
-      ["felines!", this.felinesPos, 50],
+      [getMessage("felines!"), this.felinesPos, 50],
     ].forEach(([t, pos, dy]: [string, Point, number], i) => {
       const p = new Path2D();
       const { path, length } = engrave(t);
