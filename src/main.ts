@@ -20,11 +20,11 @@ function init() {
  * The game loop
  */
 function draw(time: timestamp) {
+  requestAnimationFrame(draw);
+
   Clock.update(time * 0.01);
   Game.update();
   TweenManager.update();
-
-  requestAnimationFrame(draw);
 }
 
 init();

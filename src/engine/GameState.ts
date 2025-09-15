@@ -121,6 +121,7 @@ export default class Game {
         let newRecord = this.stock > this.prevRecord;
 
         if (newRecord) {
+          this.prevRecord = this.stock;
           localStorage.setItem(RECORD_KEY, `${this.stock}`);
         }
 
