@@ -219,7 +219,7 @@ export class City {
       });
 
       textSize = 24;
-      ctx.font = `${textSize}px Consolas,sans-serif`;
+      ctx.font = `${textSize}px 'Courier New',Consolas,monospace`;
       ctx.textAlign = "left";
 
       billboard(new Point(cw - 120, 350), {
