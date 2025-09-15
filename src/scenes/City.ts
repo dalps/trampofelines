@@ -4,7 +4,7 @@ import Game from "../engine/GameState";
 import { Stage } from "../engine/Stage";
 import { Tube } from "../entities/Tube";
 import {
-  billBoard as billboard,
+  billboard as billboard,
   makeGradient,
   star,
 } from "../utils/CanvasUtils";

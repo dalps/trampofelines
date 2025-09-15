@@ -169,7 +169,7 @@ export function drawSector(
   }
 }
 
-export function billBoard(
+export function billboard(
   pos: Point,
   {
     padding = 5,

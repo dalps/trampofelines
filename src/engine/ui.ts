@@ -1,5 +1,5 @@
 import { YarnBall } from "../entities/YarnBall";
-import { star } from "../utils/CanvasUtils";
+import { billboard, circle, star } from "../utils/CanvasUtils";
 import { lerp } from "../utils/MathUtils";
 import { Point } from "../utils/Point";
 import palette, { hsl, HSLColor } from "./color";
@@ -32,8 +32,29 @@ const MESSAGES = {
   "new record!": {
     it: `nuovo record!`,
   },
+  "help": {
+    en: [
+      `draw trampofelines on the screen`,
+      `to make the yarn balls bounce`,
+      ``,
+      `fill up the baskets to capacity`,
+      ``,
+      `game over if you drop three balls`,
+    ],
+    it: [
+      `disegna trampofelini sullo schermo`,
+      `per far rimbalzare i gomitoli`,
+      ``,
+      `riempi i cestini fino al numero indicato`,
+      ``,
+      `perdi se fai cadere tre gomitoli`,
+    ],
+  },
+  "how to play": {
+    it: "come si gioca",
+  },
   "nice!": {
-    it: "bene!",
+    it: "ottimo!",
   },
   "missed": {
     en: n => `missed ${n}`,
@@ -48,6 +69,39 @@ export function getLanguage() {
 
 export function getMessage(key: keyof typeof MESSAGES) {
   return MESSAGES[key][Game.language] ?? key;
+}
+
+export function drawHelp() {
+  Stage.setActiveLayer("info");
+  const center = new Point(Stage.cw * 0.5, Stage.ch * 0.3);
+  const lines = getMessage("help") as string[];
+  const fontSize = 14;
+  const padding = 5;
+  const size = new Point(
+    Math.min(400, Stage.cw * 0.9),
+    (lines.length + 2) * fontSize
+  );
+
+  billboard(center.sub(size.scale(0.5).addX(padding)), {
+    width: size.x,
+    height: size.y,
+    color1: palette.white,
+    color2: palette.gray,
+    padding,
+    beamLength: 0,
+    content() {
+      lines.forEach((line, i) => {
+        console.log(line);
+        drawText(line, {
+          fontSize,
+          pos: size
+            .scale(0.5)
+            .addY(-lines.length * fontSize * 0.5 + i * fontSize + padding * 2),
+          fill: palette.blueGray,
+        });
+      });
+    },
+  });
 }
 
 export function drawLives() {

@@ -8,7 +8,7 @@ import { drawText } from "./font";
 import Game, { State } from "./GameState";
 import { MyCanvas } from "./MyCanvas";
 import sfx from "./sfx";
-import { drawGameoverUI, drawLives, getMessage } from "./ui";
+import { drawGameoverUI, drawHelp, drawLives, getMessage } from "./ui";
 import { zzfxP } from "./zzfx";
 
 export type LayerName = string;
@@ -84,7 +84,8 @@ export class Stage {
       ["again", () => Game.restart(), PALETTE.coral],
       ["bye", () => Game.title(), PALETTE.blue2],
       ["go!", () => Game.restart(), PALETTE.blue2],
-    ].map(([id, action, color]: [string, () => void, HSLColor]) => {
+      ["how to play", () => drawHelp(), PALETTE.blue3, 20],
+    ].map(([id, action, color, fontSize]: [string, () => void, HSLColor]) => {
       const btn = document.getElementById(id) as HTMLButtonElement;
       const { x: w, y: h } = new Point(200, 48);
 
@@ -95,7 +96,10 @@ export class Stage {
 
       this.setActiveLayer(id);
 
-      drawText(getMessage(id), { pos: new Point(w * 0.5, h * 0.5), fontSize: 24 });
+      drawText(getMessage(id), {
+        pos: new Point(w * 0.5, h * 0.5),
+        fontSize: fontSize ?? 24,
+      });
       btn.appendChild(this.getLayer(id));
       btn.onclick = () => {
         zzfxP(sfx.button);
@@ -146,15 +150,20 @@ export class Stage {
       this.getLayer(layer).setSize(cw, ch);
     });
 
-    if (ch / cw < 0.65) {
-      BUTTONS[0].style.bottom = BUTTONS[1].style.bottom;
-      BUTTONS[0].style.left = `${cw * 0.5 - 220}px`;
-      BUTTONS[1].style.left = `${cw * 0.5 + 20}px`;
-    } else {
-      BUTTONS[0].style.bottom = "30%";
-      BUTTONS[0].style.left = `${cw * 0.5 - 100}px`;
-      BUTTONS[1].style.left = `${cw * 0.5 - 100}px`;
-    }
+    [
+      [0, 1],
+      [2, 3],
+    ].forEach(([idx0, idx1]) => {
+      if (ch / cw < 0.65) {
+        BUTTONS[idx0].style.bottom = BUTTONS[1].style.bottom;
+        BUTTONS[idx0].style.left = `${cw * 0.5 - 220}px`;
+        BUTTONS[idx1].style.left = `${cw * 0.5 + 20}px`;
+      } else {
+        BUTTONS[idx0].style.bottom = "30%";
+        BUTTONS[idx0].style.left = `${cw * 0.5 - 100}px`;
+        BUTTONS[idx1].style.left = `${cw * 0.5 - 100}px`;
+      }
+    });
 
     // Redraw backgrounds
     City.draw();
