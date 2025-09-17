@@ -1,3 +1,4 @@
+import { drawCatFace } from "../entities/Trampofeline";
 import { YarnBall } from "../entities/YarnBall";
 import { billboard, circle, star } from "../utils/CanvasUtils";
 import { lerp } from "../utils/MathUtils";
@@ -91,7 +92,6 @@ export function drawHelp() {
     beamLength: 0,
     content() {
       lines.forEach((line, i) => {
-        console.log(line);
         drawText(line, {
           fontSize,
           pos: size
@@ -182,4 +182,25 @@ export function drawGameoverUI(newRecord = false) {
       fill: palette.brightYellow,
     });
   }
+}
+
+export function drawFavicon() {
+  const originalSize = 50;
+  const size = 50;
+  const scale = size / originalSize;
+  const pos = new Point(size * 0.5, size * 0.625);
+
+  Stage.newOffscreenLayer("cat", size, size);
+  Stage.setActiveLayer("cat");
+  Stage.debugOffscreenLayer("cat");
+  const { ctx, activeLayer } = Stage;
+
+  ctx.translate(pos.x, pos.y);
+  ctx.scale(scale, scale);
+
+  drawCatFace({ drawPaws: false });
+
+  const url = activeLayer.toDataURL("image/png", 0); // can only set quality for image/jpeg
+  console.log(url);
+  console.log(url.length);
 }

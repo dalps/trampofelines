@@ -309,6 +309,8 @@ export function drawCatFace({
 } = {}) {
   const { ctx } = Stage;
 
+  ctx.lineCap = "round";
+
   if (drawPaws) {
     // arms & paws
     ctx.strokeStyle = coatColor;
@@ -425,6 +427,8 @@ export function drawCatFace({
 export function drawCatRear() {
   const { time } = Clock;
   const { ctx } = Stage;
+
+  ctx.lineCap = "round";
 
   // butt
   ctx.fillStyle = coatColor.toString();
