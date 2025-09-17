@@ -263,7 +263,7 @@ export class City {
         height: size,
         right: true,
         content() {
-          ctx.drawImage(Stage.getLayer("catFace"), 15, -15);
+          ctx.drawImage(Stage.getCanvas("catFace"), 15, -15);
           ctx.fillStyle = palette.blue3;
           ctx.fillText(text, 40, 80);
         },

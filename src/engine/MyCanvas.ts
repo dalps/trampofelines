@@ -1,13 +1,30 @@
 import { Point } from "../utils/Point";
 
-export class MyCanvas extends HTMLCanvasElement {
-  private _ctx: CanvasRenderingContext2D;
+export class MyCanvas {
+  public canvas: HTMLCanvasElement;
+  public ctx: CanvasRenderingContext2D;
   private _rect: DOMRect;
 
-  constructor(public name: string, public width = 480, public height = 480) {
-    super();
-
+  constructor(public name: string, width = 480, height = 480) {
+    this.canvas = document.createElement("canvas");
+    this.ctx = this.canvas.getContext("2d");
     this.setSize(width, height);
+  }
+
+  get width() {
+    return this.canvas.width;
+  }
+
+  set width(w: number) {
+    this.canvas.width = w;
+  }
+
+  get height() {
+    return this.canvas.height;
+  }
+
+  set height(h: number) {
+    this.canvas.height = h;
   }
 
   setSize(w: number, h: number) {
@@ -15,14 +32,8 @@ export class MyCanvas extends HTMLCanvasElement {
     this.height = h;
   }
 
-  get ctx(): CanvasRenderingContext2D {
-    if (!this._ctx) this._ctx = this.getContext("2d")!;
-
-    return this._ctx;
-  }
-
   get rect(): DOMRect {
-    return this._rect ?? (this._rect = this.getBoundingClientRect());
+    return this._rect ?? (this._rect = this.canvas.getBoundingClientRect());
   }
 
   resolveMousePosition(e: MouseEvent): Point {
@@ -37,7 +48,3 @@ export class MyCanvas extends HTMLCanvasElement {
     return new Point(e.clientX - this.rect.x, e.clientY - this.rect.y);
   }
 }
-
-customElements.define("my-canvas", MyCanvas, {
-  extends: "canvas",
-});

@@ -112,7 +112,7 @@ export class Tube {
     ctx.save();
     ctx.translate(this.position.x, this.position.y);
     this.right && ctx.transform(-1, 0, 0, 1, 0, 0);
-    ctx.drawImage(Stage.getLayer("tube"), 0, 0);
+    ctx.drawImage(Stage.getCanvas("tube"), 0, 0);
     ctx.restore();
   }
 

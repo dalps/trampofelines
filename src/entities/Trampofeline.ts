@@ -37,14 +37,14 @@ const { nightBlue: coatColor, blueGray: detailColor } = palette;
 
 export default class TrampofelineManager extends EntityManager<Trampofeline> {
   enableUI() {
-    Stage.stage.appendChild(Stage.getLayer("ui"));
+    Stage.stage.appendChild(Stage.getCanvas("ui"));
   }
 
   disableUI() {
     p1 = p2 = undefined;
     soundInterval && clearInterval(soundInterval);
 
-    const ui = Stage.getLayer("ui");
+    const ui = Stage.getCanvas("ui");
     if (ui.parentElement) {
       Stage.stage.removeChild(ui);
     }
@@ -53,7 +53,8 @@ export default class TrampofelineManager extends EntityManager<Trampofeline> {
   constructor() {
     super();
 
-    const ui = Stage.getLayer("ui");
+    const uiLayer = Stage.getLayer("ui");
+    const ui = Stage.getCanvas("ui");
 
     ui.addEventListener("mousedown", handleMouseDown, false);
     ui.addEventListener("mousemove", handleMouseMove, false);
@@ -64,7 +65,7 @@ export default class TrampofelineManager extends EntityManager<Trampofeline> {
     ui.addEventListener("touchend", handleTouchEnd, false);
 
     function handleTouchStart(e: TouchEvent) {
-      p1 = ui.resolveTouchPosition(e.touches[0]);
+      p1 = uiLayer.resolveTouchPosition(e.touches[0]);
       mouseDown = true;
     }
 
@@ -78,7 +79,7 @@ export default class TrampofelineManager extends EntityManager<Trampofeline> {
 
       drawing = true;
       distance = p1 && p2 ? p1.sub(p2).abs() : 0;
-      p2 = ui.resolveTouchPosition(e.touches[0]);
+      p2 = uiLayer.resolveTouchPosition(e.touches[0]);
     }
 
     function handleTouchEnd(e: TouchEvent) {
@@ -90,7 +91,7 @@ export default class TrampofelineManager extends EntityManager<Trampofeline> {
     function handleMouseDown(e: MouseEvent) {
       e.preventDefault();
 
-      p1 = ui.resolveMousePosition(e);
+      p1 = uiLayer.resolveMousePosition(e);
 
       Stage.setActiveLayer("game");
 
@@ -117,7 +118,7 @@ export default class TrampofelineManager extends EntityManager<Trampofeline> {
 
       drawing = true;
       distance = p1 && p2 ? p1.sub(p2).abs() : 0;
-      p2 = ui.resolveMousePosition(e);
+      p2 = uiLayer.resolveMousePosition(e);
     }
 
     function handleMouseUp(e: MouseEvent) {
@@ -342,13 +343,14 @@ export function drawCatFace({
   const earY = -20;
   const earHeight = 10;
 
-  ctx.lineWidth = 2;
+  ctx.lineWidth = 3;
   ctx.fillStyle = coatColor;
   ctx.strokeStyle = detailColor;
   ctx.beginPath();
   ctx.moveTo(20, -20);
   // ctx.quadraticCurveTo(0, 50, -20, -20);
   ctx.bezierCurveTo(40, 30, -40, 30, -20, -20);
+  ctx.closePath();
 
   // ears
   [innerEarX, -innerEarX].forEach((x, i) => {
@@ -360,6 +362,7 @@ export function drawCatFace({
   ctx.fill();
 
   // stripes
+  ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.moveTo(0, -20);
   ctx.lineTo(0, -15);

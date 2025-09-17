@@ -1,7 +1,6 @@
 import { Basket } from "../entities/Basket";
-import { drawCatFace, drawCatRear } from "../entities/Trampofeline";
+import { drawCatFace } from "../entities/Trampofeline";
 import { City } from "../scenes/City";
-import { Title2 } from "../scenes/Title2";
 import { Point } from "../utils/Point";
 import PALETTE, { HSLColor } from "./color";
 import { drawText } from "./font";
@@ -33,6 +32,10 @@ export class Stage {
 
   public static getLayer(layer: LayerName): MyCanvas {
     return this._layers.get(layer);
+  }
+
+  public static getCanvas(layer: LayerName): HTMLCanvasElement {
+    return this.getLayer(layer).canvas;
   }
 
   /**
@@ -100,7 +103,7 @@ export class Stage {
         pos: new Point(w * 0.5, h * 0.5),
         fontSize: fontSize ?? 24,
       });
-      btn.appendChild(this.getLayer(id));
+      btn.appendChild(this.getCanvas(id));
       btn.onclick = () => {
         zzfxP(sfx.button);
         action();
@@ -112,12 +115,13 @@ export class Stage {
     // Create the game's layers and add them to the DOM
     CANVASES.forEach((name, i) => {
       const layer = new MyCanvas(name);
+      const { canvas } = layer;
 
-      layer.id = name;
-      layer.style.zIndex = `${i}`;
+      canvas.id = name;
+      canvas.style.zIndex = `${i}`;
 
       this._layers.set(name, layer);
-      this.stage.appendChild(layer);
+      this.stage.appendChild(canvas);
     });
 
     const { blue0, blue1, blue3 } = PALETTE;
@@ -181,10 +185,10 @@ export class Stage {
     }
   }
 
-  // static debugOffscreenLayer(name: string) {
-  //   const canvas = Stage.getLayer(name);
-  //   Stage.stage.appendChild(canvas);
-  //   canvas.style.border = "1px solid blue";
-  //   canvas.style.zIndex = "9999";
-  // }
+  static debugOffscreenLayer(name: string) {
+    const { canvas } = Stage.getCanvas(name);
+    Stage.stage.appendChild(canvas);
+    canvas.style.border = "1px solid blue";
+    canvas.style.zIndex = "9999";
+  }
 }

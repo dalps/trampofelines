@@ -144,8 +144,8 @@ export class Basket extends DynamicBody {
       Game.stock += 1;
       CollisionManager.unregisterBody(this);
 
-      zzfxP(sfx.filled)
-      zzfxP(sfx.score2)
+      zzfxP(sfx.filled);
+      zzfxP(sfx.score2);
 
       // gfx
       new Firework(this.position, {
@@ -173,7 +173,7 @@ export class Basket extends DynamicBody {
     ctx.save();
     ctx.translate(this.position.x, this.position.y);
     ctx.rotate(c.dir);
-    ctx.drawImage(Stage.getLayer(this.id), -100, -90);
+    ctx.drawImage(Stage.getCanvas(this.id), -100, -90);
     ctx.restore();
   }
 
@@ -213,7 +213,7 @@ export class Basket extends DynamicBody {
       `M21.9-0.9C21.9-0.9 25.1-50.2 0-50.2C-25.1-50.2-21.9-25.1-21.9-25.1L-28.2-25.1C-28.2-25.1-31.3-56.4 0-56.4C31.3-56.4 28.2-0.9 28.2-0.9Z`
     );
 
-    const pattern = ctx.createPattern(Stage.getLayer("pattern"), "repeat");
+    const pattern = ctx.createPattern(Stage.getCanvas("pattern"), "repeat");
 
     ctx.lineWidth = 5;
     ctx.strokeStyle = palette.basket2;
