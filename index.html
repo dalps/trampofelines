@@ -17,6 +17,35 @@
         padding: 0;
         height: 100%;
         background: hsla(212, 94%, 7%, 1);
+        font: bold 1em "Courier New", Courier, monospace;
+        color: white;
+        text-align: center;
+      }
+
+      body,
+      button {
+        cursor: url(./cursors/60/arrow.png), pointer;
+      }
+
+      body:active,
+      button:active {
+        cursor: url(./cursors/60/arrowdown.png), pointer;
+      }
+
+      canvas#ui {
+        cursor: url(./cursors/60/markerblue.png), pointer;
+      }
+
+      #stage {
+        width: 100vw;
+        height: 100svh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      #loading {
+        margin: auto;
       }
 
       canvas {
@@ -29,11 +58,6 @@
         image-rendering: pixelated;
       }
 
-      #stage {
-        width: 100vw;
-        height: 100svh;
-      }
-
       button {
         z-index: 4;
         position: absolute;
@@ -42,7 +66,6 @@
         outline: none;
         border: none;
         border-radius: 5px;
-        cursor: pointer;
         animation: a1 2s ease-in-out alternate infinite;
 
         &:hover {
@@ -72,12 +95,12 @@
   </head>
   <body>
     <div id="stage">
-      Loading...
-      <div id="title">
+      <div id="loading">Loading...</div>
+      <div id="title" style="display: none">
         <button id="go!"></button>
         <button id="how to play"></button>
       </div>
-      <div id="gameover">
+      <div id="gameover" style="display: none">
         <button id="again"></button>
         <button id="bye"></button>
       </div>

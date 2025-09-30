@@ -3,3 +3,6 @@ tmp
 game
 pack.zip
 dist
+
+# Local Netlify folder
+.netlify

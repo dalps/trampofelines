@@ -5,9 +5,9 @@ serve:
     live-server dist
 
 watch:
-    esbuild --bundle --loader:.html=copy --entry-names='[name]' --outdir=dist --format=esm --watch=forever --sourcemap index.html src/main.ts
+    esbuild --bundle --loader:.html=copy --loader:.png=copy --entry-names='[name]' --outdir=dist --format=esm --watch=forever --sourcemap index.html src/main.ts
 
-build: minify-html
+build: cursors minify-html
     esbuild --bundle --minify --entry-names='[name]' --outdir=dist --format=esm --sourcemap src/main.ts
 
 closure: build
@@ -15,10 +15,10 @@ closure: build
     google-closure-compiler --js=dist/main.js -W QUIET -O ADVANCED --js_output_file=tmp/main.js
     cp tmp/main.js dist
 
-zip: clean build
+zip: clean cursors build
     mkdir -p tmp
     roadroller dist/main.js -o tmp/main.js
-    advzip pack.zip -a tmp/main.js dist/index.html
+    advzip pack.zip -a tmp/main.js dist/index.html cursors
     stat pack.zip
 
 minify-html:
@@ -34,3 +34,11 @@ clean:
 
 linecount:
     find src/ -name '*.ts' | xargs wc -lc
+
+deploy:
+    unzip pack.zip -d game
+    netlify deploy --no-build --dir game --prod
+
+cursors:
+    mkdir -p dist/cursors
+    cp -r ./cursors/ dist/
