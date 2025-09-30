@@ -174,7 +174,7 @@ export default class TrampofelineManager extends EntityManager<Trampofeline> {
   testPlacement(): boolean {
     valid =
       distance >= MIN_CAT_LENGTH &&
-      this.count < MAX_CATS &&
+      // this.count < MAX_CATS &&
       this.list.filter(({ joints, dead }) => {
         if (dead) return false;
 
